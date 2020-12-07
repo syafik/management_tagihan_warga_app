@@ -1,0 +1,56 @@
+<%= form_with(model: user_contribution, local: true) do |form| %>
+   <%= errors_for(user_contribution) %>
+  <div class="form-group">
+    <%= form.label :address_id %>
+    <%= form.select :address_id, Address.includes(:main_user).select('id, block_address').collect {|p| [ "#{p.main_user.try(:name).try(:upcase)} - #{p.block_address.try(:upcase)}", p.id ] }, {include_blank: true}, {class: 'select-field-js', style: 'width:100%'}  %>
+  </div>
+  <div class="form-group">
+    <%= form.label :month %>
+    <%= form.select :month, options_for_select(UserContribution::MONTHNAMES, user_contribution.month), {}, {class: 'select-field-js', style: 'width:100%'}  %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :year %>
+    <%= form.select :year, options_for_select((2020..2050).to_a, user_contribution.year), {},{class: 'select-field-js', style: 'width:100%'}  %>
+  </div>
+
+   <div class="form-group">
+    <%= form.label :payment_type %>
+    <%= form.select :payment_type, options_for_select([["CASH", 1],["TRANSFER", 2]], user_contribution.payment_type), {},{class: 'select-field-js', style: 'width:100%'}  %>
+  </div>
+
+
+  <div class="form-group">
+    <%= form.label :contribution %>
+    <%= form.text_field :contribution, class: 'form-control'%>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :pay_at %>
+    <%= form.text_field :pay_at, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :receiver_id %>
+    <%= form.select :receiver_id, User.select('id, name').where(role: 2).collect {|p| [ p.name.try(:upcase), p.id ] }, {include_blank: true}, {class: 'select-field-js', style: 'width:100%'}  %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :description %>
+    <%= form.text_area :description, class: 'form-control' %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit 'Submit', class: 'btn btn-primary mr-2' %>
+    <%= link_to 'Cancel', user_contributions_path, class: 'btn btn-light' %>
+  </div>
+<% end %>
+
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    if ($(".select-field-js").length) {
+      $(".select-field-js").select2();
+    }
+  })
+</script>

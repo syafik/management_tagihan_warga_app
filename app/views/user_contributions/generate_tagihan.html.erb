@@ -1,0 +1,22 @@
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Generate Data Tagihan</h4>
+        <p class="card-description"> Fill the form below. </p>
+        <%= form_tag  do_generate_data_user_contributions_path do  %>
+          <div class="form-group">
+            <%= label_tag :bulan %>
+            <%= select_tag :month, options_for_select(UserContribution::MONTHNAMES, @month_selected), class: 'form-control mb-2 mr-sm-2' %>
+          </div>
+          <div class="form-group">
+            <%= label_tag :tahun %>
+            <%= select_tag :year, options_for_select((2020..2050).to_a, @year_selected), class: 'form-control mb-2 mr-sm-2' %>
+          </div>
+          <%= submit_tag "Generate", class: 'btn btn-primary mr-2' %>
+          <%= link_to 'Cancel', user_contributions_path, class: 'btn btn-light' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

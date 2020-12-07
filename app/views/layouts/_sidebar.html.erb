@@ -1,0 +1,57 @@
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+  <ul class="nav">
+    <li class="nav-item nav-profile">
+      <a href="<%= users_path(current_user) %>" class="nav-link">
+        <div class="text-wrapper">
+          <p class="profile-name"><%= current_user.email %></p>
+          <p class="designation">Administrator</p>
+        </div>
+      </a>
+    </li>
+    <li class="nav-item nav-category">
+      <span class="nav-link">Applikasi</span>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="<%= addresses_path %>">
+        <span class="menu-title">Daftar Rumah</span>
+        <i class="icon-ghost menu-icon"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="<%= users_path %>">
+        <span class="menu-title">Daftar Warga</span>
+        <i class="icon-ghost menu-icon"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="<%= user_contributions_path %>">
+        <span class="menu-title">Data Iuran Warga</span>
+        <i class="icon-ghost menu-icon"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="<%= cash_transactions_path %>">
+        <span class="menu-title">Daftar Transaksi</span>
+        <i class="icon-ghost menu-icon"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="<%= debts_path %>">
+        <span class="menu-title">Daftar Hutang Piutang</span>
+        <i class="icon-ghost menu-icon"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="<%= cash_flows_path %>">
+        <span class="menu-title">Daftar Cash Flow</span>
+        <i class="icon-ghost menu-icon"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="<%= installments_path %>">
+        <span class="menu-title">Daftar Cicilan RT</span>
+        <i class="icon-ghost menu-icon"></i>
+      </a>
+    </li>
+  </ul>
+</nav>

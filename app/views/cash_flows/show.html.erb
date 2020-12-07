@@ -1,0 +1,49 @@
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-sm-flex align-items-center mb-4">
+          <h4 class="card-title mb-sm-0">Cash Flow Detail</h4>
+        </div>
+          <div class="table-responsive rounded p-1">
+            <table class="table">
+              <thead></thead>
+              <tbody>
+              <tr>
+                <td class="font-weight-bold">ID</td>
+                <td><%= @cash_flow.id %></td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Month</td>
+                <td><%= UserContribution::MONTHNAMES.invert[@cash_flow.month] %></td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Year</td>
+                <td><%= @cash_flow.year %></td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Cash In</td>
+                <td><%= number_to_currency(@cash_flow.cash_in, unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Cash Out</td>
+                <td><%= number_to_currency(@cash_flow.cash_out, unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Total</td>
+                <td><%= number_to_currency(@cash_flow.total, unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <%= link_to 'Edit', edit_cash_flow_path(@cash_flow), class: 'btn btn-primary mr-2' if current_user.role == 2 %>
+                  <%= link_to 'Back', cash_flows_path, class: 'btn btn-light'  %>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+

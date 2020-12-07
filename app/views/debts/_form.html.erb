@@ -1,0 +1,39 @@
+<%= form_with(model: debt, local: true) do |form| %>
+  <%= errors_for(debt) %>
+
+  <div class="form-group">
+    <%= form.label :user_id %>
+    <%= form.select :user_id, User.includes(:address).select('id, name, address_id').collect {|p| [ "#{p.try(:address).try(:block_address).try(:upcase)}-#{p.name.try(:upcase)}", p.id ] }, {include_blank: true}, {class: 'select-field-js', style: 'width:100%'} %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :value %>
+    <%= form.text_field :value, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :description %>
+    <%= form.text_area :description, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :debt_date %>
+    <%= form.text_field :debt_date , class: 'form-control'%>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :debt_type %>
+    <%= form.select :debt_type ,options_for_select(Debt::TYPE), {}, {class: 'select-field-js', style: 'width:100%'}%>
+  </div>
+
+  <%= form.submit 'Submit', class: 'btn btn-primary mr-2' %>
+  <%= link_to 'Cancel', debts_path, class: 'btn btn-light' %>
+<% end %>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    if ($(".select-field-js").length) {
+      $(".select-field-js").select2();
+    }
+  })
+</script>

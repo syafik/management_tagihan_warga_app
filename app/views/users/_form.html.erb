@@ -1,0 +1,61 @@
+<%= form_for(user) do |f| %>
+  <%= errors_for(user) %>
+  <div class="form-group">
+    <%= f.label :email %>
+    <%= f.email_field :email, autofocus: true, class: 'form-control', placeholder: 'email address' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :name %>
+    <%= f.text_field :name, class: 'form-control', placeholder: 'nama' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :phone_number %>
+    <%= f.text_field :phone_number, class: 'form-control', placeholder: 'no tlp' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :role %>
+     <%= f.select :role, [["Warga", 1], ["Admin", 2], ["Sekuriti", 3]], {}, {id: 'role-pick', class: 'select-field-js', style: 'width:100%'}  %>
+  </div>
+
+  <div id="address-box" class="form-group <%= user.is_security? ? "d-none": ""%>">
+    <%= f.label :block %>
+    <%= f.select :address_id, Address.select('id, block_address').collect {|p| [ p.block_address.try(:upcase), p.id ] }, {include_blank: true}, {class: 'select-field-js', style: 'width:100%'}  %>
+  </div>
+  
+  <div id="pic-box" class="form-group <%= user.is_security? ? "": "d-none"%>">
+    <%= f.label :pic_blok %>
+    <%= f.text_field :pic_blok, class: 'form-control', placeholder: 'pic retribution'  %>
+  </div>
+
+  <% if user.new_record? %>
+    <div class="form-group">
+      <%= f.label :password %>
+      <%= f.password_field :password, class: 'form-control', placeholder: 'password' %>
+    </div>
+  <% end %>
+
+  <%= f.submit 'Submit', class: 'btn btn-primary mr-2' %>
+  <%= link_to 'Cancel', users_path, class: 'btn btn-light' %>
+<% end %>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    if ($(".select-field-js").length) {
+      $(".select-field-js").select2();
+    }
+    $('#role-pick').change(function(){
+      if($(this).val() == 3){
+        $('#address-box').addClass('d-none');  
+        $('#user_address_id').val('');
+        $('#user_address_id').trigger('change'); 
+        $('#pic-box').removeClass('d-none');
+        $('#user_pic_blok').val('')
+      }else{
+        $('#address-box').removeClass('d-none');
+      }
+    })
+  })
+</script>

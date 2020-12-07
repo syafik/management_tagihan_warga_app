@@ -1,0 +1,33 @@
+<div class="table-responsive border rounded p-1">
+  <table class="table table-hover" id="table-content">
+    <thead>
+    <tr>
+      <th class="font-weight-bold">No</th>
+      <th class="font-weight-bold"><%= sort_link(@q, :block_address, 'Blok',{}, {remote: true, class: 'ajax-request'}) %></th>
+      <th class="font-weight-bold"><%= sort_link(@q, :contribution, 'Iuran',{}, {remote: true, class: 'ajax-request'}) %></th>
+      <th class="font-weight-bold"><%= sort_link(@q, :arrears, 'Tunggakan',{}, {remote: true, class: 'ajax-request'}) %></th>
+      <th class="font-weight-bold">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% cur_page = @addresses.current_page %>
+    <% @addresses.each_with_index do |address, i| %>
+      <tr>
+        <td><%= (i + 1) + ((cur_page - 1)*Kaminari.config.default_per_page) %> </td>
+        <td><%= address.block_address.upcase %></td>
+        <td><%= number_to_currency(address.contribution, unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+        <td><%= address.arrears %></td>
+        <td>
+          <%= link_to 'Lihat', address, class: 'btn-sm btn-success' %>
+          <%= link_to 'Ubah', edit_address_path(address), class: 'btn-sm btn-info'  if current_user.is_admin? %>
+          <%#= link_to 'Destroy', user, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn-sm btn-danger'%>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+<div class="d-flex mt-4 flex-wrap">
+  <p class="text-muted"><%= page_entries_info @addresses, entry_name: 'item' %></p>
+  <%= paginate @addresses, remote: true %>
+</div>

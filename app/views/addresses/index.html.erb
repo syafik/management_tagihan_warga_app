@@ -1,0 +1,23 @@
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-sm-flex align-items-center mb-4">
+          <h4 class="card-title mb-sm-0">Daftar Rumah</h4>
+          <% if current_user.is_admin? %>
+            <a href="<%= new_address_path %>" class="btn btn-primary ml-auto mb-3 mb-sm-0"> Buat Rumah Baru</a>
+          <% end %>
+        </div>
+        <%= render partial: 'shared/search_form',
+                   locals: {
+                       url: search_addresses_path,
+                       attributes: Address.ransackable_attributes,
+                       predicates: Address.ransack_predicates
+                   } %>
+        <div id="content-data">
+          <%= render partial: 'data' %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

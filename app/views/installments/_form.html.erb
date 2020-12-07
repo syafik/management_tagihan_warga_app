@@ -1,0 +1,28 @@
+<%= form_for(installment) do |f| %>
+  <%= errors_for(installment) %>
+  <div class="form-group">
+    <%= f.label :description %>
+    <%= f.text_field :description, class: 'form-control'  %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :parent %><p><i> **Isi kosong untuk membuat cicilan baru, dan pilih parent untuk bayar.</i><p>
+    <%= f.select :parent_id, Installment.select('id, description').where("parent_id IS NULL").collect {|p| [ p.description.try(:upcase), p.id ] }, {include_blank: true},{class: 'select-field-js', style: 'width:100%'}  %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :value %>
+    <%= f.text_field :value, class: 'form-control' %>
+  </div>
+
+  <%= f.submit 'Submit', class: 'btn btn-primary mr-2' %>
+  <%= link_to 'Cancel', installments_path, class: 'btn btn-light' %>
+<% end %>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    if ($(".select-field-js").length) {
+      $(".select-field-js").select2();
+    }
+  })
+</script>

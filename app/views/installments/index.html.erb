@@ -1,0 +1,19 @@
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-sm-flex align-items-center mb-4">
+          <h4 class="card-title mb-sm-0">Daftar Cicilan RT</h4>
+          <% if current_user.is_admin? %>
+            <a href="<%= new_installment_path %>" class="btn btn-primary ml-auto mb-3 mb-sm-0"> Buat Cicilan Baru/Bayar Cicilan</a>
+          <% end %>
+        </div>
+        <%= render partial: 'search_form' %>
+        <div id="content-data">
+          <%= render partial: 'data' %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

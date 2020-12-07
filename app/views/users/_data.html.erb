@@ -1,0 +1,37 @@
+<div class="table-responsive border rounded p-1">
+  <table class="table table-hover" id="table-content">
+    <thead>
+    <tr>
+      <th class="font-weight-bold">No</th>
+      <th class="font-weight-bold"><%= sort_link(@q, :email, 'Email',{}, {remote: true, class: 'ajax-request'}) %></th>
+      <th class="font-weight-bold"><%= sort_link(@q, :name, 'Name',{}, {remote: true, class: 'ajax-request'}) %></th>
+      <th class="font-weight-bold"><%= sort_link(@q, :address_block, 'Blok',{}, {remote: true, class: 'ajax-request'}) %></th>
+      <th class="font-weight-bold"><%= sort_link(@q, :role, 'Role',{}, {remote: true, class: 'ajax-request'}) %></th>
+      <th class="font-weight-bold">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% cur_page = @users.current_page %>
+    <% @users.each_with_index do |user, i| %>
+      <tr>
+        <td><%= (i + 1) + ((cur_page - 1)*Kaminari.config.default_per_page) %> </td>
+        <td><%= user.email %></td>
+        <td><%= user.name %></td>
+        <td><%= user.try(:address).try(:block_address).try(:upcase) %></td>
+        <td><%= user.try(:role_name) %></td>
+        <td>
+          <%= link_to 'Lihat', user, class: 'btn-sm btn-success' %>
+          <% if current_user.is_admin? %>
+            <%= link_to 'Ubah', edit_user_path(user), class: 'btn-sm btn-info' %>
+          <% end %>
+          <%#= link_to 'Destroy', user, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn-sm btn-danger'%>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+<div class="d-flex mt-4 flex-wrap">
+  <p class="text-muted"><%= page_entries_info @users, entry_name: 'item' %></p>
+  <%= paginate @users, remote: true %>
+</div>

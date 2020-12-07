@@ -1,0 +1,2 @@
+class UserDebt < ApplicationRecord
+end

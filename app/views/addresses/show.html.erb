@@ -1,0 +1,41 @@
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-sm-flex align-items-center mb-4">
+          <h4 class="card-title mb-sm-0">Address Detail</h4>
+        </div>
+          <div class="table-responsive rounded p-1">
+            <table class="table">
+              <thead></thead>
+              <tbody>
+              <tr>
+                <td class="font-weight-bold">ID</td>
+                <td><%= @address.id %></td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Block</td>
+                <td><%= @address.block_address.upcase %></td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Iuran</td>
+                <td><%= number_to_currency(@address.contribution, unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+              </tr>
+                <tr>
+                  <td class="font-weight-bold">Tunggakan</td>
+                  <td><%= @address.try(:arrears) %></td>
+                </tr>
+              <tr>
+                <td colspan="2">
+                  <%= link_to 'Edit', edit_address_path(@address), class: 'btn btn-primary mr-2' if current_user.role == 2 %>
+                  <%= link_to 'Back', addresses_path, class: 'btn btn-light'  %>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,50 @@
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title mb-sm-0 text-center">Komplek Puri Ayana Gempol</h4>
+        <h4 class="card-title mb-sm-0 text-center">Laporan Transaksi per <%= UserContribution::MONTHNAMES.invert[month.to_i] %>, <%= year %></span></h4>
+        <br />
+        <div id="content-data">
+          <div class="table-responsive border rounded p-1">
+            <table class="table table-bordered table-striped" id="table-content">
+              <thead>
+                <tr>
+                  <th><b>No</b></th>
+                  <th><b>Deskripsi</b></th>
+                  <th><b>Debit</b></th>
+                  <th><b>Kredit</b></th>
+                </tr>
+              </thead>
+              <tbody>
+              <% report_items.each_with_index do |ri, i| %>
+                <tr>
+                <td><%= i+1 %></td>
+                <td><%= ri[1] %></td>
+                <% if ri[0] == 'cash_in' %>
+                  <td align='right'><%= number_to_currency(ri[2], unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+                  <td></td>
+                <% else %>
+                  <td></td>
+                  <td align='right'><%= number_to_currency(ri[2], unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+                <% end %>
+                </tr>
+              <% end %>
+              <tr>
+                <td colspan="2"  align='right'><b>TOTAL</b></td>
+                <td align='right'><b><%= number_to_currency(debit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
+                <td  align='right'><b><%= number_to_currency(credit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
+              </tr>
+              <tr>
+                <td colspan="2"  align='right'><b>SISA</b></td>
+                <td colspan="2" align='right' style='color:<%=  debit_total-credit_total >= 0 ? 'black' : 'red' %>'><b><%= number_to_currency(debit_total-credit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,24 @@
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <%= form_tag(search_cash_transactions_path, remote:true, class: 'form-inline ajax-form-request') do |f| %>
+          <%= label_tag :bulan, nil, class: 'mb-2 mr-sm-2' %>
+          <%= select_tag :month_eq, options_for_select(UserContribution::MONTHNAMES, @month_selected), class: 'form-control mb-2 mr-sm-2' %>
+          <%= label_tag :tahun, nil, class: 'mb-2 mr-sm-2' %>
+          <%= select_tag :year_eq, options_for_select((2020..2050).to_a, @year_selected), class: 'form-control mb-2 mr-sm-2' %>
+          <%= label_tag :penanggung_jawab, nil, class: 'mb-2 mr-sm-2' %>
+          <%= select_tag :pic_id_eq, options_for_select(User.select('id, name').where(role: [2,3]).collect {|p| [ p.name.try(:upcase), p.id ] }), include_blank: "All", class: 'form-control mb-2 mr-sm-2' %>
+          <%= submit_tag "Search", class: 'form-control btn btn-primary mb-2 mr-sm-2' %>
+        <% end %>
+        <br />
+        <h4 class="card-title mb-sm-0 text-center">Daftar Transaksi <span id='month-year-selected'><%= UserContribution::MONTHNAMES.invert[@month_selected] %>, <%= @year_selected %></span></h4>
+        <br />
+        <div id="content-data">
+          <%= render partial: 'data' %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

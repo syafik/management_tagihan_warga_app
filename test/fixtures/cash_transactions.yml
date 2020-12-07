@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  transaction_date: 2020-11-27 15:12:10
+  transaction_type: 1
+  total: 1.5
+  month: 1
+  year: 1
+  transaction_group: 1
+
+two:
+  transaction_date: 2020-11-27 15:12:10
+  transaction_type: 1
+  total: 1.5
+  month: 1
+  year: 1
+  transaction_group: 1

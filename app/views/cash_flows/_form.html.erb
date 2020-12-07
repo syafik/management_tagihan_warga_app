@@ -1,0 +1,36 @@
+<%= form_for(cash_flow) do |f| %>
+  <%= errors_for(cash_flow) %>
+  <div class="form-group">
+    <%= f.label :month %>
+    <%= f.select :month, options_for_select(UserContribution::MONTHNAMES), {}, {class: 'select-field-js', style: 'width:100%'}  %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :year %>
+    <%= f.select :year, options_for_select((2020..2050).to_a), {},{class: 'select-field-js', style: 'width:100%'}  %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :cash_in %>
+    <%= f.text_field :cash_in, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :cash_out %>
+    <%= f.text_field :cash_out, class: 'form-control' %>
+  </div>
+
+
+  <%= f.submit 'Submit', class: 'btn btn-primary mr-2' %>
+  <%= link_to 'Cancel', cash_flows_path, class: 'btn btn-light' %>
+<% end %>
+
+
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    if ($(".select-field-js").length) {
+      $(".select-field-js").select2();
+    }
+  })
+</script>

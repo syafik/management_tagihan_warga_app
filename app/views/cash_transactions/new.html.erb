@@ -1,0 +1,47 @@
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Buat Data Transaksi Baru</h4>
+        <p class="card-description"> Fill the form below. </p>
+        <%= form_tag cash_transactions_path do  %>
+          <%= errors_for(@ct) %>
+          <div class="form-group">
+            <%= label_tag :bulan %>
+            <%= select_tag :month, options_for_select(UserContribution::MONTHNAMES, @month_selected), class: 'form-control mb-2 mr-sm-2' %>
+          </div>
+          <div class="form-group">
+            <%= label_tag :tahun %>
+            <%= select_tag :year, options_for_select((2020..2050).to_a, @year_selected), class: 'form-control mb-2 mr-sm-2' %>
+          </div>
+          <div class="form-group">
+            <%= label_tag :jenis_transaksi %>
+            <%= select_tag :transaction_type, options_for_select(CashTransaction::TYPE, @ct.transaction_type), class: 'form-control mb-2 mr-sm-2' %>
+          </div>
+          <div class="form-group">
+            <%= label_tag :group_transaction %>
+            <%= select_tag :transaction_group, options_for_select(CashTransaction::GROUP, @ct.transaction_group), class: 'form-control mb-2 mr-sm-2' %>
+          </div>
+          <div class="form-group">
+            <%= label_tag :keterangan %>
+            <%= text_field_tag :description, @ct.description, class: 'form-control mb-2 mr-sm-2' %>
+          </div>
+          <div class="form-group">
+            <%= label_tag :total %>
+            <%= text_field_tag :total, @ct.total, class: 'form-control mb-2 mr-sm-2' %>
+          </div>
+          <div class="form-group">
+            <%= label_tag :tanggal_transaksi %>
+            <%= text_field_tag :transaction_date, @ct.transaction_date, class: 'form-control mb-2 mr-sm-2' %>
+          </div>
+          <div class="form-group">
+            <%= label_tag :penanggung_jawab %>
+            <%= select_tag :pic_id, options_for_select(User.where(:role => [2,3]).collect {|p| [ p.name.try(:upcase), p.id ] }, @ct.pic_id), class: 'form-control mb-2 mr-sm-2' %>
+          </div>
+          <%= submit_tag "Simpan", class: 'btn btn-primary mr-2' %>
+          <%= link_to 'Cancel', users_path, class: 'btn btn-light' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

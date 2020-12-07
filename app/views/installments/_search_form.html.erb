@@ -1,0 +1,5 @@
+<%= form_tag(search_installments_path, remote:true, class: 'form-inline ajax-form-request') do |f| %>
+  <%= label_tag :description, nil, class: 'mb-2 mr-sm-2' %>
+  <%= text_field :description_eq, '', class: 'form-control mb-2 mr-sm-2' %>
+  <%= submit_tag "Search", class: 'form-control btn btn-primary mb-2 mr-sm-2' %>
+<% end %>

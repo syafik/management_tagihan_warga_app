@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 1
+  year: 1
+  month: 1
+  contribution: 1.5
+  pay_at: 2020-04-12 17:29:18
+  receiver_id: 1
+  description: MyText
+
+two:
+  user_id: 1
+  year: 1
+  month: 1
+  contribution: 1.5
+  pay_at: 2020-04-12 17:29:18
+  receiver_id: 1
+  description: MyText

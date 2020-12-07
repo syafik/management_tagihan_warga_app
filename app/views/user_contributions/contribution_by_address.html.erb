@@ -1,0 +1,90 @@
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-sm-flex align-items-center mb-4">
+          <h4 class="card-title mb-sm-0">Address Contribution Detail</h4>
+        </div>
+        <div class="table-responsive rounded p-1">
+          <table class="table">
+            <thead></thead>
+            <tbody>
+            <tr>
+              <td class="font-weight-bold">ID</td>
+              <td><%= @address.id %></td>
+            </tr>
+            <tr>
+              <td class="font-weight-bold">Block</td>
+              <td><%= @address.block_address.upcase %></td>
+            </tr>
+            <tr>
+              <td class="font-weight-bold">User</td>
+              <td><%= @address.main_user.try(:name).try(:upcase) %></td>
+            </tr>
+            <tr>
+              <td class="font-weight-bold">Iuran</td>
+              <td><%= number_to_currency(@address.contribution, unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <%= link_to 'Edit Address', edit_address_path(@address), class: 'btn btn-primary mr-2' if current_user.role == 2 %>
+                <%= link_to 'Cancel', user_contributions_path, class: 'btn btn-light' %>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <br />
+        <div class="d-sm-flex align-items-center mb-4">
+          <p class="card-title mb-sm-0">
+          ** Dari Januari, 2020 sampai per bulan <%= UserContribution::MONTHNAMES.invert[Date.current.month] %>, <%= Date.current.year %>
+          </p>          
+        </div>
+        <div class="table-responsive rounded p-1">
+          <table class="table">
+            <thead></thead>
+            <tbody>
+              <tr>
+                <td class="font-weight-bold">Total Tagihan</td>
+                <td><%= (Date.current.year.to_i-2020)*12 + Date.current.month.to_i %> kali</td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Yang sudah di bayar</td>
+                <td><%= @address.user_contributions.count %> kali</td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Tagihan yang harus di bayar</td>
+                <td><%= ((Date.current.year.to_i-2020)*12 + Date.current.month.to_i) - @address.user_contributions.count %> kali pembayaran</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <br /> 
+        <div class="d-sm-flex align-items-center mb-4">
+          <p class="card-title mb-sm-0">Contribution List</p> 
+        </div>
+        <div class="table-responsive rounded p-1">
+          <table class="table">
+            <tbody>
+            <% 1.upto((Date.current.year.to_i-2020)*12 + Date.current.month.to_i) do |i| %>
+              <tr>
+                <% uc = @address.user_contributions[i-1] %>
+                <td style="width:10%" class="font-weight-bold">Tagihan ke <%= i%></td>
+                <td  style="width:20%"><%= uc.nil? ? "BELUM BAYAR" : uc.contribution_long_desc %></td>
+                <td  style="width:40%">
+                  <% if uc && current_user.is_admin? %>
+                    <%= link_to "Edit", edit_user_contribution_path(uc), class: 'btn btn-success' %>
+                    <%= link_to "Destroy", user_contribution_path(uc), method: :delete, confirm: 'are you sure?', class: 'btn btn-danger' %>
+                  <% end %>
+                </td>
+              </tr>  
+            <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

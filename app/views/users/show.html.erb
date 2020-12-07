@@ -1,0 +1,59 @@
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-sm-flex align-items-center mb-4">
+          <h4 class="card-title mb-sm-0">User Detail</h4>
+        </div>
+          <div class="table-responsive rounded p-1">
+            <table class="table">
+              <thead></thead>
+              <tbody>
+              <tr>
+                <td class="font-weight-bold">ID</td>
+                <td><%= @user.id %></td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Email</td>
+                <td><%= @user.email %></td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Name</td>
+                <td><%= @user.name %></td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Blok</td>
+                <td><%= @user.try(:address).try(:block_address).try(:upcase) %></td>
+              </tr>
+              <% if current_user.role != 1 %>
+                <tr>
+                  <td class="font-weight-bold">No Tlp</td>
+                  <td><%= @user.phone_number %></td>
+                </tr>
+                <tr>
+                  <td class="font-weight-bold">Iuran</td>
+                  <td><%= number_to_currency(@user.try(:address).try(:contribution) , unit: "Rp.", separator: ",", delimiter: ".") %></td>
+                </tr>
+                <tr>
+                  <td class="font-weight-bold">Tunggakan</td>
+                  <td><%= @user.try(:address).try(:arrears) %></td>
+                </tr>
+                 <tr>
+                  <td class="font-weight-bold">PIC Blok</td>
+                  <td><%= @user.pic_blok %></td>
+                </tr>
+              <% end %>
+              <tr>
+                <td colspan="2">
+                  <%= link_to 'Edit', edit_user_path(@user), class: 'btn btn-primary mr-2' if current_user.role == 2 %>
+                  <%= link_to 'Back', users_path, class: 'btn btn-light'  %>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+

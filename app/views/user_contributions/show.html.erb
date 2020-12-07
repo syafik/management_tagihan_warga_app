@@ -1,0 +1,57 @@
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-sm-flex align-items-center mb-4">
+          <h4 class="card-title mb-sm-0">User Contribution Detail</h4>
+        </div>
+          <div class="table-responsive rounded p-1">
+            <table class="table">
+              <thead></thead>
+              <tbody>
+              <tr>
+                <td class="font-weight-bold">ID</td>
+                <td><%= @user_contribution.id %></td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Address</td>
+                <td><%= @user_contribution.address.block_address.upcase %></td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Contribution</td>
+                <td><%= @user_contribution.contribution %></td>
+              </tr>
+
+              <tr>
+                <td class="font-weight-bold">Pay at</td>
+                <td><%= @user_contribution.pay_at.strftime('%d %B %Y') rescue "-"%></td>
+              </tr>
+
+              <tr>
+                <td class="font-weight-bold">month</td>
+                <td><%= @user_contribution.month %></td>
+              </tr>
+
+              <tr>
+                <td class="font-weight-bold">year</td>
+                <td><%= @user_contribution.year %></td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold">Payment Type</td>
+                <td><%= @user_contribution.payment_type == 1 ? "CASH" : "TRANSFER" %></td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <%= link_to 'Edit', edit_user_contribution_path(@user_contribution), class: 'btn btn-primary mr-2' if current_user.role == 2 %>
+                  <%= link_to 'Back', user_contributions_path, class: 'btn btn-light'  %>
+                  <%= link_to 'Destroy', user_contribution_path(@user_contribution), method: :delete, class: 'btn btn-danger', confirm: 'are you sure?'  %>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>User:</strong>
+  <%= @debt.user_id %>
+</p>
+
+<p>
+  <strong>Value:</strong>
+  <%= @debt.value %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @debt.description %>
+</p>
+
+<p>
+  <strong>Debt date:</strong>
+  <%= @debt.debt_date %>
+</p>
+
+<p>
+  <strong>Debt type:</strong>
+  <%= @debt.debt_type %>
+</p>
+
+<%= link_to 'Edit', edit_debt_path(@debt) %> |
+<%= link_to 'Back', debts_path %>

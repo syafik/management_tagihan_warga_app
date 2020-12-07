@@ -1,0 +1,40 @@
+<div class="table-responsive border rounded p-1" style='height: 600px; min-height: 100%; max-height: 100%; overflow-x: scroll;'> 
+  <table class="table table-hover table-bordered" id="table-content">
+    <thead>
+    <tr>
+      <th class="font-weight-bold">Blok</th>
+      <% (1..12).each do |i| %>
+        <th class="font-weight-bold"><%= i %></th>
+      <% end %>
+      <th class="font-weight-bold">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @addresses.each do |address| %>
+      <tr>
+        <td><%= address.try(:block_address).try(:upcase) %></td>
+        <% address.user_contributions.each do |uc| %>
+          <td class="font-weight-bold" bgcolor="green"><%= '' %></td>
+        <% end %>
+        <% (address.user_contributions.size + 1).upto(12).each do |i| %>
+          <td class="font-weight-bold" bgcolor="grey"><%= '' %></td>
+        <% end %>
+        <td>
+          <%= link_to 'Lihat Data', contribution_by_address_user_contribution_path(address), class: 'btn-sm btn-success' %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+$(document).ready(function(){
+  $(".table-responsive").freezeTable({
+    'scrollable': true,
+    'shadow': true,
+    'columnNum': 2,
+  });
+})
+
+</script>

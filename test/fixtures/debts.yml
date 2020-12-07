@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 1
+  value: 1.5
+  description: MyText
+  debt_date: 2020-12-04
+  debt_type: 1
+
+two:
+  user_id: 1
+  value: 1.5
+  description: MyText
+  debt_date: 2020-12-04
+  debt_type: 1

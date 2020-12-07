@@ -1,0 +1,2 @@
+class TotalContribution < ApplicationRecord
+end

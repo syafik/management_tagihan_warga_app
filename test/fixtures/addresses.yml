@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  block_address: MyString
+  block_number: MyString
+  block: MyString
+
+two:
+  block_address: MyString
+  block_number: MyString
+  block: MyString
