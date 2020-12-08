@@ -41,6 +41,7 @@ gem 'activerecord-import'
 gem 'google_drive'
 gem 'pdfkit'
 gem 'wkhtmltopdf-binary'
+gem 'devise_token_auth'
 group :development, :test do
   # Call 'byebug' to stop execution and get a debugger console
   gem 'byebug', platform: :mri

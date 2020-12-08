@@ -20,7 +20,7 @@ class UserContribution < ApplicationRecord
 }
 
   def self.import_existing_data(execute_month)
-    session = GoogleDrive::Session.from_service_account_key("My Project 34179-7a1a2c83e354.json")
+    session = GoogleDrive::Session.from_service_account_key("config/gdrive_project.json")
     Address::BLOK_NAME.each do |key, value|
       receiver = User.where("pic_blok LIKE '%#{key}%'").first
       ws = session.spreadsheet_by_key("1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk").worksheets[value]

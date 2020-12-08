@@ -41,7 +41,7 @@ class UserContributionsController < ApplicationController
     if TotalContribution.where(:month => params[:month], :year => params[:year], :blok => blok_name).exists?
       redirect_to import_data_user_contributions_path, :alert => "Month #{params[:month]}-#{params[:year]} sudah tergenerate." and return
     end
-    session = GoogleDrive::Session.from_service_account_key("My Project 34179-7a1a2c83e354.json")
+    session = GoogleDrive::Session.from_service_account_key("config/gdrive_project.json")
     ws = session.spreadsheet_by_key("1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk").worksheets[params[:blok].to_i]
     (1..ws.num_rows).each do |row|
       block_address = ws[row, 2].strip
@@ -154,7 +154,7 @@ class UserContributionsController < ApplicationController
   def do_generate_data
     month = params[:month] rescue Date.current.month
     year = params[:year] rescue Date.current.year
-    session = GoogleDrive::Session.from_service_account_key("My Project 34179-7a1a2c83e354.json")
+    session = GoogleDrive::Session.from_service_account_key("config/gdrive_project.json")
     Address::BLOK_NAME.each do |key, value|
       ws = session.spreadsheet_by_key("1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk").worksheets[value]
       (1..ws.num_rows).each do |row|
