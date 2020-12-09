@@ -1,9 +1,25 @@
 Rails.application.routes.draw do
+  
   devise_for :users, skip: :registrations, controllers: {
     sessions: 'users/sessions',
     passwords: 'users/passwords',
     unlocks: 'users/unlocks'
   }
+
+  namespace :api, defaults: {format: :json} do
+    namespace :v1 do 
+      mount_devise_token_auth_for 'User', at: 'auth', 
+      controllers: {
+        sessions: 'api/v1/sessions',
+        registrations: 'api/v1/registrations'
+      }
+      get '/cash_flows', to: "home#cash_flows"
+      get '/profile', to: "home#profile"
+      get '/contributions', to: "home#contributions"
+    end
+  end
+
+
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   root :to => "home#index"
   resources :users do

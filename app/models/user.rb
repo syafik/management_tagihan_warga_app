@@ -1,4 +1,8 @@
 class User < ApplicationRecord
+            # Include default devise modules.
+            devise :database_authenticatable, :registerable,
+                    :rememberable, :validatable
+            include DeviseTokenAuth::Concerns::User
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -9,6 +13,18 @@ class User < ApplicationRecord
   validate :phone_number_format_validation
 
   belongs_to :address, optional: true
+  before_validation :set_uid
+
+    def set_uid
+      self.uid = self.class.generate_uid if self.uid.blank?
+    end
+
+    def self.generate_uid
+      loop do
+        token = Devise.friendly_token
+        break token unless to_adapter.find_first({ uid: token })
+      end
+    end
 
 
   def self.ransack_predicates
