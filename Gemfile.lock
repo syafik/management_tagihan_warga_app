@@ -61,6 +61,8 @@ GEM
       sshkit (>= 1.9.0)
     capistrano-bundler (1.6.0)
       capistrano (~> 3.1)
+    capistrano-dotenv-tasks (0.1.5)
+      capistrano (~> 3.0)
     capistrano-rails (1.4.0)
       capistrano (~> 3.1)
       capistrano-bundler (~> 1.1)
@@ -299,6 +301,7 @@ DEPENDENCIES
   activerecord-import
   byebug
   capistrano
+  capistrano-dotenv-tasks
   capistrano-rails
   capistrano-rbenv
   capistrano3-puma

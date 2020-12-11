@@ -57,6 +57,7 @@ group :development do
   gem 'capistrano', require: false
   gem 'capistrano-rails', require: false
   gem 'capistrano-rbenv', require: false
+  gem 'capistrano-dotenv-tasks', require: false
   gem 'capistrano3-puma'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
