@@ -1,0 +1,16 @@
+<%= form_with(model: notification, local: true) do |form| %>
+  <%= errors_for(notification) %>
+
+  <div class="form-group">
+    <%= form.label :title %>
+    <%= form.text_field :title, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :notif %>
+    <%= form.text_area :notif, class: 'form-control' %>
+  </div>
+
+  <%= form.submit 'Submit', class: 'btn btn-primary mr-2' %>
+  <%= link_to 'Cancel', notifications_path, class: 'btn btn-light' %>
+<% end %>

@@ -14,8 +14,10 @@ Rails.application.routes.draw do
         registrations: 'api/v1/registrations'
       }
       get '/cash_flows', to: "home#cash_flows"
-      get '/profile', to: "home#profile"
+      get '/profile', to: "user#profile"
       get '/contributions', to: "home#contributions"
+      post '/user/reset_password_token', to: "user#reset_password_token"
+      post '/user/reset_password', to: "user#reset_password"
     end
   end
 
@@ -47,6 +49,13 @@ Rails.application.routes.draw do
   end
 
   resources :addresses do
+    collection do
+      match :search, via: [:get, :post]
+    end
+  end
+
+
+  resources :notifications do
     collection do
       match :search, via: [:get, :post]
     end

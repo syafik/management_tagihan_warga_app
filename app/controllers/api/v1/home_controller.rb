@@ -1,10 +1,8 @@
 class Api::V1::HomeController < Api::V1::BaseController
 
-  before_action :authenticate_user!
-  
-
-  def profile
-    render json: {status: true, profile: current_user}, status: :ok
+  def index
+    
+    render json: {status: true}
   end
 
   def cash_flows
