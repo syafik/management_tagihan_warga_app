@@ -1,11 +1,10 @@
-class Notification < ApplicationRecord
+# frozen_string_literal: true
 
+class Notification < ApplicationRecord
   def self.ransack_predicates
     [
-        ["Contains", 'cont'],
-        ["Equal", 'eq'],
+      %w[Contains cont],
+      %w[Equal eq]
     ]
   end
-
-
 end

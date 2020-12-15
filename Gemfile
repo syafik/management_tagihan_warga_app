@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '5.2.1'
+gem 'rails', '5.2.4.3'
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 0.18'
 # Use Puma as the app server
@@ -31,17 +31,22 @@ gem 'jbuilder', '~> 2.5'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
-gem 'dotenv'  # if you haven't added it, already
+gem 'activerecord-import'
+gem 'brakeman'
+gem 'ckeditor', github: 'galetahub/ckeditor'
 gem 'devise'
+gem 'devise_token_auth'
+# if you haven't added it, already
+gem 'dotenv'
+gem 'faker'
+gem 'google_drive'
+gem 'kaminari'
+gem 'paperclip'
+gem 'pdfkit'
 gem 'ransack'
 gem 'rubocop'
-gem 'kaminari'
-gem 'faker'
-gem 'activerecord-import'
-gem 'google_drive'
-gem 'pdfkit'
+gem 'sib-api-v3-sdk'
 gem 'wkhtmltopdf-binary'
-gem 'devise_token_auth'
 
 group :development, :test do
   # Call 'byebug' to stop execution and get a debugger console
@@ -55,10 +60,10 @@ group :development do
   # Spring speeds up development by keeping your application running in the background.
   # Read more: https://github.com/rails/spring
   gem 'capistrano', require: false
+  gem 'capistrano3-puma'
+  gem 'capistrano-dotenv-tasks', require: false
   gem 'capistrano-rails', require: false
   gem 'capistrano-rbenv', require: false
-  gem 'capistrano-dotenv-tasks', require: false
-  gem 'capistrano3-puma'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
 end

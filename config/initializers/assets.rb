@@ -10,5 +10,7 @@ Rails.application.config.assets.version = '1.0'
 
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
-Rails.application.config.assets.precompile += %w[*.js *.css *.png *.jpg *.jpeg *.svg]
+Rails.application.config.assets.precompile += %w[*.js *.css *.png *.jpg *.jpeg *.svg ckeditor/config.js ckeditor/puriayana.js]
 Rails.application.config.assets.precompile << /\.(?:svg|eot|woff|ttf|woff2)$/
+Rails.application.config.assets.precompile << %w[ckeditor/config.js]
+

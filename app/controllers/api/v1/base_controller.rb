@@ -1,8 +1,11 @@
-class Api::V1::BaseController < ActionController::API
+# frozen_string_literal: true
 
-  include DeviseTokenAuth::Concerns::SetUserByToken
+module Api
+  module V1
+    class BaseController < ActionController::API
+      include DeviseTokenAuth::Concerns::SetUserByToken
 
-  before_action :authenticate_user!
-
-
+      before_action :authenticate_user!
+    end
+  end
 end

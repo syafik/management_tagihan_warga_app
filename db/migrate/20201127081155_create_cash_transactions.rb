@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateCashTransactions < ActiveRecord::Migration[5.2]
   def change
     create_table :cash_transactions do |t|
@@ -10,6 +12,6 @@ class CreateCashTransactions < ActiveRecord::Migration[5.2]
       t.text :description
       t.timestamps
     end
-    add_index :cash_transactions, [:month, :year]
+    add_index :cash_transactions, %i[month year]
   end
 end

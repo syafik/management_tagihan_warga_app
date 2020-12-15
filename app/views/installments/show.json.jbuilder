@@ -1,1 +1,3 @@
-json.partial! "installments/installment", installment: @installment
+# frozen_string_literal: true
+
+json.partial! 'installments/installment', installment: @installment

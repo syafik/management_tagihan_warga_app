@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class NotificationsController < ApplicationController
-  before_action :set_notification, only: [:show, :edit, :update, :destroy]
+  before_action :set_notification, only: %i[show edit update destroy]
 
   # GET /notifications
   # GET /notifications.json
@@ -17,15 +19,14 @@ class NotificationsController < ApplicationController
   def search
     index
     respond_to do |format|
-        format.html { redirect_to debts_path }
-        format.js { render 'index.js.erb'}
+      format.html { redirect_to debts_path }
+      format.js { render 'index.js.erb' }
     end
   end
 
   # GET /notifications/1
   # GET /notifications/1.json
-  def show
-  end
+  def show; end
 
   # GET /notifications/new
   def new
@@ -33,8 +34,7 @@ class NotificationsController < ApplicationController
   end
 
   # GET /notifications/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /notifications
   # POST /notifications.json
@@ -77,13 +77,14 @@ class NotificationsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_notification
-      @notification = Notification.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def notification_params
-      params.require(:notification).permit(:title, :notif, :user_id)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_notification
+    @notification = Notification.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def notification_params
+    params.require(:notification).permit(:title, :notif, :user_id)
+  end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateTotalContributions < ActiveRecord::Migration[5.2]
   def change
     create_table :total_contributions do |t|
@@ -7,6 +9,6 @@ class CreateTotalContributions < ActiveRecord::Migration[5.2]
       t.float :total
       t.timestamps
     end
-    add_index :total_contributions, [:month, :year, :blok]
+    add_index :total_contributions, %i[month year blok]
   end
 end

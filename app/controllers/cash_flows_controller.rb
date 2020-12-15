@@ -1,13 +1,14 @@
-class CashFlowsController < ApplicationController
+# frozen_string_literal: true
 
-  before_action :set_cash_flow, only: [:show, :edit, :update, :destroy]
+class CashFlowsController < ApplicationController
+  before_action :set_cash_flow, only: %i[show edit update destroy]
 
   # GET /users
   # GET /users.json
   def index
     @q = CashFlow.ransack(params[:q])
     @cash_flows = @q.result.order('month, year asc')
-    
+
     @total_cash_in = @cash_flows.sum(&:cash_in)
     @total_cash_out = @cash_flows.sum(&:cash_out)
     @grand_total = @cash_flows.sum(&:total)
@@ -20,16 +21,14 @@ class CashFlowsController < ApplicationController
   def search
     index
     respond_to do |format|
-        format.html { redirect_to cash_flows_path }
-        format.js { render 'index.js.erb'}
+      format.html { redirect_to cash_flows_path }
+      format.js { render 'index.js.erb' }
     end
   end
 
-
   # GET /users/1
   # GET /users/1.json
-  def show
-  end
+  def show; end
 
   # GET /users/new
   def new
@@ -37,8 +36,7 @@ class CashFlowsController < ApplicationController
   end
 
   # GET /users/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /users
   # POST /users.json
@@ -81,14 +79,14 @@ class CashFlowsController < ApplicationController
   # end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_cash_flow
-      @cash_flow = CashFlow.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def cash_flow_params
-      params.fetch(:cash_flow, {}).permit(:month, :year, :cash_in, :cash_out, :total)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_cash_flow
+    @cash_flow = CashFlow.find(params[:id])
+  end
 
+  # Only allow a list of trusted parameters through.
+  def cash_flow_params
+    params.fetch(:cash_flow, {}).permit(:month, :year, :cash_in, :cash_out, :total)
+  end
 end

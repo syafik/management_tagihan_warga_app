@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy]
+  before_action :set_user, only: %i[show edit update destroy]
 
   # GET /users
   # GET /users.json
@@ -17,16 +19,14 @@ class UsersController < ApplicationController
   def search
     index
     respond_to do |format|
-        format.html { redirect_to admins_path }
-        format.js { render 'index.js.erb'}
+      format.html { redirect_to admins_path }
+      format.js { render 'index.js.erb' }
     end
   end
 
-
   # GET /users/1
   # GET /users/1.json
-  def show
-  end
+  def show; end
 
   # GET /users/new
   def new
@@ -34,12 +34,11 @@ class UsersController < ApplicationController
   end
 
   # GET /users/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /users
   # POST /users.json
-  def create  
+  def create
     @user = User.new(user_params)
 
     respond_to do |format|
@@ -67,8 +66,7 @@ class UsersController < ApplicationController
     end
   end
 
-  def pic_retribution
-  end
+  def pic_retribution; end
 
   # DELETE /users/1
   # DELETE /users/1.json
@@ -81,14 +79,15 @@ class UsersController < ApplicationController
   # end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_user
-      @user = User.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def user_params
-      params.fetch(:user, {}).permit(:email, :name, :phone_number, :password, :contribution, :block_address, :role, :pic_blok)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_user
+    @user = User.find(params[:id])
+  end
 
+  # Only allow a list of trusted parameters through.
+  def user_params
+    params.fetch(:user, {}).permit(:email, :name, :phone_number, :password, :contribution, :block_address, :role,
+                                   :pic_blok)
+  end
 end

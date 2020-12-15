@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class AddressesController < ApplicationController
-  before_action :set_address, only: [:show, :edit, :update, :destroy]
+  before_action :set_address, only: %i[show edit update destroy]
 
   # GET /users
   # GET /users.json
@@ -17,16 +19,14 @@ class AddressesController < ApplicationController
   def search
     index
     respond_to do |format|
-        format.html { redirect_to addresses_path }
-        format.js { render 'index.js.erb'}
+      format.html { redirect_to addresses_path }
+      format.js { render 'index.js.erb' }
     end
   end
 
-
   # GET /users/1
   # GET /users/1.json
-  def show
-  end
+  def show; end
 
   # GET /users/new
   def new
@@ -34,8 +34,7 @@ class AddressesController < ApplicationController
   end
 
   # GET /users/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /users
   # POST /users.json
@@ -78,14 +77,14 @@ class AddressesController < ApplicationController
   # end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_address
-      @address = Address.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def address_params
-      params.fetch(:address, {}).permit(:block_address, :contribution, :arrears)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_address
+    @address = Address.find(params[:id])
+  end
 
+  # Only allow a list of trusted parameters through.
+  def address_params
+    params.fetch(:address, {}).permit(:block_address, :contribution, :arrears)
+  end
 end

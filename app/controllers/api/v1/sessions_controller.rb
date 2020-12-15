@@ -1,9 +1,14 @@
-class Api::V1::SessionsController < DeviseTokenAuth::SessionsController
-  skip_before_action :verify_authenticity_token, only: :create, raise: false
+# frozen_string_literal: true
 
-  def create
-    p params
-    super
+module Api
+  module V1
+    class SessionsController < DeviseTokenAuth::SessionsController
+      skip_before_action :verify_authenticity_token, only: :create, raise: false
+
+      def create
+        p params
+        super
+      end
+    end
   end
-
 end

@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class DebtsController < ApplicationController
-  before_action :set_debt, only: [:show, :edit, :update, :destroy]
+  before_action :set_debt, only: %i[show edit update destroy]
 
   # GET /debts
   # GET /debts.json
@@ -17,15 +19,14 @@ class DebtsController < ApplicationController
   def search
     index
     respond_to do |format|
-        format.html { redirect_to debts_path }
-        format.js { render 'index.js.erb'}
+      format.html { redirect_to debts_path }
+      format.js { render 'index.js.erb' }
     end
   end
 
   # GET /debts/1
   # GET /debts/1.json
-  def show
-  end
+  def show; end
 
   # GET /debts/new
   def new
@@ -33,8 +34,7 @@ class DebtsController < ApplicationController
   end
 
   # GET /debts/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /debts
   # POST /debts.json
@@ -77,13 +77,14 @@ class DebtsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_debt
-      @debt = Debt.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def debt_params
-      params.require(:debt).permit(:user_id, :value, :description, :debt_date, :debt_type)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_debt
+    @debt = Debt.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def debt_params
+    params.require(:debt).permit(:user_id, :value, :description, :debt_date, :debt_type)
+  end
 end

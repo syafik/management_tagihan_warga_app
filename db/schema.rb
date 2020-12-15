@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_07_051852) do
+ActiveRecord::Schema.define(version: 2020_12_15_074836) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,12 @@ ActiveRecord::Schema.define(version: 2020_12_07_051852) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "empty", default: false
+  end
+
+  create_table "app_settings", force: :cascade do |t|
+    t.text "home_page_text"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "cash_flows", force: :cascade do |t|
@@ -52,6 +58,17 @@ ActiveRecord::Schema.define(version: 2020_12_07_051852) do
     t.index ["pic_id"], name: "index_cash_transactions_on_pic_id"
   end
 
+  create_table "ckeditor_assets", force: :cascade do |t|
+    t.string "data_file_name", null: false
+    t.string "data_content_type"
+    t.integer "data_file_size"
+    t.string "data_fingerprint"
+    t.string "type", limit: 30
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["type"], name: "index_ckeditor_assets_on_type"
+  end
+
   create_table "debts", force: :cascade do |t|
     t.integer "user_id"
     t.float "value"
@@ -71,6 +88,15 @@ ActiveRecord::Schema.define(version: 2020_12_07_051852) do
     t.datetime "updated_at", null: false
     t.boolean "paid_off", default: false
     t.index ["parent_id"], name: "index_installments_on_parent_id"
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.string "title"
+    t.text "notif"
+    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "total_contributions", force: :cascade do |t|
@@ -109,6 +135,15 @@ ActiveRecord::Schema.define(version: 2020_12_07_051852) do
     t.index ["user_id"], name: "index_user_debts_on_user_id"
   end
 
+  create_table "user_notifications", force: :cascade do |t|
+    t.integer "notification_id"
+    t.integer "user_id"
+    t.boolean "is_read", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["notification_id", "user_id"], name: "index_user_notifications_on_notification_id_and_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "name", null: false
@@ -122,9 +157,13 @@ ActiveRecord::Schema.define(version: 2020_12_07_051852) do
     t.string "phone_number"
     t.integer "address_id"
     t.string "pic_blok"
+    t.string "provider", default: "email", null: false
+    t.string "uid", default: "", null: false
+    t.json "tokens"
     t.index ["address_id"], name: "index_users_on_address_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
 end

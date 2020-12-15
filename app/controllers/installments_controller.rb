@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 class InstallmentsController < ApplicationController
-  before_action :set_installment, only: [:show, :edit, :update, :destroy]
+  before_action :set_installment, only: %i[show edit update destroy]
 
   # GET /installments
   # GET /installments.json
   def index
     @q = Installment.ransack(params[:q])
     @q.sorts = 'id asc' if @q.sorts.empty?
-    @installments = @q.result.includes(:installment_transactions).where("parent_id IS NULL").page(params[:page])
+    @installments = @q.result.includes(:installment_transactions).where('parent_id IS NULL').page(params[:page])
     respond_to do |format|
       format.html
       format.js
@@ -16,15 +18,14 @@ class InstallmentsController < ApplicationController
   def search
     index
     respond_to do |format|
-        format.html { redirect_to addresses_path }
-        format.js { render 'index.js.erb'}
+      format.html { redirect_to addresses_path }
+      format.js { render 'index.js.erb' }
     end
   end
 
   # GET /installments/1
   # GET /installments/1.json
-  def show
-  end
+  def show; end
 
   # GET /installments/new
   def new
@@ -32,8 +33,7 @@ class InstallmentsController < ApplicationController
   end
 
   # GET /installments/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /installments
   # POST /installments.json
@@ -76,13 +76,14 @@ class InstallmentsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_installment
-      @installment = Installment.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def installment_params
-      params.require(:installment).permit(:description, :value, :parent_id)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_installment
+    @installment = Installment.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def installment_params
+    params.require(:installment).permit(:description, :value, :parent_id)
+  end
 end

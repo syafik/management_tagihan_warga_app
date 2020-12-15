@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateCashFlows < ActiveRecord::Migration[5.2]
   def change
     create_table :cash_flows do |t|
@@ -8,6 +10,6 @@ class CreateCashFlows < ActiveRecord::Migration[5.2]
       t.integer :year
       t.timestamps
     end
-    add_index :cash_flows, [:month, :year]
+    add_index :cash_flows, %i[month year]
   end
 end

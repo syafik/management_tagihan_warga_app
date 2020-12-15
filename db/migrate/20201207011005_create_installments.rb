@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateInstallments < ActiveRecord::Migration[5.2]
   def change
     create_table :installments, force: true do |t|

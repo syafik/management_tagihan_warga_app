@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
-            # Include default devise modules.
-            devise :database_authenticatable, :registerable,
-                    :rememberable, :validatable
-            include DeviseTokenAuth::Concerns::User
+  # Include default devise modules.
+  devise :database_authenticatable, :registerable,
+         :rememberable, :validatable
+  include DeviseTokenAuth::Concerns::User
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -15,79 +17,113 @@ class User < ApplicationRecord
   belongs_to :address, optional: true
   before_validation :set_uid
 
-    def set_uid
-      self.uid = self.class.generate_uid if self.uid.blank?
-    end
+  def set_uid
+    self.uid = self.class.generate_uid if uid.blank?
+  end
 
-    def self.generate_uid
-      loop do
-        token = Devise.friendly_token
-        break token unless to_adapter.find_first({ uid: token })
-      end
+  def self.generate_uid
+    loop do
+      token = Devise.friendly_token
+      break token unless to_adapter.find_first({ uid: token })
     end
-
+  end
 
   def self.ransack_predicates
     [
-        ["Contains", 'cont'],
-        ["Not Contains", 'not_cont'],
-        ["Equal", 'eq'],
-        ["Not Equal", 'not_eq'],
-        ["Less Than", 'lt'],
-        ["Less Than or Equal to", 'lteq'],
-        ["Greater Than", 'gt'],
-        ["Greater Than or Equal to", 'gteq']
+      %w[Contains cont],
+      ['Not Contains', 'not_cont'],
+      %w[Equal eq],
+      ['Not Equal', 'not_eq'],
+      ['Less Than', 'lt'],
+      ['Less Than or Equal to', 'lteq'],
+      ['Greater Than', 'gt'],
+      ['Greater Than or Equal to', 'gteq']
     ]
   end
 
   def password_complexity
     # Regexp extracted from https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
-    if password.blank? || password =~ /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
-      return
-    end
+    return if password.blank? || password =~ /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
 
     errors.add :password, 'harus 8-128 karakter dan mempunyai minmal 1 number and 1 huruf.'
   end
-  
+
   def phone_number_format_validation
-    if phone_number.blank? || phone_number =~ /\+?([ -]?\d+)+|\(\d+\)([ -]\d+)/
-      return
-    end
+    return if phone_number.blank? || phone_number =~ /\+?([ -]?\d+)+|\(\d+\)([ -]\d+)/
+
     errors.add :phone_number, 'harus diisi dengan format yang benar.'
   end
 
   def is_admin?
-    self.role == 2
+    role == 2
   end
 
   def is_security?
-    self.role == 3
+    role == 3
   end
 
   def is_warga?
-    self.role == 1
+    role == 1
   end
 
   def role_name
-    case self.role
+    case role
     when 1
-      "Warga"
+      'Warga'
     when 2
-      "Admin"
+      'Admin'
     when 3
-      "Sekuriti"
+      'Sekuriti'
     end
   end
 
-
   validate :password_complexity
 
-  def self.ransackable_attributes(auth_object = nil)
-    %w(email name addresses_block_address role)
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[email name addresses_block_address role]
   end
 
   def self.ransortable_attributes(_auth_object = nil)
     column_names
+  end
+
+  def deliver_reset_password_token_email(token)
+    api_instance = SibApiV3Sdk::TransactionalEmailsApi.new
+    send_smtp_email = SibApiV3Sdk::SendSmtpEmail.new
+    sender = SibApiV3Sdk::SendSmtpEmailSender.new(name: 'admin-puri-ayana', email: 'no-reply@puriayanagempol.com')
+    send_smtp_email.subject = '[Puri Ayana App] - Ini reset password token anda!'
+    send_smtp_email.to = [{name: name, email: email}]
+    send_smtp_email.sender = sender
+    send_smtp_email.html_content = "<html>
+    <head>
+      <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+    </head>
+    <body>
+      <p>Hello #{name}!</p>
+      <p>
+      Ini adalah token untuk mereset password Anda. Token ini berlaku selama 5 menit saja.<br>
+      --------------------------
+      </p>
+      <p>Token Anda: <b>#{token}</b></p>
+      <br>
+      ----------
+      </p>
+      <p>
+        Terima Kasih dan Selamat beraktifitas.
+        Semoga Anda senantiasa sehat dan diberikan kemurahan rejeki, Aamiin..
+  
+        Salam, <br />
+        Pengurus
+      </p>
+    </body>
+  </html>
+  "
+    begin
+      result = api_instance.send_transac_email(send_smtp_email)    
+      p result
+    rescue SibApiV3Sdk::ApiError => e
+      puts "Exception when calling TransactionalEmailsApi->send_transac_email: #{e}"
+    end
   end
 
 end

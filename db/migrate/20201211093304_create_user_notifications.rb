@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateUserNotifications < ActiveRecord::Migration[5.2]
   def change
     create_table :user_notifications do |t|
@@ -7,6 +9,6 @@ class CreateUserNotifications < ActiveRecord::Migration[5.2]
 
       t.timestamps
     end
-    add_index :user_notifications, [:notification_id, :user_id]
+    add_index :user_notifications, %i[notification_id user_id]
   end
 end

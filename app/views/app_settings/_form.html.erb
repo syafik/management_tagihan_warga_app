@@ -1,0 +1,11 @@
+<%= form_for(app_setting) do |f| %>
+  <%= errors_for(app_setting) %>
+  
+  <div class="form-group">
+    <%= f.label :home_page_text %>
+    <%= f.cktext_area :home_page_text, class: 'form-control ckeditor', input_html: { ckeditor: { toolbar: 'mini' } } %>
+  </div>
+
+  <%= f.submit 'Submit', class: 'btn btn-primary mr-2' %>
+  <%= link_to 'Cancel', app_settings_path, class: 'btn btn-light' %>
+<% end %>

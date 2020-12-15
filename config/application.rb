@@ -14,7 +14,8 @@ module SwitchupAdministrator
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
     config.assets.paths << Rails.root.join('app', 'assets', 'fonts')
-    config.autoload_paths += %W["#{ Rails.root}/app/validators/"]
+    config.autoload_paths += %W["#{Rails.root}/app/validators/"]
+    config.autoload_paths += %W(#{Rails.root}/app/models/ckeditor) 
 
     config.time_zone = 'Jakarta'
     config.i18n.default_locale = :id

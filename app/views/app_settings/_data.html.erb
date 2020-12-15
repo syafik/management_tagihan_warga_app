@@ -1,0 +1,24 @@
+<div class="table-responsive border rounded p-1">
+  <table class="table table-hover" id="table-content">
+    <thead>
+    <tr>
+      <th class="font-weight-bold">No</th>
+      <th class="font-weight-bold"><%= sort_link(@q, :home_page_text, 'Home Page Text',{}, {remote: true, class: 'ajax-request'}) %></th>
+      <th class="font-weight-bold">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @app_settings.each_with_index do |cf, i| %>
+      <tr>
+        <td><%= (i + 1) %> </td>
+        <td><%= cf.home_page_text.truncate(100) %></td>
+        <td>
+          <%= link_to 'Lihat', cf, class: 'btn-sm btn-success' %>
+          <%= link_to 'Ubah', edit_app_setting_path(cf), class: 'btn-sm btn-info'  if current_user.is_admin? %>
+          <%= link_to 'Destroy', cf, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn-sm btn-danger'%>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>

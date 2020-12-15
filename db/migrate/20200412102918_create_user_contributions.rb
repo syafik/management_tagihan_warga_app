@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateUserContributions < ActiveRecord::Migration[5.2]
   def change
     create_table :user_contributions do |t|
