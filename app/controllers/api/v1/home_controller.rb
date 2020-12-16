@@ -18,37 +18,40 @@ module Api
 
       def cash_flows
         cash_flows = CashFlow.where(year: params[:year])
-        render json: { status: true, cash_flows: cash_flows }, status: :ok
+        render json: { status: true, title: "Cash Flow Tahun #{params[:year]}", cash_flows: cash_flows }, status: :ok
       end
 
       def cash_transactions
+        report_items = []
+        debit_total = 0
+        credit_total = 0
         year_selected = params[:year] || Date.current.year
         month_selected = params[:month] || Date.current.month
-        selected_date = Date.parse("#{@year_selected}-#{@month_selected}-10") 
-        @cash_transactions = CashTransaction.where(transaction_date: selected_date.beginning_of_month..selected_date.end_of_month).order('transaction_date ASC')
+        selected_date = Date.parse("#{year_selected}-#{month_selected}-10") 
+        cash_transactions = CashTransaction.where(transaction_date: selected_date.beginning_of_month..selected_date.end_of_month).order('transaction_date ASC')
         CashTransaction::REPORT_WARGA.each do |key, value|
           if value.is_a?(Array)
             total = cash_transactions.select { |t| value.include?(t.transaction_group) }.sum(&:total)
             if key.include?('PEMASUKAN')
-              @report_items << ['cash_in', '', key, total]
-              @debit_total += total
+              report_items << ['cash_in', '', key, total]
+              debit_total += total
             else
-              @report_items << ['cash_out', '', key, total]
-              @credit_total += total
+              report_items << ['cash_out', '', key, total]
+              credit_total += total
             end
           else
             cash_transactions.select { |t| value == t.transaction_group }.each do |t|
               if key.include?('PEMASUKAN')
-                @report_items << ['cash_in', t.transaction_date.strftime('%d %B %Y'), t.description, t.total]
-                @debit_total += t.total
+                report_items << ['cash_in', t.transaction_date.strftime('%d %B %Y'), t.description, t.total]
+                debit_total += t.total
               else
-                @report_items << ['cash_out', t.transaction_date.strftime('%d %B %Y'), t.description, t.total]
-                @credit_total += t.total
+                report_items << ['cash_out', t.transaction_date.strftime('%d %B %Y'), t.description, t.total]
+                credit_total += t.total
               end
             end
           end
         end
-        render json: { status: true, cash_flows: cash_flows }, status: :ok
+        render json: { status: true, title: "Transaksi Kas Per #{UserContribution::MONTHNAMES.invert[params[:month].to_i]} #{params[:year]}", transactions: report_items }, status: :ok
       end
 
       def contributions
