@@ -8,7 +8,16 @@ module Api
       def sign_up_params
         params.require(:registration).permit(:email, :password, :name, :phone_number)
       end
-      
+
+      def render_create_success
+        render json: {
+          success: true,
+          message: "Selamat, berhasil meembuat akun baru.",
+          me: @resource,
+          address: @resource.address
+        }
+      end
+
     end
   end
 end

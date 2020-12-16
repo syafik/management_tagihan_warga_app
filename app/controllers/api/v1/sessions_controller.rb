@@ -5,9 +5,14 @@ module Api
     class SessionsController < DeviseTokenAuth::SessionsController
       skip_before_action :verify_authenticity_token, only: :create, raise: false
 
-      def create
-        p params
-        super
+      def render_create_success
+        render json: {
+          success: true,
+          message: "Login berhasil.",
+          me: @resource,
+          avatar: (url_for(@resource.avatar) rescue nil),
+          address: @resource.address
+        }
       end
     end
   end
