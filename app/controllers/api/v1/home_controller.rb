@@ -5,7 +5,7 @@ module Api
     class HomeController < Api::V1::BaseController
       def home_page
         render status: 200,  json: { 
-          status: true, 
+          success: true, 
           me: current_user,
           tagihan: current_user.try(:address).try(:tagihan_now), 
           last_payment: current_user.try(:address).try(:last_payment_contribution), 
@@ -18,7 +18,7 @@ module Api
 
       def cash_flows
         cash_flows = CashFlow.where(year: params[:year])
-        render json: { status: true, title: "Cash Flow Tahun #{params[:year]}", cash_flows: cash_flows }, status: :ok
+        render json: { success: true, title: "Cash Flow Tahun #{params[:year]}", cash_flows: cash_flows }, status: :ok
       end
 
       def cash_transactions
@@ -51,25 +51,25 @@ module Api
             end
           end
         end
-        render json: { status: true, title: "Transaksi Kas Per #{UserContribution::MONTHNAMES.invert[params[:month].to_i]} #{params[:year]}", transactions: report_items }, status: :ok
+        render json: { success: true, title: "Transaksi Kas Per #{UserContribution::MONTHNAMES.invert[params[:month].to_i]} #{params[:year]}", transactions: report_items }, status: :ok
       end
 
       def contributions
-        render json: { status: true, contributions: current_user.address.try(:user_contributions) }, status: :ok
+        render json: { success: true, contributions: current_user.address.try(:user_contributions) }, status: :ok
       end
 
       def address_info
         address = Address.includes(:users, :user_contributions).where(block_address: params[:block].gsub(/[^0-9A-Za-z]/, '').upcase).first
         if address
-          render json: { status: true, address: address, users: address.users, tagihan: address.tagihan_now }, status: :ok
+          render json: { success: true, address: address, users: address.users, tagihan: address.tagihan_now }, status: :ok
         else
-          render status: 404, json: {status: false, message: 'Address not found'}
+          render status: 404, json: {success: false, message: 'Address not found'}
         end
       end
 
       def pay_contribution
         address = Address.find(params[:address_id])
-        return render status:402, json:{status: true, message: 'pembayaran iuran gagal.', error: 'invalid address_id'} if address.nil?
+        return render status:402, json:{success: true, message: 'pembayaran iuran gagal.', error: 'invalid address_id'} if address.nil?
         uc = UserContribution.new(
             month: Date.current.month,
             year: Date.current.year,
@@ -94,9 +94,9 @@ module Api
             total: (params[:total_bayar].to_i*params[:contribution].to_f),
             pic_id: current_user.id
           )
-          render json: { status: true, message: 'pembayaran iuran berhasil dilakukan.'}, status: :ok
+          render json: { success: true, message: 'pembayaran iuran berhasil dilakukan.'}, status: :ok
         else
-          render status:402, json:{status: false, message: 'pembayaran iuran gagal.', error: uc.errors}
+          render status:402, json:{success: false, message: 'pembayaran iuran gagal.', error: uc.errors}
         end
       end
 
@@ -112,9 +112,9 @@ module Api
           pic_id: current_user.id
         )
         if ct.save
-          render json: { status: true, message: 'transaksi berhasil disimpan.', address: address, users: address.users, tagihan: address.tagihan_now }, status: :ok
+          render json: { success: true, message: 'transaksi berhasil disimpan.', address: address, users: address.users, tagihan: address.tagihan_now }, status: :ok
         else
-          render status:402, json:{status: false, message: 'transaksi gagal disimpan.', error: ct.errors}
+          render status:402, json:{success: false, message: 'transaksi gagal disimpan.', error: ct.errors}
         end
       end
     end
