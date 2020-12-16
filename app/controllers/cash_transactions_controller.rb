@@ -4,7 +4,8 @@ class CashTransactionsController < ApplicationController
   def index
     @year_selected = params[:year_eq] || Date.current.year
     @month_selected = params[:month_eq] || Date.current.month
-    @cash_transactions = @cash_transactions.where(year: @year_selected, month: @month_selected)
+    selected_date = Date.parse("#{@year_selected}-#{@month_selected}-10") 
+    @cash_transactions = CashTransaction.where(transaction_date: selected_date.beginning_of_month..selected_date.end_of_month)
     @cash_transactions = @cash_transactions.where(pic_id: params[:pic_id_eq]) unless params[:pic_id_eq].blank?
     @cash_transactions = @cash_transactions.order('transaction_date ASC')
     @debit_total = @cash_transactions.select { |t| t.transaction_type == CashTransaction::TYPE['DEBIT'] }.sum(&:total)
@@ -112,8 +113,8 @@ class CashTransactionsController < ApplicationController
     if CashFlow.where(year: params[:year], month: params[:month]).exists?
       redirect_to cash_transactions_path, alert: 'Already closed!'
     else
-      cash_transactions = CashTransaction.select('transaction_type, total, month, year').where(year: params[:year],
-                                                                                               month: params[:month])
+      selected_date = Date.parse("#{params[:year]}-#{params[:month]}-10") 
+      cash_transactions = CashTransaction.select('transaction_type, total, month, year').where(transaction_date: selected_date.beginning_of_month..selected_date.end_of_month)
       debit_total = cash_transactions.select { |t| t.transaction_type == CashTransaction::TYPE['DEBIT'] }.sum(&:total)
       credit_total = cash_transactions.select { |t| t.transaction_type == CashTransaction::TYPE['KREDIT'] }.sum(&:total)
 
@@ -133,24 +134,25 @@ class CashTransactionsController < ApplicationController
     @report_items = []
     @debit_total = 0
     @credit_total = 0
-    cash_transactions = CashTransaction.where(year: params[:year], month: params[:month])
+    selected_date = Date.parse("#{params[:year]}-#{params[:month]}-10") 
+    cash_transactions = CashTransaction.where(transaction_date: selected_date.beginning_of_month..selected_date.end_of_month).order('transaction_date ASC')
     CashTransaction::REPORT_WARGA.each do |key, value|
       if value.is_a?(Array)
         total = cash_transactions.select { |t| value.include?(t.transaction_group) }.sum(&:total)
         if key.include?('PEMASUKAN')
-          @report_items << ['cash_in', key, total]
+          @report_items << ['cash_in', '', key, total]
           @debit_total += total
         else
-          @report_items << ['cash_out', key, total]
+          @report_items << ['cash_out', '', key, total]
           @credit_total += total
         end
       else
         cash_transactions.select { |t| value == t.transaction_group }.each do |t|
           if key.include?('PEMASUKAN')
-            @report_items << ['cash_in', t.description, t.total]
+            @report_items << ['cash_in', t.transaction_date.strftime('%d %B %Y'), t.description, t.total]
             @debit_total += t.total
           else
-            @report_items << ['cash_out', t.description, t.total]
+            @report_items << ['cash_out', t.transaction_date.strftime('%d %B %Y'), t.description, t.total]
             @credit_total += t.total
           end
         end

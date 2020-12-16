@@ -75,6 +75,7 @@ class UserContributionsController < ApplicationController
       end
     end
 
+    t_date = Date.parse(tgl_bayar.to_date || "#{params[:year]}-#{params[:month]}-20")
     CashTransaction.create(
       month: params[:month],
       year: params[:year],
@@ -82,7 +83,7 @@ class UserContributionsController < ApplicationController
       transaction_type: CashTransaction::TYPE['DEBIT'],
       transaction_group: CashTransaction::GROUP['IURAN WARGA'],
       description: "Pendapatan Iuran Warga Blok #{blok_name}",
-      total: UserContribution.where(month: params[:month], year: params[:year], blok: blok_name).sum(&:contribution),
+      total: UserContribution.where(pay_at: t_date.beginning_of_month..t_date.end_of_month).sum(&:contribution),
       pic_id: user.id
     )
     redirect_to user_contributions_path, notice: 'Import data success'
@@ -229,6 +230,6 @@ class UserContributionsController < ApplicationController
   # Only allow a list of trusted parameters through.
   def user_contribution_params
     params.require(:user_contribution).permit(:address_id, :year, :month, :contribution, :pay_at, :receiver_id,
-                                              :description, :transaction_date)
+                                              :description, :transaction_date, :imported_cash_transaction)
   end
 end

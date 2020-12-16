@@ -6,15 +6,13 @@ module Api
       def home_page
         render status: 200,  json: { 
           status: true, 
-          tagihan: current_user.tagihan_now, 
-          last_payment: current_user.last_payment_contribution, 
+          me: current_user,
+          tagihan: current_user.try(:address).try(:tagihan_now), 
+          last_payment: current_user.try(:address).try(:last_payment_contribution), 
           blok: current_user.address ? current_user.address.block_address : "-",
           info: AppSetting.first.home_page_text % {user: current_user.name, greeting: Time.greeting_message_time },
           cash_flow: CashFlow.info((Date.current-1.month).month, (Date.current-1.month).year),
-          last_5_transaction: {
-            info: { month: UserContribution::MONTHNAMES.invert[Date.current.month], year: Date.current.year}, 
-            transactions: CashTransaction.last_5_transaction
-          }
+          information: Notification.last
         }
       end
 
@@ -23,19 +21,78 @@ module Api
         render json: { status: true, cash_flows: cash_flows }, status: :ok
       end
 
+      def cash_transactions
+        year_selected = params[:year] || Date.current.year
+        month_selected = params[:month] || Date.current.month
+        selected_date = Date.parse("#{@year_selected}-#{@month_selected}-10") 
+        @cash_transactions = CashTransaction.where(transaction_date: selected_date.beginning_of_month..selected_date.end_of_month).order('transaction_date ASC')
+  
+        render json: { status: true, cash_flows: cash_flows }, status: :ok
+      end
+
       def contributions
         render json: { status: true, contributions: current_user.address.try(:user_contributions) }, status: :ok
       end
 
       def address_info
-        address = Address.where(block_address: params[:block]).first
+        address = Address.includes(:users, :user_contributions).where(block_address: params[:block].gsub(/[^0-9A-Za-z]/, '').upcase).first
         if address
-          render json: { status: true, address: address, users: address.users  }, status: :ok
+          render json: { status: true, address: address, users: address.users, tagihan: address.tagihan_now }, status: :ok
         else
           render status: 404, json: {status: false, message: 'Address not found'}
         end
       end
 
+      def pay_contribution
+        address = Address.find(params[:address_id])
+        return render status:402, json:{status: true, message: 'pembayaran iuran gagal.', error: 'invalid address_id'} if address.nil?
+        uc = UserContribution.new(
+            month: Date.current.month,
+            year: Date.current.year,
+            address_id: address.id,
+            contribution: params[:contribution],
+            receiver_id: current_user.id,
+            pay_at: params[:pay_at],
+            payment_type: params[:payment_type]
+        )
+        if uc.save
+          1.upto(params[:total_bayar].to_i-1) do |_i|
+            ucd = uc.dup
+            ucd.save
+          end unless params[:total_bayar].to_i > 1
+          CashTransaction.create(
+            month: Date.current.month,
+            year: Date.current.month,
+            transaction_date: params[:pay_at],
+            transaction_type: CashTransaction::TYPE['DEBIT'],
+            transaction_group: CashTransaction::GROUP['IURAN WARGA'],
+            description: params[:total_bayar].to_i > 1 ? "#{params[:total_bayar].to_i} kali Iuran Warga Blok #{address.block_address}" : "Iuran Warga Blok #{address.block_address}" ,
+            total: (params[:total_bayar].to_i*params[:contribution].to_f),
+            pic_id: current_user.id
+          )
+          render json: { status: true, message: 'pembayaran iuran berhasil dilakukan.'}, status: :ok
+        else
+          render status:402, json:{status: false, message: 'pembayaran iuran gagal.', error: uc.errors}
+        end
+      end
+
+      def add_transaction
+        ct = CashTransaction.new(
+          month: Date.current.month,
+          year: Date.current.month,
+          transaction_date: params[:transaction_date],
+          transaction_type: params[:transaction_type],
+          transaction_group: params[:transaction_group] ,
+          description: params[:description] ,
+          total: params[:total],
+          pic_id: current_user.id
+        )
+        if ct.save
+          render json: { status: true, message: 'transaksi berhasil disimpan.', address: address, users: address.users, tagihan: address.tagihan_now }, status: :ok
+        else
+          render status:402, json:{status: false, message: 'transaksi gagal disimpan.', error: ct.errors}
+        end
+      end
     end
   end
 end

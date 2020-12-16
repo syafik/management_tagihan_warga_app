@@ -43,17 +43,6 @@ class User < ApplicationRecord
     ]
   end
 
-  def tagihan_now
-    total_paid = UserContribution.where(address_id: address_id).count
-    total_paid_should_be = (Date.current.year.to_i - 2020) * 12 + Date.current.month.to_i
-    "Anda mempunyai tagihan iuran #{total_paid_should_be - total_paid} kali."       
-  end
-
-  def last_payment_contribution
-    uc = UserContribution.where(address_id: address_id).order('id desc').last
-    "Pembayaran iuran terakhir Anda tanggal #{uc && uc.pay_at ? uc.try(:pay_at).try(:strftime, '%b %d, %Y') : '-'}"
-  end
-
   def password_complexity
     # Regexp extracted from https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
     return if password.blank? || password =~ /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/

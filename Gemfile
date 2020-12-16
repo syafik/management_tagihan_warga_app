@@ -47,6 +47,7 @@ gem 'ransack'
 gem 'rubocop'
 gem 'sib-api-v3-sdk'
 gem 'wkhtmltopdf-binary'
+gem 'swagger-docs'
 
 group :development, :test do
   # Call 'byebug' to stop execution and get a debugger console

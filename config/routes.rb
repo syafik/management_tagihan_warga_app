@@ -17,12 +17,17 @@ Rails.application.routes.draw do
                                           }
       get '/home_page', to: 'home#home_page'
       get '/address/info/:block', to: 'home#address_info'
-      get '/cash_flows', to: 'home#cash_flows'
+      get '/cash_flows/:year', to: 'home#cash_flows'
+      get '/cash_transactions/:month/:year', to: 'home#cash_transactions'
       get '/profile', to: 'user#profile'
       get '/contributions', to: 'home#contributions'
       post '/user/reset_password_token', to: 'user#reset_password_token'
       post '/user/reset_password', to: 'user#reset_password'
       put '/user/profile/update', to: 'user#update_profile'
+      get '/address/contribution_info', to: 'home#load_address_contribution_info'
+      post '/pay_contribution', to: 'home#pay_contribution'
+      post '/add_transaction', to: 'home#add_transaction'
+      
     end
   end
 

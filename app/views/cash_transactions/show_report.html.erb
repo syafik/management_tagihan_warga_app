@@ -12,6 +12,7 @@
               <thead>
                 <tr>
                   <th><b>No</b></th>
+                  <th><b>Tanggal</b></th>
                   <th><b>Deskripsi</b></th>
                   <th><b>Debit</b></th>
                   <th><b>Kredit</b></th>
@@ -22,12 +23,13 @@
                 <tr>
                 <td><%= i+1 %></td>
                 <td><%= ri[1] %></td>
+                <td><%= ri[2] %></td>
                 <% if ri[0] == 'cash_in' %>
-                  <td align='right'><%= number_to_currency(ri[2], unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+                  <td align='right'><%= number_to_currency(ri[3], unit: "Rp. ", separator: ",", delimiter: ".") %></td>
                   <td></td>
                 <% else %>
                   <td></td>
-                  <td align='right'><%= number_to_currency(ri[2], unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+                  <td align='right'><%= number_to_currency(ri[3], unit: "Rp. ", separator: ",", delimiter: ".") %></td>
                 <% end %>
                 </tr>
               <% end %>

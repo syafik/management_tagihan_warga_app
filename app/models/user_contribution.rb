@@ -4,6 +4,10 @@ class UserContribution < ApplicationRecord
   belongs_to :address
   belongs_to :receiver, class_name: 'User'
 
+  validates :contribution, :pay_at, :receiver_id, :payment_type, :blok, presence: true
+
+  before_save :set_blok_group
+
   MONTHNAMES =
     {
       'Januari' => 1,
@@ -53,4 +57,11 @@ class UserContribution < ApplicationRecord
     desc += " SECARA #{payment_type == 2 ? 'TRANSFER' : 'CASH'}"
     desc
   end
+
+  private
+
+  def set_blok_group
+    blok = address.block_address.gsub(/[^A-Za-z]/, '').upcase
+  end
+
 end
