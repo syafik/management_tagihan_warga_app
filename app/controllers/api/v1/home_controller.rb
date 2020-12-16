@@ -26,7 +26,28 @@ module Api
         month_selected = params[:month] || Date.current.month
         selected_date = Date.parse("#{@year_selected}-#{@month_selected}-10") 
         @cash_transactions = CashTransaction.where(transaction_date: selected_date.beginning_of_month..selected_date.end_of_month).order('transaction_date ASC')
-  
+        CashTransaction::REPORT_WARGA.each do |key, value|
+          if value.is_a?(Array)
+            total = cash_transactions.select { |t| value.include?(t.transaction_group) }.sum(&:total)
+            if key.include?('PEMASUKAN')
+              @report_items << ['cash_in', '', key, total]
+              @debit_total += total
+            else
+              @report_items << ['cash_out', '', key, total]
+              @credit_total += total
+            end
+          else
+            cash_transactions.select { |t| value == t.transaction_group }.each do |t|
+              if key.include?('PEMASUKAN')
+                @report_items << ['cash_in', t.transaction_date.strftime('%d %B %Y'), t.description, t.total]
+                @debit_total += t.total
+              else
+                @report_items << ['cash_out', t.transaction_date.strftime('%d %B %Y'), t.description, t.total]
+                @credit_total += t.total
+              end
+            end
+          end
+        end
         render json: { status: true, cash_flows: cash_flows }, status: :ok
       end
 
