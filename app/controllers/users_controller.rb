@@ -88,6 +88,6 @@ class UsersController < ApplicationController
   # Only allow a list of trusted parameters through.
   def user_params
     params.fetch(:user, {}).permit(:email, :name, :phone_number, :password, :contribution, :block_address, :role,
-                                   :pic_blok)
+                                   :pic_blok, :avatar)
   end
 end

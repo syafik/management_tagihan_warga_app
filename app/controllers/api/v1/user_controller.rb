@@ -6,7 +6,15 @@ module Api
       skip_before_action :authenticate_user!, only: %i[reset_password reset_password_token]
 
       def profile
-        render json: { status: true, profile: current_user, address: current_user.address }, status: :ok
+        render json: { status: true, profile: current_user, address: current_user.address, avatar: current_user.avatar }, status: :ok
+      end
+
+      def update_profile
+        if current_user.update(params[:user])
+          render json: { status: true, message: 'Profile telah terupdate', profile: current_user, address: current_user.address, avatar: current_user.avatar }, status: :ok
+        else
+          render status: 402, json: { status: false, message: 'Profile update gagal.', error: current_user.errors }
+        end
       end
 
       def reset_password_token
@@ -34,7 +42,7 @@ module Api
                           json: { status: false,
                                   message: 'Token yang di masukkan salah, silakan periksa kembali token Anda.' }
           end
-          if check_user.reset_password_sent_at + 5.minutes >= Time.current
+          if check_user.reset_password_sent_at + 5.minutes < Time.current
             return render status: 402, json: { status: false, message: 'Token sudah kadaluarsa, silakan resend token' }
           end
 

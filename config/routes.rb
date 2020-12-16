@@ -15,11 +15,14 @@ Rails.application.routes.draw do
                                             sessions: 'api/v1/sessions',
                                             registrations: 'api/v1/registrations'
                                           }
+      get '/home_page', to: 'home#home_page'
+      get '/address/info/:block', to: 'home#address_info'
       get '/cash_flows', to: 'home#cash_flows'
       get '/profile', to: 'user#profile'
       get '/contributions', to: 'home#contributions'
       post '/user/reset_password_token', to: 'user#reset_password_token'
       post '/user/reset_password', to: 'user#reset_password'
+      put '/user/profile/update', to: 'user#update_profile'
     end
   end
 

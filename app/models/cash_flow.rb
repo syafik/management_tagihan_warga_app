@@ -15,6 +15,11 @@ class CashFlow < ApplicationRecord
     ['year']
   end
 
+  def self.info(month, year)
+    cf = CashFlow.where(month: month, year:year).first
+    {month: UserContribution::MONTHNAMES.invert[month], year: year, pemasukan: cf.cash_in, pengeluaran: cf.cash_out }
+  end
+
   private
 
   def set_total_cash

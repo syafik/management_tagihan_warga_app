@@ -17,6 +17,8 @@ class User < ApplicationRecord
   belongs_to :address, optional: true
   before_validation :set_uid
 
+  has_one_attached :avatar
+
   def set_uid
     self.uid = self.class.generate_uid if uid.blank?
   end
@@ -39,6 +41,17 @@ class User < ApplicationRecord
       ['Greater Than', 'gt'],
       ['Greater Than or Equal to', 'gteq']
     ]
+  end
+
+  def tagihan_now
+    total_paid = UserContribution.where(address_id: address_id).count
+    total_paid_should_be = (Date.current.year.to_i - 2020) * 12 + Date.current.month.to_i
+    "Anda mempunyai tagihan iuran #{total_paid_should_be - total_paid} kali."       
+  end
+
+  def last_payment_contribution
+    uc = UserContribution.where(address_id: address_id).order('id desc').last
+    "Pembayaran iuran terakhir Anda tanggal #{uc && uc.pay_at ? uc.try(:pay_at).try(:strftime, '%b %d, %Y') : '-'}"
   end
 
   def password_complexity
