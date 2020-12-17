@@ -6,12 +6,23 @@ module Api
       skip_before_action :authenticate_user!, only: %i[reset_password reset_password_token]
 
       def profile
-        render json: { success: true, profile: current_user, address: current_user.address, avatar: current_user.avatar.try(:url) }, status: :ok
+        render json: { 
+          success: true, 
+          me: current_user,
+          avatar: (url_for(current_user.avatar) rescue nil),
+          address: current_user.address
+        }, status: :ok
       end
 
       def update_profile
         if current_user.update(user_params)
-          render json: { success: true, message: 'Profile telah terupdate', profile: current_user, address: current_user.address, avatar: current_user.avatar }, status: :ok
+          render json: { 
+            success: true, 
+            message: 'Profile telah terupdate', 
+            me: current_user,
+            avatar: (url_for(current_user.avatar) rescue nil),
+            address: current_user.address
+          }, status: :ok
         else
           render status: 402, json: { success: false, message: 'Profile update gagal.', error: current_user.errors }
         end
