@@ -10,7 +10,7 @@ module Api
       end
 
       def update_profile
-        if current_user.update(params[:user])
+        if current_user.update(user_params)
           render json: { success: true, message: 'Profile telah terupdate', profile: current_user, address: current_user.address, avatar: current_user.avatar }, status: :ok
         else
           render status: 402, json: { success: false, message: 'Profile update gagal.', error: current_user.errors }
@@ -65,6 +65,14 @@ module Api
                  json: { success: false, message: 'Maaf, Email yang dimasukkan tidak terdaftar dalam system.' }
         end
       end
+
+      private
+
+      def user_params
+        params.fetch(:user, {}).permit(:email, :name, :phone_number, :password, :contribution, :block_address, :role,
+          :pic_blok, :avatar)
+      end
+      
     end
   end
 end
