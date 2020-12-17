@@ -6,7 +6,7 @@ module Api
       skip_before_action :authenticate_user!, only: %i[reset_password reset_password_token]
 
       def profile
-        render json: { success: true, profile: current_user, address: current_user.address, avatar: current_user.avatar }, status: :ok
+        render json: { success: true, profile: current_user, address: current_user.address, avatar: current_user.avatar.try(:url) }, status: :ok
       end
 
       def update_profile
