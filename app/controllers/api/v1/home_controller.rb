@@ -96,7 +96,7 @@ module Api
           )
           render json: { success: true, message: 'pembayaran iuran berhasil dilakukan.'}, status: :ok
         else
-          render status:402, json:{success: false, message: 'pembayaran iuran gagal.', error: uc.errors}
+          render status:402, json:{success: false, message: "Pembayaran iuran gagal. #{uc.errors.full_messages.join(", ")}"}
         end
       end
 

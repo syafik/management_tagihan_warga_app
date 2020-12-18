@@ -24,7 +24,7 @@ module Api
             address: current_user.address
           }, status: :ok
         else
-          render status: 402, json: { success: false, message: 'Profile update gagal.', error: current_user.errors.full_messages.join(", ") }
+          render status: 402, json: { success: false, message: "Profile update gagal. #{current_user.errors.full_messages.join(", ")}" }
         end
       end
 
@@ -69,7 +69,7 @@ module Api
                    json: { success: true,
                            message: 'Password sudah terupdate dan sudah bisa di gunakan. Silakan login kembali.' }
           else
-            render status: 402, json: { success: false, message: 'Reset password gagal.', error: check_user.errors.full_messages.join(", ") }
+            render status: 402, json: { success: false, message: "Reset password gagal. #{check_user.errors.full_messages.join(", ")}" }
           end
         else
           render status: 402,
