@@ -20,6 +20,11 @@ class CashFlow < ApplicationRecord
     {month: UserContribution::MONTHNAMES.invert[month], year: year, pemasukan: cf.cash_in, pengeluaran: cf.cash_out }
   end
 
+  def month_info
+    UserContribution::MONTHNAMES.invert[month]
+  end
+
+
   private
 
   def set_total_cash

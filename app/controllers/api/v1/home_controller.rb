@@ -17,8 +17,11 @@ module Api
       end
 
       def cash_flows
-        cash_flows = CashFlow.where(year: params[:year])
-        render json: { success: true, title: "Cash Flow Tahun #{params[:year]}", cash_flows: cash_flows }, status: :ok
+        cash_flows = CashFlow.where(year: params[:year]).order('month ASC')
+        total_cash_in = cash_flows.sum(&:cash_in)
+        total_cash_out = cash_flows.sum(&:cash_out)
+        grand_total = cash_flows.sum(&:total)
+        render json: { success: true, title: "Cash Flow Tahun #{params[:year]}", total_cash_in: total_cash_in, total_cash_out: total_cash_out, grand_total: grand_total, cash_flows: cash_flows.as_json(:methods => [:month_info]) }, status: :ok
       end
 
       def cash_transactions
