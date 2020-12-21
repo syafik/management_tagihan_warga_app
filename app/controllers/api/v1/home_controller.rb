@@ -56,7 +56,7 @@ module Api
 
       def contributions
         contributions = current_user.address.try(:user_contributions)
-        render json: { success: true, contributions: contributions.as_json(:methods => [:contribution_desc])}, status: :ok
+        render json: { success: true, title: "Tagihan Anda per #{UserContribution::MONTHNAMES.invert[Date.current.month]} #{Date.current.year}", tagihan: "#{current_user.address.try(:tagihan_now)}",  contributions: contributions.as_json(:methods => [:contribution_desc])}, status: :ok
       end
 
       def address_info
