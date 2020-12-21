@@ -62,6 +62,10 @@ class UserContribution < ApplicationRecord
     "Pembayaran Iuran, #{payment_type == 2 ? 'TRANSFER' : 'CASH'} Diterima Oleh: #{try(:receiver).try(:name).try(:upcase)}"
   end
 
+  def tgl_bayar
+    pay_at.blank? ? "-" : pay_at.strftime('%d %B %Y')
+  end
+
 
   private
 
