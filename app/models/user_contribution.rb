@@ -58,6 +58,11 @@ class UserContribution < ApplicationRecord
     desc
   end
 
+  def contribution_desc
+    "Pembayaran Iuran, #{payment_type == 2 ? 'TRANSFER' : 'CASH'} Diterima Oleh: #{try(:receiver).try(:name).try(:upcase)}"
+  end
+
+
   private
 
   def set_blok_group
