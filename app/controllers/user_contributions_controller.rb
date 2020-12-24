@@ -75,7 +75,7 @@ class UserContributionsController < ApplicationController
       end
     end
 
-    t_date = Date.parse(tgl_bayar.to_date || "#{params[:year]}-#{params[:month]}-20")
+    t_date = Date.parse("#{params[:year]}-#{params[:month]}-20")
     CashTransaction.create(
       month: params[:month],
       year: params[:year],
