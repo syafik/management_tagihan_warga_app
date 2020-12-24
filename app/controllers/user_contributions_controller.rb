@@ -83,7 +83,7 @@ class UserContributionsController < ApplicationController
       transaction_type: CashTransaction::TYPE['DEBIT'],
       transaction_group: CashTransaction::GROUP['IURAN WARGA'],
       description: "Pendapatan Iuran Warga Blok #{blok_name}",
-      total: UserContribution.where(pay_at: t_date.beginning_of_month..t_date.end_of_month).sum(&:contribution),
+      total: UserContribution.where(pay_at: t_date.beginning_of_month..t_date.end_of_month, blok: blok_name, receiver_id: user.id).sum(&:contribution),
       pic_id: user.id
     )
     redirect_to user_contributions_path, notice: 'Import data success'
