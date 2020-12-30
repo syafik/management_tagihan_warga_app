@@ -5,7 +5,7 @@
         <h4 class="card-title mb-sm-0 text-center">Komplek Puri Ayana Gempol</h4>
         <h4 class="card-title mb-sm-0 text-center">Laporan Transaksi per <%= UserContribution::MONTHNAMES.invert[month.to_i] %>, <%= year %></span></h4>
         <br />
-        <div id="content-data" style = "display:block; clear:both; page-break-after:always;">
+        <div id="content-data" style="display:block; clear:both; page-break-after:always;">
           <div class="table-responsive border rounded p-1">
             <table class="table table-bordered table-striped" id="table-content">
               <thead>
@@ -19,7 +19,7 @@
               </thead>
               <tbody>
               <% report_items.each_with_index do |ri, i| %>
-                <tr>
+                <tr style='page-break-inside: avoid'>
                 <td><%= i+1 %></td>
                 <td><%= ri[1] %></td>
                 <td><%= ri[2] %></td>
