@@ -33,12 +33,12 @@
                 </tr>
               <% end %>
               <tr>
-                <td colspan="3"  align='right'><b>TOTAL</b></td>
-                <td align='right'><b><%= number_to_currency(debit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
+                <td  colspan="3"  align='right'><b>TOTAL</b></td>
+                <td  align='right'><b><%= number_to_currency(debit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
                 <td  align='right'><b><%= number_to_currency(credit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
               </tr>
               <tr>
-                <td colspan="3"  align='right'><b>SISA</b></td>
+                <td colspan="3" align='right'><b>SISA</b></td>
                 <td colspan="2" align='right' style='color:<%=  debit_total-credit_total >= 0 ? 'black' : 'red' %>'><b><%= number_to_currency(debit_total-credit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
               </tr>
               </tbody>
