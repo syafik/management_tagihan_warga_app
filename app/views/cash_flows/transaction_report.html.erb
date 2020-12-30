@@ -1,0 +1,55 @@
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title mb-sm-0 text-center">Komplek Puri Ayana Gempol</h4>
+        <h4 class="card-title mb-sm-0 text-center">Laporan Alur Kas Tahun <%= year %></span></h4>
+        <br />
+        <div id="content-data">
+          <div class="table-responsive border rounded p-1">
+            <table class="table table-bordered table-striped" id="table-content">
+              <tbody>
+                <tr>
+                  <th><b>No</b></th>
+                  <th><b>Bulan</b></th>
+                  <th><b>Debit</b></th>
+                  <th><b>Kredit</b></th>
+                  <th><b>Sisa</b></th>
+                </tr>
+              <% cash_flows.each_with_index do |cf, i| %>
+                <tr>
+                  <td>
+                    <div class='pagebreak'><%= i+1 %></div>
+                  </td>
+                  <td>
+                    <div class='pagebreak'><%= UserContribution::MONTHNAMES.invert[cf.month] %></div>
+                  </td>
+                  <td style="font-weight:bolder;"> 
+                    <div class='pagebreak'><%= number_to_currency(cf.cash_in, unit: "Rp. ", separator: ",", delimiter: ".") %></div>
+                  </td>
+                  <td style="font-weight:bolder;">
+                    <div class='pagebreak'><%= number_to_currency(cf.cash_out, unit: "Rp. ", separator: ",", delimiter: ".") %></div>
+                  </td>
+                  <td style="font-weight:bolder;color:<%= cf.total < 0 ? 'red' : 'black'%>">
+                    <div class='pagebreak'><%= number_to_currency(cf.total, unit: "Rp. ", separator: ",", delimiter: ".") %></div>
+                  </td>
+                </tr>
+              <% end %>
+              <tr>
+                <td  colspan="2"  align='right'><div class='pagebreak'><b>TOTAL</b></div></td>
+                <td  align='right'><div class='pagebreak'><b><%= number_to_currency(debit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></div></td>
+                <td  align='right'><div class='pagebreak'><b><%= number_to_currency(credit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></div></td>
+              </tr>
+              <tr>
+                <td colspan="2" align='right'><div class='pagebreak'><b>SISA KAS <%= year %></b></div></td>
+                <td colspan="2" align='right' style='color:<%=  grand_total >= 0 ? 'black' : 'red' %>'><div class='pagebreak'><b><%= number_to_currency(grand_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></div></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

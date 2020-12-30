@@ -68,6 +68,26 @@ class CashFlowsController < ApplicationController
     end
   end
 
+  def generate_report
+    year = params[:year] || Date.current.year
+    cash_flows = CashFlow.where(year: year).order('month, year asc')
+    debit_total = cash_flows.sum(&:cash_in)
+    credit_total = cash_flows.sum(&:cash_out)
+    grand_total = cash_flows.sum(&:total)
+    respond_to do |format|
+      format.html
+      format.pdf do
+        html = render_to_string('transaction_report.html.erb', layout: 'report', locals: { cash_flows: cash_flows,
+                                                                                            year: year, debit_total: debit_total, credit_total: credit_total, grand_total: grand_total })
+        kit = PDFKit.new(html)
+        kit.stylesheets << "#{Rails.root}/app/assets/stylesheets/application.css"
+        kit.stylesheets << "#{Rails.root}/app/assets/stylesheets/style.css"
+        send_data(kit.to_pdf, filename: "laporan_alur_kas_tahun_#{params[:year]}.pdf",
+                              type: 'application/pdf', disposition: 'inline')
+      end
+    end
+  end
+
   # DELETE /users/1
   # DELETE /users/1.json
   # def destroy

@@ -1,4 +1,5 @@
 <div class="table-responsive border rounded p-1">
+<a href="<%= generate_report_cash_flows_path(params[:year] || Date.current.year, format: :pdf) %>" class="btn btn-primary mr-auto mb-3 mb-sm-0" target='_blank'> Generate Report</a>
   <table class="table table-hover" id="table-content">
     <thead>
     <tr>

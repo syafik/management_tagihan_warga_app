@@ -2,6 +2,7 @@
 
 Rails.application.routes.draw do
   mount Ckeditor::Engine => '/ckeditor'
+  get '/api' => redirect('/swagger/dist/index.html?url=/apidocs/api-docs.json')
   devise_for :users, skip: :registrations, controllers: {
     sessions: 'users/sessions',
     passwords: 'users/passwords',
@@ -42,6 +43,7 @@ Rails.application.routes.draw do
   resources :cash_flows do
     collection do
       match :search, via: %i[get post]
+      get 'generate_report/:year', to: 'cash_flows#generate_report', as: :generate_report
     end
   end
 
