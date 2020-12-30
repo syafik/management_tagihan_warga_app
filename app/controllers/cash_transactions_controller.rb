@@ -57,7 +57,7 @@ class CashTransactionsController < ApplicationController
   end
 
   def do_import_data
-    session = GoogleDrive::Session.from_service_account_key('My Project 34179-7a1a2c83e354.json')
+    session = GoogleDrive::Session.from_service_account_key('config/gdrive_project.json')
     ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[5]
     transaction_type = params[:transaction_type]
     (3..ws.num_rows).each do |row|
