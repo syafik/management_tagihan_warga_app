@@ -6,6 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>PuriAyana App!</title>
   <%= csrf_meta_tags %>
+  <style>
+      .pagebreak {
+          page-break-inside: avoid !important;
+          margin: 4px 0 4px 0;  
+      }
+      
+      thead, tfoot { display: table-row-group } 
+  </style>
+  
 </head>
 <body>
 <div class="container-scroller">
@@ -16,7 +25,7 @@
     <!-- partial:partials/_sidebar.html -->
     <%#= render partial: 'layouts/sidebar' %>
     <!-- partial -->
-    <div class="main-panel" style="width:100%">
+    <div class="main-panel pagebreak" style="width:100%">
       <div class="content-wrapper">
         <%= yield %>
       </div>

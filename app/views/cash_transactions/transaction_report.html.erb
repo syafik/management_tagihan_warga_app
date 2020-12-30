@@ -5,10 +5,10 @@
         <h4 class="card-title mb-sm-0 text-center">Komplek Puri Ayana Gempol</h4>
         <h4 class="card-title mb-sm-0 text-center">Laporan Transaksi per <%= UserContribution::MONTHNAMES.invert[month.to_i] %>, <%= year %></span></h4>
         <br />
-        <div id="content-data" style="display:block; clear:both; page-break-after:always;">
+        <div id="content-data">
           <div class="table-responsive border rounded p-1">
             <table class="table table-bordered table-striped" id="table-content">
-              <thead>
+              <tbody>
                 <tr>
                   <th><b>No</b></th>
                   <th><b>Tanggal</b></th>
@@ -16,30 +16,38 @@
                   <th><b>Debit</b></th>
                   <th><b>Kredit</b></th>
                 </tr>
-              </thead>
-              <tbody>
               <% report_items.each_with_index do |ri, i| %>
-                <tr style='page-break-inside: avoid'>
-                <td><%= i+1 %></td>
-                <td><%= ri[1] %></td>
-                <td><%= ri[2] %></td>
+                <tr>
+                  <td>
+                    <div class='pagebreak'><%= i+1 %></div>
+                  </td>
+                  <td>
+                    <div class='pagebreak'><%= ri[1] %></div>
+                  </td>
+                  <td>
+                    <div class='pagebreak'><%= ri[2] %></div>
+                  </td>
                 <% if ri[0] == 'cash_in' %>
-                  <td align='right'><%= number_to_currency(ri[3], unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+                  <td align='right'>
+                    <div class='pagebreak'><%= number_to_currency(ri[3], unit: "Rp. ", separator: ",", delimiter: ".") %></div>
+                  </td>
                   <td></td>
                 <% else %>
                   <td></td>
-                  <td align='right'><%= number_to_currency(ri[3], unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+                  <td align='right'>
+                    <div class='pagebreak'><%= number_to_currency(ri[3], unit: "Rp. ", separator: ",", delimiter: ".") %></div>
+                  </td>
                 <% end %>
                 </tr>
               <% end %>
               <tr>
-                <td  colspan="3"  align='right'><b>TOTAL</b></td>
-                <td  align='right'><b><%= number_to_currency(debit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
-                <td  align='right'><b><%= number_to_currency(credit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
+                <td  colspan="3"  align='right'><div class='pagebreak'><b>TOTAL</b></div></td>
+                <td  align='right'><div class='pagebreak'><b><%= number_to_currency(debit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></div></td>
+                <td  align='right'><div class='pagebreak'><b><%= number_to_currency(credit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></div></td>
               </tr>
               <tr>
-                <td colspan="3" align='right'><b>SISA</b></td>
-                <td colspan="2" align='right' style='color:<%=  debit_total-credit_total >= 0 ? 'black' : 'red' %>'><b><%= number_to_currency(debit_total-credit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
+                <td colspan="3" align='right'><div class='pagebreak'><b>SISA</b></div></td>
+                <td colspan="2" align='right' style='color:<%=  debit_total-credit_total >= 0 ? 'black' : 'red' %>'><div class='pagebreak'><b><%= number_to_currency(debit_total-credit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></div></td>
               </tr>
               </tbody>
             </table>
