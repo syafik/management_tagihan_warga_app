@@ -171,7 +171,7 @@ class UserContributionsController < ApplicationController
     end
     session = GoogleDrive::Session.from_service_account_key('config/gdrive_project.json')
     Address::BLOK_NAME.each do |_key, value|
-      ws = session.spreadsheet_by_key('1s0cqOJbSPoB1358ftFtPSxOd_BCdIGQyjThcQYuRsXw').worksheets[value]
+      ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[value]
       (1..ws.num_rows).each do |row|
         if row == 1
           ws[row, 1] =
@@ -196,7 +196,7 @@ class UserContributionsController < ApplicationController
     end
 
     # PENGELUARAN WORKSHEET
-    ws = session.spreadsheet_by_key('1s0cqOJbSPoB1358ftFtPSxOd_BCdIGQyjThcQYuRsXw').worksheets[5]
+    ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[5]
     (1..ws.num_rows).each do |row|
       if row == 1
         ws[row, 1] =
