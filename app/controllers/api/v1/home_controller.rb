@@ -81,7 +81,8 @@ module Api
             contribution: params[:contribution],
             receiver_id: current_user.id,
             pay_at: params[:pay_at],
-            payment_type: params[:payment_type]
+            payment_type: params[:payment_type],
+            blok: params[:blok]
         )
         if uc.save
           1.upto(params[:total_bayar].to_i-1) do |_i|
