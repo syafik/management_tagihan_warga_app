@@ -6,7 +6,7 @@ module Api
       skip_before_action :verify_authenticity_token, only: :create, raise: false
 
       def render_create_success
-        @resource.updates(device_token: params[:device_token], device_type: params[:device_type])
+        @resource.update(device_token: params[:device_token], device_type: params[:device_type])
         render status: 200, json: {
           success: true,
           message: "Login berhasil.",
