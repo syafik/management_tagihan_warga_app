@@ -46,6 +46,7 @@ gem 'pdfkit'
 gem 'ransack'
 gem 'rubocop'
 gem 'sib-api-v3-sdk'
+gem "typhoeus"
 gem 'wkhtmltopdf-binary'
 gem 'swagger-docs'
 
