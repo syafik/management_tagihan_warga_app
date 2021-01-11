@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Notification < ApplicationRecord
+  
+  validates :title, :notif, presence: true
   after_create :send_mobile_notification
 
   def self.ransack_predicates

@@ -132,6 +132,15 @@ module Api
         notification = Notification.find(params[:id])
         render json: { success: true, notification: notification }, status: :ok
       end
+
+      def add_notification
+        notification = Notification.new(title: params[:title], notif: params[:notif])
+        if notification.save
+          render json: { success: true, message: 'notifikasi berhasil disimpan dan dikirim.'}, status: :ok
+        else
+          render status:402, json:{success: false, message: 'notifikasi gagal disimpan.', error: notification.errors}
+        end
+      end
     end
   end
 end
