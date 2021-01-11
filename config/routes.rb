@@ -28,7 +28,8 @@ Rails.application.routes.draw do
       get '/address/contribution_info', to: 'home#load_address_contribution_info'
       post '/pay_contribution', to: 'home#pay_contribution'
       post '/add_transaction', to: 'home#add_transaction'
-      get '/pengumuman', to: 'home#notification'
+      get '/notification', to: 'home#notification'
+      get '/notification/:id', to: 'home#notification_show'
       
     end
   end

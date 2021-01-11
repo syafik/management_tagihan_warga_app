@@ -124,7 +124,12 @@ module Api
       end
 
       def notification
-        notification = Notification.order('created_at ASC').limit(10)
+        notifications = Notification.order('created_at ASC').limit(10)
+        render json: { success: true, notifications: notifications }, status: :ok
+      end
+
+      def notification_show
+        notification = Notification.find(params[:id])
         render json: { success: true, notification: notification }, status: :ok
       end
     end

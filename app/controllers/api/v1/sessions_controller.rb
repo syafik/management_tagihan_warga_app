@@ -7,6 +7,7 @@ module Api
 
       def render_create_success
         render status: 200, json: {
+          @resource.updates(device_token: params[:device_token], device_type: params[:device_type])
           success: true,
           message: "Login berhasil.",
           me: @resource,
