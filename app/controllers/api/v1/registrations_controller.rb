@@ -6,7 +6,7 @@ module Api
       skip_before_action :verify_authenticity_token
 
       def sign_up_params
-        params.require(:registration).permit(:email, :password, :name, :phone_number)
+        params.require(:registration).permit(:email, :password, :name, :phone_number, :device_type, :device_token)
       end
 
       def render_create_success

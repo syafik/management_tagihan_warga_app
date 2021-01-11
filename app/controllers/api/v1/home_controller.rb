@@ -58,7 +58,7 @@ module Api
       end
 
       def contributions
-        contributions = current_user.address.try(:user_contributions)
+        contributions = current_user.address.try(:user_contributions).order('created_at ASC')
         render json: { success: true, title: "Tagihan Anda per #{UserContribution::MONTHNAMES.invert[Date.current.month]} #{Date.current.year}", tagihan: "#{current_user.address.try(:tagihan_now)}",  contributions: contributions.as_json(:methods => [:contribution_desc, :tgl_bayar])}, status: :ok
       end
 
@@ -121,6 +121,11 @@ module Api
         else
           render status:402, json:{success: false, message: 'transaksi gagal disimpan.', error: ct.errors}
         end
+      end
+
+      def notification
+        notification = Notification.order('created_at ASC').limit(10)
+        render json: { success: true, notification: notification }, status: :ok
       end
     end
   end
