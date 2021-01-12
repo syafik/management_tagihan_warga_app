@@ -133,7 +133,7 @@ module Api
       end
 
       def notifications
-        user_notifications =  current_user.user_notifications.includes(:notifications).order('created_at DESC').limit(10)
+        user_notifications =  current_user.user_notifications.includes(:notification).order('created_at DESC').limit(10)
         render json: { success: true, user_notifications: user_notifications.as_json(methods: [:notification]) }, status: :ok
       end
 
