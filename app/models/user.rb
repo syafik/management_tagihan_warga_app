@@ -18,6 +18,10 @@ class User < ApplicationRecord
   before_validation :set_uid
 
   has_one_attached :avatar
+  has_many :debts
+
+  has_many :user_notifications
+  has_many :notifications, through: :user_notifications
 
   def set_uid
     self.uid = self.class.generate_uid if uid.blank?
@@ -126,6 +130,15 @@ class User < ApplicationRecord
     rescue SibApiV3Sdk::ApiError => e
       puts "Exception when calling TransactionalEmailsApi->send_transac_email: #{e}"
     end
+  end
+
+  def has_debt?
+    return false unless debts.exists?
+    debts.select{|d| d.debt_type == 1}.sum(&:value) > debts.select{|d| d.debt_type == 2}.sum(&:value) 
+  end
+
+  def blok_name
+    address.try(:block_address)
   end
 
 end

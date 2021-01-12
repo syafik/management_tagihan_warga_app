@@ -17,8 +17,8 @@
         <td><%= (i + 1) %> </td>
         <td><%= installment.description.upcase %></td>
         <td><%= number_to_currency(installment.value, unit: "Rp. ", separator: ",", delimiter: ".") %></td>
-        <td><%= number_to_currency(installment.installment_transactions.sum(&:value) , unit: "Rp. ", separator: ",", delimiter: ".") %></td>
-        <td><%= number_to_currency(installment.value - installment.installment_transactions.sum(&:value) , unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+        <td><%= number_to_currency(installment.total_paid , unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+        <td><%= number_to_currency(installment.remaining_installment , unit: "Rp. ", separator: ",", delimiter: ".") %></td>
         <td><%= installment.paid_off ? "LUNAS" : "BELUM LUNAS" %></td>
         <td>
           <%= link_to 'Lihat', installment, class: 'btn-sm btn-success' %>

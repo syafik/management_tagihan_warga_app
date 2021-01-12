@@ -6,6 +6,19 @@ class Installment < ApplicationRecord
   belongs_to :parent, class_name: 'Installment', foreign_key: 'parent_id', optional: true
   has_many :installment_transactions, class_name: 'Installment', foreign_key: 'parent_id'
 
+
+  def total_paid
+    installment_transactions.sum(&:value)
+  end
+
+  def remaining_installment
+    value - total_paid
+  end
+
+  def paid_off?
+    remaining_installment <= 0
+  end
+
   private
 
   def create_cash_transaction
@@ -27,4 +40,5 @@ class Installment < ApplicationRecord
       transaction_group: t_group
     )
   end
+
 end

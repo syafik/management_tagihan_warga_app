@@ -10,7 +10,8 @@ module Api
           success: true, 
           me: current_user,
           avatar: (url_for(current_user.avatar) rescue nil),
-          address: current_user.address
+          address: current_user.address,
+          has_debt: current_user.has_debt?
         }, status: :ok
       end
 
@@ -21,7 +22,8 @@ module Api
             message: 'Profile telah terupdate', 
             me: current_user,
             avatar: (url_for(current_user.avatar) rescue nil),
-            address: current_user.address
+            address: current_user.address,
+            has_debt: current_user.has_debt?
           }, status: :ok
         else
           render status: 402, json: { success: false, message: "Profile update gagal. #{current_user.errors.full_messages.join(", ")}" }

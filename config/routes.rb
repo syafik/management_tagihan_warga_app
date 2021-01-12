@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       get '/address/info/:block', to: 'home#address_info'
       get '/cash_flows/:year', to: 'home#cash_flows'
       get '/cash_transactions/:month/:year', to: 'home#cash_transactions'
+      get '/users', to: 'home#user_lists'
       get '/profile', to: 'user#profile'
       get '/contributions', to: 'home#contributions'
       post '/user/reset_password_token', to: 'user#reset_password_token'
@@ -28,9 +29,15 @@ Rails.application.routes.draw do
       get '/address/contribution_info', to: 'home#load_address_contribution_info'
       post '/pay_contribution', to: 'home#pay_contribution'
       post '/add_transaction', to: 'home#add_transaction'
-      get '/notification', to: 'home#notification'
-      get '/notification/:id', to: 'home#notification_show'
-      
+      get '/notifications', to: 'home#notifications'
+      get '/notifications/:id', to: 'home#notification_show'
+      post '/notifications/add', to: 'home#add_notification'
+      get '/debts', to: 'home#debts'
+      post '/debts/add', to: 'home#add_debt'
+      get '/installments', to: 'home#installments'
+      get '/installments/:id', to: 'home#installment_transaction'
+      post '/installments/add', to: 'home#add_installment'
+      post '/installments/pay', to: 'home#pay_installment'
     end
   end
 

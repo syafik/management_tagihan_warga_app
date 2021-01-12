@@ -12,7 +12,8 @@ module Api
           message: "Login berhasil.",
           me: @resource,
           avatar: (url_for(@resource.avatar) rescue nil),
-          address: @resource.address
+          address: @resource.address,
+          has_debt: current_user.has_debt?
         }
       end
 

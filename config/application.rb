@@ -19,5 +19,6 @@ module SwitchupAdministrator
 
     config.time_zone = 'Jakarta'
     config.i18n.default_locale = :id
+    config.active_job.queue_adapter = :delayed_job
   end
 end

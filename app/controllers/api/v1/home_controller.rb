@@ -16,6 +16,13 @@ module Api
         }
       end
 
+      def user_lists
+        users = User.includes(:address).where(kk: true)
+        render status: :ok, json: {
+          users: users.as_json(methods: [:blok_name])
+        }
+      end
+
       def cash_flows
         cash_flows = CashFlow.where(year: params[:year]).order('month ASC')
         total_cash_in = cash_flows.sum(&:cash_in)
@@ -58,7 +65,7 @@ module Api
       end
 
       def contributions
-        contributions = current_user.address.try(:user_contributions).order('created_at ASC')
+        contributions = current_user.address.try(:user_contributions).order('created_at DESC')
         render json: { success: true, title: "Tagihan Anda per #{UserContribution::MONTHNAMES.invert[Date.current.month]} #{Date.current.year}", tagihan: "#{current_user.address.try(:tagihan_now)}",  contributions: contributions.as_json(:methods => [:contribution_desc, :tgl_bayar])}, status: :ok
       end
 
@@ -99,6 +106,8 @@ module Api
             total: (params[:total_bayar].to_i*params[:contribution].to_f),
             pic_id: current_user.id
           )
+          notification = Notification.create(title: "Pembayaran Iuran Bulanan Sukses!", notif: "Terima Kasih atas pembayara iuran bulanan yang telah dilakukan. \n Anda membayar sebanyak #{params[:total_bayar]} kali tagihan sebesar #{(params[:total_bayar].to_i*params[:contribution].to_f)}, dan sudah diterima oleh #{current_user.name} Secara #{params[:payment_type].to_i == 2 ? 'TRANSFER' : 'CASH'} tanggal #{uc.pay_at.strftime('%d %B %Y')}.")
+          SendNotificationToUsersJob.perform_later(notification.id, 1, address.users.pluck(:id))
           render json: { success: true, message: 'pembayaran iuran berhasil dilakukan.'}, status: :ok
         else
           render status:402, json:{success: false, message: "Pembayaran iuran gagal. #{uc.errors.full_messages.join(", ")}"}
@@ -123,9 +132,9 @@ module Api
         end
       end
 
-      def notification
-        notifications = Notification.order('created_at ASC').limit(10)
-        render json: { success: true, notifications: notifications }, status: :ok
+      def notifications
+        user_notifications =  current_user.user_notifications.includes(:notifications).order('created_at DESC').limit(10)
+        render json: { success: true, user_notifications: user_notifications.as_json(methods: [:notification]) }, status: :ok
       end
 
       def notification_show
@@ -136,11 +145,44 @@ module Api
       def add_notification
         notification = Notification.new(title: params[:title], notif: params[:notif])
         if notification.save
+          SendNotificationToUsersJob.perform_later(notification.id, 1, [])
           render json: { success: true, message: 'notifikasi berhasil disimpan dan dikirim.'}, status: :ok
         else
           render status:402, json:{success: false, message: 'notifikasi gagal disimpan.', error: notification.errors}
         end
       end
+
+      def debts
+        debts = current_user.debts
+        total_pinjam = debts.select{|d| d.debt_type == 1}.sum(&:value)
+        total_bayar = debts.select{|d| d.debt_type == 2}.sum(&:value)
+        sisa_hutang = total_pinjam - total_bayar
+        render status: :ok, json: {success: true, debts: debts, total_pinjam: total_pinjam, total_bayar: total_bayar, sisa_hutang: sisa_hutang}
+      end
+
+      def add_debt
+          
+      end
+
+      def installments
+        installments = Installment.includes(:installment_transactions).where('parent_id IS NULL')
+        render status: :ok, json: {success: true, installments: installments.as_json(:methods => [:total_paid, :remaining_installment, :paid_off?])}
+      end
+
+      def installment_transaction
+        installment = Installment.find(params[:id])
+        installment_transactions = installment.installment_transactions
+        render status: :ok, json: {success: true, installment: installment.as_json(:methods => [:total_paid, :remaining_installment, :paid_off?]), installment_transactions: installment_transactions}
+      end
+
+      def add_installment
+        
+      end
+
+      def pay_installment
+
+      end
+
     end
   end
 end

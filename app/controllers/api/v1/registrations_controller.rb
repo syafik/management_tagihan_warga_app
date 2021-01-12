@@ -14,7 +14,8 @@ module Api
           success: true,
           message: "Selamat, berhasil meembuat akun baru.",
           me: @resource,
-          address: @resource.address
+          address: @resource.address,
+          has_debt: current_user.has_debt?
         }
       end
 

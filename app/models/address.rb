@@ -35,7 +35,7 @@ class Address < ApplicationRecord
   def tagihan_now
     total_paid = user_contributions.count
     total_paid_should_be = (Date.current.year.to_i - 2020) * 12 + Date.current.month.to_i
-    tagihan = total_paid_should_be - total_paid)
+    tagihan = total_paid_should_be - total_paid
     tagihan = 0 if tagihan < 0
     tagihan
   end

@@ -43,6 +43,7 @@ class NotificationsController < ApplicationController
 
     respond_to do |format|
       if @notification.save
+        SendNotificationToUsersJob.perform_later(@notification.id, 1, [])
         format.html { redirect_to @notification, notice: 'Notification was successfully created.' }
         format.json { render :show, status: :created, location: @notification }
       else

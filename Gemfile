@@ -34,6 +34,8 @@ gem 'jbuilder', '~> 2.5'
 gem 'activerecord-import'
 gem 'brakeman'
 gem 'ckeditor', github: 'galetahub/ckeditor'
+gem 'daemons'
+gem 'delayed_job_active_record'
 gem 'devise'
 gem 'devise_token_auth'
 # if you haven't added it, already
