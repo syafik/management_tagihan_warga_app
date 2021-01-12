@@ -14,26 +14,28 @@ class SendNotificationToUsersJob < ApplicationJob
     end
     UserNotification.import user_notifications
     
-
     notification = Notification.find(notification_id)
     device_tokens = notification.app_notif_receivers.pluck(:device_token)
-    request = Typhoeus::Request.new(
-      "https://fcm.googleapis.com/fcm/send",
-      method: :post,
-      body: {
-        "notification":{
-          "title": notification.title,
-          "body": notification.notif,
-          "click_action": "FLUTTER_NOTIFICATION_CLICK"
-        },
-        "data": {
-          "notif_id": notification.id
-        },
-        "registration_ids":  device_tokens
-      }.to_json,
-      headers: { "Content-Type": "application/json", Authorization: "key=#{ENV['FCM_APIKEY']}" }
-    )
-    request.run
-
+    p device_tokens
+    unless device_tokens.blank?
+      request = Typhoeus::Request.new(
+        "https://fcm.googleapis.com/fcm/send",
+        method: :post,
+        body: {
+          "notification":{
+            "title": notification.title,
+            "body": notification.notif,
+            "click_action": "FLUTTER_NOTIFICATION_CLICK"
+          },
+          "data": {
+            "notif_id": notification.id
+          },
+          "registration_ids":  device_tokens
+        }.to_json,
+        headers: { "Content-Type": "application/json", Authorization: "key=#{ENV['FCM_APIKEY']}" }
+      )
+      request.run
+      p request.response
+    end
   end
 end

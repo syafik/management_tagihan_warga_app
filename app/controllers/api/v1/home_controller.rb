@@ -139,6 +139,7 @@ module Api
 
       def notification_show
         notification = Notification.find(params[:id])
+        notification.read_by(current_user)
         render json: { success: true, notification: notification }, status: :ok
       end
 
