@@ -59,9 +59,9 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: komplekpuriayana_test
-  username: postgres
-  password: password
+  database: <%= ENV['PROD_DB_NAME'] %>
+  username: <%= ENV['PROD_DB_USERNAME'] %>
+  password: <%= ENV['PROD_DB_PASSWORD'] %>
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -84,6 +84,7 @@ test:
 #
 production:
   <<: *default
-  database: komplekpuriayana_production
-  username: komplekpuriayana
-  password: <%= ENV['KOMPLEKPURIAYANA_DATABASE_PASSWORD'] %>
+  database: <%= ENV['PROD_DB_NAME'] %>
+  username: <%= ENV['PROD_DB_USERNAME'] %>
+  password: <%= ENV['PROD_DB_PASSWORD'] %>
+

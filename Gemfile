@@ -30,7 +30,7 @@ gem 'jbuilder', '~> 2.5'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
-
+gem 'dotenv-rails'
 gem 'activerecord-import'
 gem 'brakeman'
 gem 'ckeditor', github: 'galetahub/ckeditor'
@@ -39,7 +39,6 @@ gem 'delayed_job_active_record'
 gem 'devise'
 gem 'devise_token_auth'
 # if you haven't added it, already
-gem 'dotenv'
 gem 'faker'
 gem 'google_drive'
 gem 'kaminari'

@@ -31,7 +31,7 @@ class SendNotificationToUsersJob < ApplicationJob
         },
         "registration_ids":  device_tokens
       }.to_json,
-      headers: { "Content-Type": "application/json", Authorization: "key=AAAAcJFAICc:APA91bGn2J0M1_e4ipdllUBjrA3bK4xxe3_R3Sz0QpvYBVu8emz-CJdqZQN9AxvKJyvMk7CTE8BUTvZPs12titKcMeixaSDFKLgCGv8Zed9B_x2r3CJgD5HR2MbciBsDR28BP_7000rs" }
+      headers: { "Content-Type": "application/json", Authorization: "key=#{ENV['FCM_APIKEY']}" }
     )
     request.run
 
