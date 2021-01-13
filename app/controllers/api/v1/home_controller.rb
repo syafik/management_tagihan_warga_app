@@ -12,7 +12,7 @@ module Api
           blok: current_user.address ? current_user.address.block_address : "-",
           info: AppSetting.first.home_page_text % {user: current_user.name, greeting: Time.greeting_message_time },
           cash_flow: CashFlow.info((Date.current-1.month).month, (Date.current-1.month).year),
-          notification: current_user.user_notifications.includes(:notification).order('created_at DESC').limit(3).as_json(methods: [:notification]
+          notification: current_user.user_notifications.includes(:notification).order('created_at DESC').limit(3).as_json(methods: [:notification])
         }
       end
 
