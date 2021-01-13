@@ -18,7 +18,7 @@ module Api
 
       def user_lists
         users = User.includes(:address).where(kk: true)
-        render status: :ok, json: { successs: true, 
+        render status: :ok, json: { success: true, 
           users: users.as_json(methods: [:blok_name])
         }
       end
