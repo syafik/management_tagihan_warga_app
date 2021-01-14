@@ -18,6 +18,7 @@ module Api
 
       def user_lists
         users = User.includes(:address).where(kk: true)
+        byebug
         render status: :ok, json: { success: true, 
           users: users.as_json(methods: [:blok_name])
         }
@@ -126,7 +127,7 @@ module Api
           pic_id: current_user.id
         )
         if ct.save
-          render json: { success: true, message: 'transaksi berhasil disimpan.', address: address, users: address.users, tagihan: address.tagihan_now }, status: :ok
+          render json: { success: true, message: 'transaksi berhasil disimpan.' }, status: :ok
         else
           render status:402, json:{success: false, message: 'transaksi gagal disimpan.', error: ct.errors}
         end
