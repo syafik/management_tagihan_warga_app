@@ -53,7 +53,8 @@ gem 'swagger-docs'
 
 group :development, :test do
   # Call 'byebug' to stop execution and get a debugger console
-  gem 'byebug', platform: :mri
+  gem 'pry'
+  gem 'pry-byebug'
 end
 
 group :development do
