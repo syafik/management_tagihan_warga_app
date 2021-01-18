@@ -39,7 +39,6 @@ gem 'delayed_job_active_record'
 gem 'devise'
 gem 'devise_token_auth'
 # if you haven't added it, already
-gem 'faker'
 gem 'google_drive'
 gem 'kaminari'
 gem 'paperclip'
@@ -55,6 +54,16 @@ group :development, :test do
   # Call 'byebug' to stop execution and get a debugger console
   gem 'pry'
   gem 'pry-byebug'
+  %w[rspec-core rspec-expectations rspec-mocks rspec-rails rspec-support].each do |lib|
+    gem lib, git: "https://github.com/rspec/#{lib}.git", branch: 'main'
+  end
+end
+
+group :test do
+  gem 'factory_bot_rails'
+  gem 'faker', :git => 'https://github.com/faker-ruby/faker.git', :branch => 'master'
+  gem 'database_cleaner'
+  gem 'simplecov', require: false
 end
 
 group :development do

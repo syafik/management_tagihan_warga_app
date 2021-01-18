@@ -33,10 +33,7 @@ module Api
       def reset_password_token
         check_user = User.where(email: params[:email]).first
         if check_user
-          token = ('0'..'9').to_a.sample(5).join
-          check_user.reset_password_token = token
-          check_user.reset_password_sent_at = Time.current
-          check_user.save
+          token = User.generate_reset_password_token_for(check_user)
           check_user.deliver_reset_password_token_email(token)
           render status: 200,
                  json: { success: true, email: check_user.email,

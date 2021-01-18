@@ -34,6 +34,15 @@ class User < ApplicationRecord
     end
   end
 
+  def self.generate_reset_password_token_for(user)
+    loop do
+      token = ('0'..'9').to_a.sample(5).join
+      user.reset_password_token = token
+      user.reset_password_sent_at = Time.current
+      break token if user.save
+    end
+  end
+
   def self.ransack_predicates
     [
       %w[Contains cont],
