@@ -4,6 +4,7 @@
 
 class CashFlow < ApplicationRecord
   before_save :set_total_cash
+  after_commit :create_cash_info, on: :create
 
   def self.ransack_predicates
     [
@@ -15,9 +16,9 @@ class CashFlow < ApplicationRecord
     ['year']
   end
 
-  def self.info(month, year)
-    cf = CashFlow.where(month: month, year:year).first
-    {month: UserContribution::MONTHNAMES.invert[month], year: year, pemasukan: cf.cash_in, pengeluaran: cf.cash_out }
+  def self.info(year)
+    cf = CashFlow.where(year:year)
+    {year: year, pemasukan: cf.sum(:cash_in), pengeluaran: cf.sum(:cash_out) }
   end
 
   def month_info
@@ -29,5 +30,10 @@ class CashFlow < ApplicationRecord
 
   def set_total_cash
     self.total = cash_in - cash_out
+  end
+
+  def create_cash_info
+    cf = CashFlow.all.order('month DESC, year  DESC').first
+    CashInfo.create(title: "Total Sisa Kas per #{cf.month_info} #{cf.year}", remaining: CashFlow.sum(:cash_in) - CashFlow.sum(:cash_out))
   end
 end

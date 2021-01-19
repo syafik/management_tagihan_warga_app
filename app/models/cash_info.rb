@@ -1,0 +1,2 @@
+class CashInfo < ApplicationRecord
+end
