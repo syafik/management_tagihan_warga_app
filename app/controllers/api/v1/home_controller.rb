@@ -40,28 +40,37 @@ module Api
         selected_date = Date.parse("#{year_selected}-#{month_selected}-10") 
         cash_transactions = CashTransaction.where(transaction_date: selected_date.beginning_of_month..selected_date.end_of_month).order('transaction_date ASC')
         CashTransaction::REPORT_WARGA.each do |key, value|
+          item = {}
           if value.is_a?(Array)
             total = cash_transactions.select { |t| value.include?(t.transaction_group) }.sum(&:total)
             if key.include?('PEMASUKAN')
-              report_items << ['cash_in', '', key, total]
+              item[:type] = 'cash_in'
               debit_total += total
             else
-              report_items << ['cash_out', '', key, total]
+              item[:type] = 'cash_out'
               credit_total += total
             end
+            item[:transaction_date] = '-'
+            item[:description] = key
+            item[:total] = total
+            report_items << item
           else
             cash_transactions.select { |t| value == t.transaction_group }.each do |t|
               if key.include?('PEMASUKAN')
-                report_items << ['cash_in', t.transaction_date.strftime('%d %B %Y'), t.description, t.total]
+                item[:type] = 'cash_in'
                 debit_total += t.total
               else
-                report_items << ['cash_out', t.transaction_date.strftime('%d %B %Y'), t.description, t.total]
+                item[:type] = 'cash_out'
                 credit_total += t.total
               end
+              item[:transaction_date] = t.transaction_date.strftime('%d %B %Y')
+              item[:description] = t.description
+              item[:total] = t.total
+              report_items << item
             end
           end
         end
-        render json: { success: true, title: "Transaksi Kas Per #{UserContribution::MONTHNAMES.invert[params[:month].to_i]} #{params[:year]}", transactions: report_items }, status: :ok
+        render json: { success: true, title: "Transaksi Kas Per #{UserContribution::MONTHNAMES.invert[params[:month].to_i]} #{params[:year]}", transactions: report_items, debit_total: debit_total, credit_total: credit_total, grand_total: debit_total-credit_total }, status: :ok
       end
 
       def contributions
