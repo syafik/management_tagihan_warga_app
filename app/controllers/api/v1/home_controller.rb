@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 module Api
   module V1
     class HomeController < Api::V1::BaseController
@@ -74,7 +73,7 @@ module Api
       end
 
       def contributions
-        contributions = current_user.address.try(:user_contributions).order('created_at DESC')
+        contributions = current_user.address.try(:user_contributions).order('created_at ASC')
         render json: { success: true, title: "Tagihan Anda per #{UserContribution::MONTHNAMES.invert[Date.current.month]} #{Date.current.year}", tagihan: "#{current_user.address.try(:tagihan_now)}",  contributions: contributions.as_json(:methods => [:contribution_desc, :tgl_bayar])}, status: :ok
       end
 
