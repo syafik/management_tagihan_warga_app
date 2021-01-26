@@ -38,6 +38,7 @@ Rails.application.routes.draw do
       get '/installments/:id', to: 'home#installment_transaction'
       post '/installments/add', to: 'home#add_installment'
       post '/installments/pay', to: 'home#pay_installment'
+      post '/users/create', to: 'home#create_user'
     end
   end
 

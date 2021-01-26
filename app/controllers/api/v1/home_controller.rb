@@ -80,7 +80,7 @@ module Api
       def address_info
         address = Address.includes(:users, :user_contributions).where(block_address: params[:block].gsub(/[^0-9A-Za-z]/, '').upcase).first
         if address
-          render json: { success: true, address: address, users: address.users, tagihan: address.tagihan_now }, status: :ok
+          render json: { success: true, address: address, users: address.users, tagihan: address.tagihan_now, last_contribution: address.latest_contribution }, status: :ok
         else
           render status: 404, json: {success: false, message: 'Address not found'}
         end
@@ -190,6 +190,26 @@ module Api
 
       def pay_installment
 
+      end
+
+      def create_user
+        user = User.new(create_user_params)
+        user.kk = false
+        user.address_id = current_user.address_id
+        password = [*('a'..'z'),*('0'..'9')].shuffle[0,8].join
+        user.password = password
+        if user.save
+          SendPasswordToEmailJob.perform_later(user.id, password)
+          render status: 200, json: {success: true, message: 'success, password telah dikirim ke email.'}
+        else
+          render status:402, json:{success: false, message: 'gagal.', error: user.errors}
+        end
+      end
+
+      private
+
+      def create_user_params
+        params.require(:user).permit(:email, :name, :phone_number)
       end
 
     end

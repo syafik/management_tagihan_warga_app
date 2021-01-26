@@ -4,7 +4,8 @@
 
 class Address < ApplicationRecord
   has_many :users
-  has_many :user_contributions, -> { order 'id asc' }
+  has_many :user_contributions, -> { order 'id desc' }
+  has_one :latest_contribution, -> { order "id desc"}, class_name: "UserContribution"
   has_one :main_user, -> {where(kk: true)}, class_name: 'User', foreign_key: 'address_id'
 
   validates :block_address, :contribution, presence: true
