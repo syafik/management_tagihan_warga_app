@@ -55,6 +55,7 @@ module Api
             report_items << item
           else
             cash_transactions.select { |t| value == t.transaction_group }.each do |t|
+              item = {}
               if key.include?('PEMASUKAN')
                 item[:type] = 'cash_in'
                 debit_total += t.total
@@ -141,8 +142,8 @@ module Api
       end
 
       def notifications
-        user_notifications =  current_user.user_notifications.includes(:notification).order('created_at DESC').limit(20)
-        render json: { success: true, user_notifications: user_notifications.as_json(methods: [:notification]) }, status: :ok
+        user_notifications =  current_user.user_notifications.includes(:notification).order('created_at DESC').limit(10)
+        render json: { success: true, user_notifications: user_notifications.as_json(methods: [:notification, :notif_sent_at]) }, status: :ok
       end
 
       def notification_show
