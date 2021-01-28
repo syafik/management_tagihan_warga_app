@@ -108,6 +108,7 @@ class UserContributionsController < ApplicationController
   # POST /user_contributions.json
   def create
     @user_contribution = UserContribution.new(user_contribution_params)
+    @user_contribution.blok = @user_contribution.address.block_address.gsub(/[^A-Za-z]/,'') rescue ''
     respond_to do |format|
       if @user_contribution.save
         CashTransaction.create(
@@ -229,7 +230,7 @@ class UserContributionsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def user_contribution_params
-    params.require(:user_contribution).permit(:address_id, :year, :month, :contribution, :pay_at, :receiver_id,
+    params.require(:user_contribution).permit(:address_id, :year, :month, :contribution, :pay_at, :receiver_id, :payment_type, :blok,
                                               :description, :transaction_date, :imported_cash_transaction)
   end
 end
