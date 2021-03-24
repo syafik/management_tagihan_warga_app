@@ -64,7 +64,7 @@ module Api
                 item[:type] = 'cash_out'
                 credit_total += t.total
               end
-              item[:transaction_date] = t.transaction_date.strftime('%d %B %Y')
+              item[:transaction_date] = t.transaction_date.strftime('%d')
               item[:description] = t.description
               item[:total] = t.total
               report_items << item
