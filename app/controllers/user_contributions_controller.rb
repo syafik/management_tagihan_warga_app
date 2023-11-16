@@ -10,8 +10,8 @@ class UserContributionsController < ApplicationController
     conditions = params[:block_address_eq].blank? ? {} : { block_address: params[:block_address_eq] }
     @addresses = Address.where(conditions)
     conditions = { year: @year_selected }
-    ActiveRecord::Associations::Preloader.new.preload(@addresses, :user_contributions,
-                                                      UserContribution.where(conditions))
+    ActiveRecord::Associations::Preloader.new(records: @addresses, associations: :user_contributions,
+                                              scope: UserContribution.where(conditions)).call
     respond_to do |format|
       format.html
       format.js
@@ -23,11 +23,11 @@ class UserContributionsController < ApplicationController
     conditions = params[:block_address_eq].blank? ? {} : { block_address: params[:block_address_eq] }
     @addresses = Address.where(conditions)
     conditions = { year: @year_selected }
-    ActiveRecord::Associations::Preloader.new.preload(@addresses, :user_contributions,
-                                                      UserContribution.where(conditions))
+    ActiveRecord::Associations::Preloader.new(records: @addresses, associations: :user_contributions,
+                                              scope: UserContribution.where(conditions)).call
     respond_to do |format|
       format.html { redirect_to admins_path }
-      format.js { render 'index.js.erb' }
+      format.js { render 'index' }
     end
   end
 

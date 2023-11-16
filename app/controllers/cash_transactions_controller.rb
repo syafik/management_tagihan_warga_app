@@ -21,7 +21,7 @@ class CashTransactionsController < ApplicationController
     index
     respond_to do |format|
       format.html
-      format.js { render 'index.js.erb' }
+      format.js { render 'index' }
     end
   end
 
@@ -65,10 +65,12 @@ class CashTransactionsController < ApplicationController
       deskripsi = ws[row, 2]
       total = ws[row, 3]
       pic = ws[row, 4]
-      CashTransaction.create(
+      next if total.blank? && deskripsi.blank?
+
+      CashTransaction.create!(
         month: params[:month],
         year: params[:year],
-        pic_id: pic,
+        pic_id: pic.presence || '72', # pic syafik klo gak di set
         total: total.gsub(/[^\d]/, '').to_f,
         transaction_date: tgl_transaksi,
         transaction_type: transaction_type,
@@ -158,12 +160,12 @@ class CashTransactionsController < ApplicationController
         end
       end
     end
-    p @report_items
     respond_to do |format|
       format.html
       format.pdf do
-        html = render_to_string('transaction_report.html.erb', layout: 'report', locals: { report_items: @report_items,
-                                                                                           month: params[:month], year: params[:year], debit_total: @debit_total, credit_total: @credit_total })
+        html = render_to_string('transaction_report', layout: 'report', locals: { report_items: @report_items,
+                                                                                           month: params[:month], year: params[:year],
+                                                                                           debit_total: @debit_total, credit_total: @credit_total })
         kit = PDFKit.new(html)
         kit.stylesheets << "#{Rails.root}/app/assets/stylesheets/application.css"
         kit.stylesheets << "#{Rails.root}/app/assets/stylesheets/style.css"
