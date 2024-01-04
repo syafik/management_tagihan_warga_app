@@ -44,7 +44,7 @@
                 </tr>
                 <tr>
                   <td class="font-weight-bold">Avatar</td>
-                  <td><%= image_tag @user.avatar %></td>
+                  <td><%= image_tag(@user.avatar) if @user.avatar.present? %></td>
                 </tr>
               <% end %>
               <tr>

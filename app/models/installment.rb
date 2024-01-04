@@ -19,6 +19,9 @@ class Installment < ApplicationRecord
     remaining_installment <= 0
   end
 
+  def self.ransackable_attributes(auth_object = nil)
+    ["created_at", "description", "id", "paid_off", "parent_id", "transaction_type", "updated_at", "value"]
+  end
   private
 
   def create_cash_transaction

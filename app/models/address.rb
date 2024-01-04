@@ -41,4 +41,7 @@ class Address < ApplicationRecord
     tagihan
   end
 
+  def self.ransackable_attributes(auth_object = nil)
+    ["arrears", "block", "block_address", "block_number", "contribution", "created_at", "empty", "id", "updated_at"]
+  end
 end

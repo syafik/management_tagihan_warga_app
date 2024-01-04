@@ -52,4 +52,8 @@ class Debt < ApplicationRecord
       )
     end
   end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["created_at", "debt_date", "debt_type", "description", "id", "updated_at", "user_id", "value"]
+  end
 end

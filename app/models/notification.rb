@@ -25,5 +25,8 @@ class Notification < ApplicationRecord
   def self.clear_expired_notifications
     where('notifications.created_at < ?', 1.month.ago).destroy_all
   end
-  
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["created_at", "id", "notif", "title", "updated_at", "user_id"]
+  end
 end
