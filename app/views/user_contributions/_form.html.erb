@@ -2,18 +2,29 @@
    <%= errors_for(user_contribution) %>
   <div class="form-group">
     <%= form.label :address_id %>
-    <%= form.select :address_id, Address.includes(:main_user).select('id, block_address').collect {|p| [ "#{p.main_user.try(:name).try(:upcase)} - #{p.block_address.try(:upcase)}", p.id ] }, {include_blank: true}, {class: 'select-field-js', style: 'width:100%'}  %>
+    <%= form.select :address_id, Address.includes(:main_user).select('id, block_address, contribution').collect {|p| [ "#{p.main_user.try(:name).try(:upcase)} - #{p.block_address.try(:upcase)}", p.id , title: p.contribution] }, {include_blank: true}, {class: 'select-field-js address-select', style: 'width:100%'}  %>
   </div>
-  <div class="form-group">
+  <% if user_contribution.new_record? %>
     <%= form.label :month %>
-    <%= form.select :month, options_for_select(UserContribution::MONTHNAMES, user_contribution.month), {}, {class: 'select-field-js', style: 'width:100%'}  %>
-  </div>
+    <div class="form-group row">
+      <% @month_info.each do |info| %>
+        <div class="col-3">
+          <%= check_box_tag 'user_contribution_month[]', "#{info[:month]},#{info[:month_text]},#{info[:year]}", false, id: "#{info[:month]}#{info[:year]}" %>
+          <%= label_tag "#{info[:month]}#{info[:year]}", "#{info[:month_text]} #{info[:year]}" %>
+        </div>
+      <% end %>
+    </div>
+  <% else%>
+    <div class="form-group">
+      <%= form.label :month %>
+      <%= form.select :month, options_for_select(UserContribution::MONTHNAMES, user_contribution.month), {}, {class: 'select-field-js', style: 'width:100%'}  %>
+    </div>
 
-  <div class="form-group">
-    <%= form.label :year %>
-    <%= form.select :year, options_for_select((2020..2050).to_a, user_contribution.year), {},{class: 'select-field-js', style: 'width:100%'}  %>
-  </div>
-
+    <div class="form-group">
+      <%= form.label :year %>
+      <%= form.select :year, options_for_select((2020..2050).to_a, user_contribution.year), {},{class: 'select-field-js', style: 'width:100%'}  %>
+    </div>
+  <% end %>
    <div class="form-group">
     <%= form.label :payment_type %>
     <%= form.select :payment_type, options_for_select([["CASH", 1],["TRANSFER", 2]], user_contribution.payment_type), {},{class: 'select-field-js', style: 'width:100%'}  %>
@@ -22,17 +33,17 @@
 
   <div class="form-group">
     <%= form.label :contribution %>
-    <%= form.text_field :contribution, class: 'form-control'%>
+    <%= form.number_field :contribution, class: 'form-control'%>
   </div>
 
   <div class="form-group">
     <%= form.label :pay_at %>
-    <%= form.text_field :pay_at, class: 'form-control' %>
+    <%= form.text_field :pay_at, class: 'form-control date-picker' %>
   </div>
 
   <div class="form-group">
     <%= form.label :receiver_id %>
-    <%= form.select :receiver_id, User.select('id, name').where(role: 2).collect {|p| [ p.name.try(:upcase), p.id ] }, {include_blank: true}, {class: 'select-field-js', style: 'width:100%'}  %>
+    <%= form.select :receiver_id, User.select('id, name').where(role: 2).collect {|p| [ p.name.try(:upcase), p.id  ] }, {include_blank: true, selected: user_contribution.new_record? ? current_user.id : user_contribution.receiver_id}, {class: 'select-field-js', style: 'width:100%'}  %>
   </div>
 
   <div class="form-group">
@@ -46,11 +57,24 @@
   </div>
 <% end %>
 
-
 <script type="text/javascript">
   $(document).ready(function(){
     if ($(".select-field-js").length) {
       $(".select-field-js").select2();
+      $(".address-select").select2();
+      $('.address-select').on('select2:select', function (e) {
+          var data = e.params.data;
+          $('#user_contribution_contribution').val(parseInt(data.title));
+      });
     }
+
+    var date_input=$('.date-picker'); //our date input has the name "date"
+    var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
+    date_input.datepicker({
+      format: 'yyyy-mm-dd',
+      container: container,
+      todayHighlight: true,
+      autoclose: true,
+    })
   })
 </script>

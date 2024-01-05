@@ -99,6 +99,7 @@ class UserContributionsController < ApplicationController
   # GET /user_contributions/new
   def new
     @user_contribution = UserContribution.new
+    @month_info = generate_month_info
   end
 
   # GET /user_contributions/1/edit
@@ -107,21 +108,36 @@ class UserContributionsController < ApplicationController
   # POST /user_contributions
   # POST /user_contributions.json
   def create
-    @user_contribution = UserContribution.new(user_contribution_params)
-    @user_contribution.blok = @user_contribution.address.block_address.gsub(/[^A-Za-z]/,'') rescue ''
+    success = false
+    UserContribution.transaction do
+      params[:user_contribution_month].each do |value|
+        month, month_text, year = value.split(",")
+        address = Address.find_by(id: params[:user_contribution][:address_id])
+        params[:user_contribution][:month] = month.to_i
+        params[:user_contribution][:year] = year.to_i
+        params[:user_contribution][:description] = "#{address.block_address} Pembayaran bulan #{month_text} #{year}"
+        @user_contribution = UserContribution.new(user_contribution_params)
+        @user_contribution.blok = @user_contribution.address.block_address.gsub(/[^A-Za-z]/,'') rescue ''
+        if @user_contribution.save
+          CashTransaction.create(
+            month: @user_contribution.month,
+            year: @user_contribution.year,
+            transaction_date: @user_contribution.pay_at,
+            transaction_type: CashTransaction::TYPE['DEBIT'],
+            transaction_group: CashTransaction::GROUP['IURAN WARGA'],
+            description: @user_contribution.description,
+            total: @user_contribution.contribution,
+            pic_id: @user_contribution.receiver_id
+          )
+        else
+          raise ActiveRecord::Rollback
+        end
+      end
+      success = true
+    end
     respond_to do |format|
-      if @user_contribution.save
-        CashTransaction.create(
-          month: @user_contribution.month,
-          year: @user_contribution.year,
-          transaction_date: @user_contribution.pay_at,
-          transaction_type: CashTransaction::TYPE['DEBIT'],
-          transaction_group: CashTransaction::GROUP['IURAN WARGA'],
-          description: @user_contribution.description,
-          total: @user_contribution.contribution,
-          pic_id: @user_contribution.receiver_id
-        )
-        format.html { redirect_to @user_contribution, notice: 'User contribution was successfully created.' }
+      if success
+        format.html { redirect_to contribution_by_address_user_contribution_path(@user_contribution.address), notice: 'User contribution was successfully created.' }
         format.json { render :show, status: :created, location: @user_contribution }
       else
         format.html { render :new }
@@ -232,5 +248,17 @@ class UserContributionsController < ApplicationController
   def user_contribution_params
     params.require(:user_contribution).permit(:address_id, :year, :month, :contribution, :pay_at, :receiver_id, :payment_type, :blok,
                                               :description, :transaction_date, :imported_cash_transaction)
+  end
+
+  def generate_month_info
+    current_date = Date.today - 4.month
+    months_info = []
+
+    15.times do
+      months_info << { month: current_date.strftime('%_m'), month_text: current_date.strftime('%B'), year: current_date.year }
+      current_date = current_date >> 1
+    end
+
+    return months_info
   end
 end
