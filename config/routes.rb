@@ -98,6 +98,7 @@ Rails.application.routes.draw do
       get :import_data
       post :do_import_data
       get :generate_tagihan
+      get :import_arrears
       post :do_generate_data
     end
     member do

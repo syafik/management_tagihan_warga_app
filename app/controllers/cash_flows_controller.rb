@@ -22,7 +22,7 @@ class CashFlowsController < ApplicationController
     index
     respond_to do |format|
       format.html { redirect_to cash_flows_path }
-      format.js { render 'index.js.erb' }
+      format.js
     end
   end
 

@@ -175,6 +175,34 @@ class UserContributionsController < ApplicationController
     @month_selected = Date.current.month
   end
 
+  def import_arrears
+    session = GoogleDrive::Session.from_service_account_key('config/gdrive_project.json')
+    Address::BLOK_NAME.each do |_key, value|
+      ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[value]
+      (1..ws.num_rows).each do |row|
+        if row == 1
+          ws[row, 1] =
+            "DAFTAR IURAN BULAN WARGA  #{UserContribution::MONTHNAMES.invert[month.to_i].upcase} #{year}  BLOK #{Address::BLOK_NAME.invert[value]}"
+        elsif row >= 3
+          block_address = ws[row, 2].strip
+          contribution = ws[row, 3].strip
+          tagihan = ws[row, 4].strip
+          bayar = ws[row, 5].strip
+          address = Address.where(block_address: block_address).first
+          if address
+            total_paid = UserContribution.where(address_id: address.id).count
+            total_paid_should_be = (year.to_i - 2020) * 12 + month.to_i
+            ws[row, 4] = total_paid_should_be - total_paid
+            ws[row, 5] = nil
+            ws[row, 6] = nil
+            ws[row, 7] = nil
+          end
+        end
+      end
+      ws.save
+    end
+  end
+
   def do_generate_data
     month = begin
       params[:month]
