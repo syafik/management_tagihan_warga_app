@@ -32,7 +32,7 @@
           </div>
           <div class="form-group">
             <%= label_tag :tanggal_transaksi %>
-            <%= text_field_tag :transaction_date, @ct.transaction_date, class: 'form-control mb-2 mr-sm-2' %>
+            <%= text_field_tag :transaction_date, @ct.transaction_date, class: 'form-control mb-2 mr-sm-2 date-picker' %>
           </div>
           <div class="form-group">
             <%= label_tag :penanggung_jawab %>
@@ -45,3 +45,16 @@
     </div>
   </div>
 </div>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    var date_input=$('.date-picker'); //our date input has the name "date"
+    var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
+    date_input.datepicker({
+      format: 'yyyy-mm-dd',
+      container: container,
+      todayHighlight: true,
+      autoclose: true,
+    })
+  })
+</script>

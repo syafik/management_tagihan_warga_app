@@ -53,7 +53,6 @@ class UserContributionsController < ApplicationController
     (1..ws.num_rows).each do |row|
       block_address = ws[row, 2].strip
       contribution = ws[row, 3].strip
-      arrear = ws[row, 4].strip
       bayar = ws[row, 5].strip
       tgl_bayar = ws[row, 6].strip
       next unless row >= 3
@@ -87,6 +86,23 @@ class UserContributionsController < ApplicationController
       pic_id: user.id
     )
     redirect_to user_contributions_path, notice: 'Import data success'
+  end
+
+  def import_arrears_x
+    session = GoogleDrive::Session.from_service_account_key('config/gdrive_project.json')
+    0.upto(3) do |blok|
+      ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[blok]
+      (1..ws.num_rows).each do |row|
+        block_address = ws[row, 2].strip
+        arrear = ws[row, 4].strip
+        next unless row >= 3
+
+        address = Address.where(block_address: block_address).first
+        next unless address
+
+        address.update_column(:arrears, arrear)
+      end
+    end
   end
 
   # GET /user_contributions/1
@@ -190,8 +206,7 @@ class UserContributionsController < ApplicationController
           bayar = ws[row, 5].strip
           address = Address.where(block_address: block_address).first
           if address
-            total_paid = UserContribution.where(address_id: address.id).count
-            total_paid_should_be = (year.to_i - 2020) * 12 + month.to_i
+            total_paid_should_be = (year.to_i - 2024) * 12 + month.to_i
             ws[row, 4] = total_paid_should_be - total_paid
             ws[row, 5] = nil
             ws[row, 6] = nil
@@ -228,9 +243,9 @@ class UserContributionsController < ApplicationController
           bayar = ws[row, 5].strip
           address = Address.where(block_address: block_address).first
           if address
-            total_paid = UserContribution.where(address_id: address.id).count
-            total_paid_should_be = (year.to_i - 2020) * 12 + month.to_i
-            ws[row, 4] = total_paid_should_be - total_paid
+            total_paid = UserContribution.where(address_id: address.id).where("EXTRACT('year' FROM pay_at) = 2024").count
+            total_paid_should_be = (year.to_i - 2024) * 12 + month.to_i
+            ws[row, 4] = address.arrears + (total_paid_should_be - total_paid)
             ws[row, 5] = nil
             ws[row, 6] = nil
             ws[row, 7] = nil
