@@ -1,2 +1,3 @@
 # management_tagihan_warga_app
-applikasi untuk menghandle tagihan warga komplek, case spesific di komplek puri ayana gempol
+Application for handling residents' bills, specific cases at Puri Ayana Gempol
+
