@@ -100,6 +100,8 @@ Rails.application.routes.draw do
       get :generate_tagihan
       get :import_arrears
       post :do_generate_data
+      get :import_data_transfer
+      post :do_import_data_transfer
     end
     member do
       get :contribution_by_address
@@ -107,4 +109,5 @@ Rails.application.routes.draw do
   end
 
   resources :app_settings
+  resources :template_transactions
 end

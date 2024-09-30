@@ -33,7 +33,12 @@ class UserContributionsController < ApplicationController
 
   def import_data
     @year_selected = Date.current.year
-    @month_selected = Date.current.month - 1
+    @month_selected = Date.current.month
+  end
+
+  def import_data_transfer
+    @year_selected = Date.current.year
+    @month_selected = Date.current.month
   end
 
   def do_import_data
@@ -86,6 +91,54 @@ class UserContributionsController < ApplicationController
       pic_id: user.id
     )
     redirect_to user_contributions_path, notice: 'Import data success'
+  end
+
+  def do_import_data_transfer
+    session = GoogleDrive::Session.from_service_account_key('config/gdrive_project.json')
+    ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[6]
+    total_transfer_amount = 0
+    (2..ws.num_rows).each do |row|
+      block_address = ws[row, 1].strip
+      bayar = ws[row, 2].strip
+      contribution = ws[row, 3].strip
+      tgl_bayar = ws[row, 4].strip
+      bulan_bayar = ws[row, 5].strip
+      months = bulan_bayar.split(',')
+      amount = contribution.gsub(/[^\d]/, '').to_f
+
+      address = Address.where(block_address: block_address.upcase).first
+      next unless address
+
+      year_selected = params[:year].to_i
+      0.upto(bayar.to_i - 1) do |i|
+        month_selected = months[i].to_i
+        month_before = i.zero? ? month_selected : months[i - 1].to_i
+        year_selected = month_before == 12 && month_selected < month_before ? (year_selected + 1) : year_selected
+        UserContribution.create!(
+          month: month_selected,
+          year: year_selected,
+          address_id: address.id,
+          contribution: amount,
+          receiver_id: params[:receiver_id],
+          pay_at: tgl_bayar&.to_date.presence || "#{year_selected}-#{month_selected}-20",
+          blok: block_address[0].upcase,
+          payment_type: 2
+        )
+        total_transfer_amount += amount
+      end
+    end
+
+    CashTransaction.create(
+      month: params[:month],
+      year: params[:year],
+      transaction_date: params[:transaction_date],
+      transaction_type: CashTransaction::TYPE['DEBIT'],
+      transaction_group: CashTransaction::GROUP['IURAN WARGA'],
+      description: "Pendapatan Iuran Warga Yang Transfer",
+      total: total_transfer_amount,
+      pic_id: params[:receiver_id]
+    )
+    redirect_to user_contributions_path, notice: 'Import data transfer success'
   end
 
   def import_arrears_x
@@ -243,7 +296,7 @@ class UserContributionsController < ApplicationController
           bayar = ws[row, 5].strip
           address = Address.where(block_address: block_address).first
           if address
-            total_paid = UserContribution.where(address_id: address.id).where("EXTRACT('year' FROM pay_at) = 2024").count
+            total_paid = UserContribution.where(address_id: address.id).where("year = 2024").count
             total_paid_should_be = (year.to_i - 2024) * 12 + month.to_i
             ws[row, 4] = address.arrears + (total_paid_should_be - total_paid)
             ws[row, 5] = nil

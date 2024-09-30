@@ -1,0 +1,2 @@
+class TemplateTransaction < ApplicationRecord
+end

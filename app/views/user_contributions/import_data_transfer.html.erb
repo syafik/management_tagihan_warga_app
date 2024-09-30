@@ -2,9 +2,9 @@
   <div class="col-md-12 grid-margin stretch-card">
     <div class="card">
       <div class="card-body">
-        <h4 class="card-title">Import Data Tagihan Dari GDrive</h4>
+        <h4 class="card-title">Import Data Tagihan Transfer Dari GDrive</h4>
         <p class="card-description"> Fill the form below. </p>
-        <%= form_tag  do_import_data_user_contributions_path do  %>
+        <%= form_tag  do_import_data_transfer_user_contributions_path do  %>
           <div class="form-group">
             <%= label_tag :bulan %>
             <%= select_tag :month, options_for_select(UserContribution::MONTHNAMES, @month_selected), class: 'form-control mb-2 mr-sm-2' %>
@@ -12,10 +12,6 @@
           <div class="form-group">
             <%= label_tag :tahun %>
             <%= select_tag :year, options_for_select((2020..2050).to_a, @year_selected), class: 'form-control mb-2 mr-sm-2' %>
-          </div>
-          <div class="form-group">
-            <%= label_tag :blok %>
-            <%= select_tag :blok, options_for_select({"A" => 0, "B" => 1, "C" => 2, "D" => 3, "F" => 4}), class: 'form-control mb-2 mr-sm-2' %>
           </div>
           <div class="form-group">
             <%= label_tag :penanggung_jawab %>

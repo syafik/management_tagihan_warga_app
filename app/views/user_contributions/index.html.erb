@@ -6,6 +6,7 @@
           <% if current_user.is_admin? %>
             <a href="<%= new_user_contribution_path %>" class="btn btn-primary ml-auto mb-3 mb-sm-0"> Bayar Iuran</a>
             <a href="<%= import_data_user_contributions_path %>" class="btn btn-primary ml-2 mb-3 mb-sm-0"> Import Data Iuran</a>
+            <a href="<%= import_data_transfer_user_contributions_path %>" class="btn btn-primary ml-2 mb-3 mb-sm-0"> Import Data Iuran Transfer</a>
             <a href="<%= generate_tagihan_user_contributions_path %>" class="btn btn-primary ml-2 mb-3 mb-sm-0"> Generate Data Iuran</a>
           <% end %>
         </div>

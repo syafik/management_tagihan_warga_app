@@ -1,0 +1,31 @@
+<%= form_for(template_transaction) do |f| %>
+  <%= errors_for(template_transaction) %>
+  <div class="form-group">
+    <%= f.label :description %>
+    <%= f.text_area :description, autofocus: true, class: 'form-control', placeholder: 'Description' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :amount %>
+    <%= f.number_field :amount, class: 'form-control', placeholder: 'Besaran' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :transaction_type %>
+    <%= f.select :transaction_type, options_for_select(CashTransaction::TYPE, template_transaction.transaction_type), {}, class: 'form-control mb-2 mr-sm-2' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :transaction_group %>
+    <%= f.select :transaction_group, options_for_select(CashTransaction::GROUP, template_transaction.transaction_group), {}, class: 'form-control mb-2 mr-sm-2' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :active %>
+    <%= f.text_field :active, class: 'form-control'%>
+  </div>
+
+
+  <%= f.submit 'Submit', class: 'btn btn-primary mr-2' %>
+  <%= link_to 'Cancel', users_path, class: 'btn btn-light' %>
+<% end %>
