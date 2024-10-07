@@ -1,4 +1,4 @@
-<%= form_for(template_transaction) do |f| %>
+<%= form_with(model: template_transaction, local: true) do |f| %>
   <%= errors_for(template_transaction) %>
   <div class="form-group">
     <%= f.label :description %>

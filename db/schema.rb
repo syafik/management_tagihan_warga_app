@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_16_095707) do
+ActiveRecord::Schema[7.0].define(version: 2024_09_30_020448) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -147,6 +147,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_16_095707) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "template_transactions", force: :cascade do |t|
+    t.text "description"
+    t.integer "transaction_type"
+    t.integer "transaction_group"
+    t.float "amount"
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "total_contributions", force: :cascade do |t|

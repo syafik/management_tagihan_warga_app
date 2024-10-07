@@ -53,7 +53,7 @@ class UserContributionsController < ApplicationController
                   alert: "Month #{params[:month]}-#{params[:year]} sudah tergenerate." and return
     end
 
-    session = GoogleDrive::Session.from_service_account_key('config/gdrive_project.json')
+    session = GoogleDrive::Session.from_service_account_key(StringIO.new(GDRIVE_CONFIG.to_json))
     ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[params[:blok].to_i]
     (1..ws.num_rows).each do |row|
       block_address = ws[row, 2].strip
@@ -94,7 +94,7 @@ class UserContributionsController < ApplicationController
   end
 
   def do_import_data_transfer
-    session = GoogleDrive::Session.from_service_account_key('config/gdrive_project.json')
+    session = GoogleDrive::Session.from_service_account_key(StringIO.new(GDRIVE_CONFIG.to_json))
     ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[6]
     total_transfer_amount = 0
     (2..ws.num_rows).each do |row|
@@ -142,7 +142,7 @@ class UserContributionsController < ApplicationController
   end
 
   def import_arrears_x
-    session = GoogleDrive::Session.from_service_account_key('config/gdrive_project.json')
+    session = GoogleDrive::Session.from_service_account_key(StringIO.new(GDRIVE_CONFIG.to_json))
     0.upto(3) do |blok|
       ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[blok]
       (1..ws.num_rows).each do |row|
@@ -245,7 +245,7 @@ class UserContributionsController < ApplicationController
   end
 
   def import_arrears
-    session = GoogleDrive::Session.from_service_account_key('config/gdrive_project.json')
+    session = GoogleDrive::Session.from_service_account_key(StringIO.new(GDRIVE_CONFIG.to_json))
     Address::BLOK_NAME.each do |_key, value|
       ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[value]
       (1..ws.num_rows).each do |row|
@@ -282,7 +282,7 @@ class UserContributionsController < ApplicationController
     rescue StandardError
       Date.current.year
     end
-    session = GoogleDrive::Session.from_service_account_key('config/gdrive_project.json')
+    session = GoogleDrive::Session.from_service_account_key(StringIO.new(GDRIVE_CONFIG.to_json))
     Address::BLOK_NAME.each do |_key, value|
       ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[value]
       (1..ws.num_rows).each do |row|

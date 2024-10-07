@@ -25,7 +25,7 @@ class UserContribution < ApplicationRecord
     }.freeze
 
   def self.import_existing_data(execute_month)
-    session = GoogleDrive::Session.from_service_account_key('config/gdrive_project.json')
+    session = GoogleDrive::Session.from_service_account_key(StringIO.new(GDRIVE_CONFIG.to_json))
     Address::BLOK_NAME.each do |key, value|
       receiver = User.where("pic_blok LIKE '%#{key}%'").first
       ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[value]

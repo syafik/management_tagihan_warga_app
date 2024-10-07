@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @template_transaction.description %>
+</p>
+
+<p>
+  <strong>Amount:</strong>
+  <%= @template_transaction.amount %>
+</p>
+
+<p>
+  <strong>transaction_type:</strong>
+  <%= @template_transaction.transaction_type %>
+</p>
+<p>
+  <strong>transaction_group:</strong>
+  <%= @template_transaction.transaction_group %>
+</p>
+<p>
+  <strong>Active:</strong>
+  <%= @template_transaction.active %>
+</p>
+
+
+
+<%= link_to 'Edit', edit_template_transaction_path(@template_transaction) %> |
+<%= link_to 'Back', template_transactions_path %>
