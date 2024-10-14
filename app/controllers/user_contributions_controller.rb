@@ -60,19 +60,25 @@ class UserContributionsController < ApplicationController
       contribution = ws[row, 3].strip
       bayar = ws[row, 5].strip
       tgl_bayar = ws[row, 6].strip
+      months_paid = ws[row, 7].strip.split(",")
       next unless row >= 3
 
       address = Address.where(block_address: block_address).first
       next unless address
 
-      1.upto(bayar.to_i) do |_i|
+      year_selected = params[:year].to_i
+      0.upto(bayar.to_i - 1) do |i|
+        month_selected = months_paid[i].to_i
+        month_before = i.zero? ? month_selected : months[i - 1].to_i
+        year_selected = month_before == 12 && month_selected < month_before ? (year_selected + 1) : year_selected
+
         UserContribution.create(
-          month: params[:month],
-          year: params[:year],
+          month: month_selected,
+          year: year_selected,
           address_id: address.id,
           contribution: contribution.gsub(/[^\d]/, '').to_f,
           receiver_id: params[:receiver_id],
-          pay_at: (tgl_bayar.to_date || "#{params[:year]}-#{params[:month]}-20"),
+          pay_at: tgl_bayar.to_date,
           blok: blok_name,
           payment_type: 1
         )
@@ -97,7 +103,7 @@ class UserContributionsController < ApplicationController
     session = GoogleDrive::Session.from_service_account_key(StringIO.new(GDRIVE_CONFIG.to_json))
     ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[6]
     total_transfer_amount = 0
-    (2..ws.num_rows).each do |row|
+    (1..ws.num_rows).each do |row|
       block_address = ws[row, 1].strip
       bayar = ws[row, 2].strip
       contribution = ws[row, 3].strip
@@ -318,6 +324,35 @@ class UserContributionsController < ApplicationController
         ws[row, 1] = nil
         ws[row, 2] = nil
         ws[row, 3] = nil
+      end
+    end
+    ws.save
+
+    ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[7]
+    (1..ws.num_rows).each do |row|
+      if row == 1
+        ws[row, 1] =
+          "SYAFIK - LAPORAN TRANSAKSI PEMAKAIAN KAS BULAN #{UserContribution::MONTHNAMES.invert[month.to_i].upcase} #{year}"
+      elsif row >= 3
+        ws[row, 1] = nil
+        ws[row, 2] = nil
+        ws[row, 3] = nil
+      end
+    end
+    ws.save
+
+    # LIST TRANSFER WORKSHEET
+    ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[6]
+    (1..ws.num_rows).each do |row|
+      if row == 1
+        ws[row, 1] =
+          "DAFTAR IURAN TRANSFER #{UserContribution::MONTHNAMES.invert[month.to_i].upcase} #{year}"
+      elsif row >= 3
+        ws[row, 1] = nil
+        ws[row, 2] = nil
+        ws[row, 3] = nil
+        ws[row, 4] = nil
+        ws[row, 5] = nil
       end
     end
     ws.save

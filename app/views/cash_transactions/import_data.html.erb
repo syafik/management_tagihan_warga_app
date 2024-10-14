@@ -17,7 +17,14 @@
             <%= label_tag :jenis_transaksi %>
             <%= select_tag :transaction_type, options_for_select(CashTransaction::TYPE), class: 'form-control mb-2 mr-sm-2' %>
           </div>
-          <%= submit_tag "Process" %>
+          <div class="form-group">
+            <%= label_tag :source %>
+            <%= select_tag :source, options_for_select([["UMUM", 5], ["SYAFIK", 7]]), class: 'form-control mb-2 mr-sm-2' %>
+          </div>
+          <div class="d-flex justify-content-end text-end gap-3">
+            <%= link_to "Cancel", cash_transactions_path, class: "btn btn-secondary text-black mr-3" %>
+            <%= submit_tag "Submit", class: "btn btn-primary" %>
+          </div>
         <% end %>
       </div>
     </div>

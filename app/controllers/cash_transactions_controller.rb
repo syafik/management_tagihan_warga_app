@@ -58,14 +58,15 @@ class CashTransactionsController < ApplicationController
 
   def do_import_data
     session = GoogleDrive::Session.from_service_account_key(StringIO.new(GDRIVE_CONFIG.to_json))
-    ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[5]
+    source = params[:source].to_i
+    ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[source]
     transaction_type = params[:transaction_type]
     (3..ws.num_rows).each do |row|
       tgl_transaksi = ws[row, 1].strip.blank? ? "#{params[:year]}-#{params[:month]}-11" : ws[row, 1].strip
       deskripsi = ws[row, 2]
       total = ws[row, 3]
       pic = ws[row, 4]
-      next if total.blank? && deskripsi.blank?
+      next if total.blank? || deskripsi.blank?
 
       CashTransaction.create!(
         month: params[:month],
