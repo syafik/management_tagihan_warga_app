@@ -69,7 +69,7 @@ class UserContributionsController < ApplicationController
       year_selected = params[:year].to_i
       0.upto(bayar.to_i - 1) do |i|
         month_selected = months_paid[i].to_i
-        month_before = i.zero? ? month_selected : months[i - 1].to_i
+        month_before = i.zero? ? month_selected : months_paid[i - 1].to_i
         year_selected = month_before == 12 && month_selected < month_before ? (year_selected + 1) : year_selected
 
         UserContribution.create(
@@ -116,17 +116,29 @@ class UserContributionsController < ApplicationController
       next unless address
 
       year_selected = params[:year].to_i
-      0.upto(bayar.to_i - 1) do |i|
-        month_selected = months[i].to_i
-        month_before = i.zero? ? month_selected : months[i - 1].to_i
-        year_selected = month_before == 12 && month_selected < month_before ? (year_selected + 1) : year_selected
+
+      today = Time.zone.today
+      current_year = today.year
+
+      bayar.to_i.times do |i|
+        month_selected = months[i]
+        if month_selected.include?('-')
+          # Format: "12-2024"
+          month_str, year_str = month_selected.split('-')
+          month = month_str.to_i
+          year = year_str.to_i
+        else
+          # Format: "1", "2", dst — tahun mengikuti current_year_track
+          month = month_selected.to_i
+          year = current_year
+        end
         UserContribution.create!(
-          month: month_selected,
-          year: year_selected,
+          month: month,
+          year: year,
           address_id: address.id,
           contribution: amount,
           receiver_id: params[:receiver_id],
-          pay_at: tgl_bayar&.to_date.presence || "#{year_selected}-#{month_selected}-20",
+          pay_at: tgl_bayar&.to_date.presence || "#{month}-#{year}-20",
           blok: block_address[0].upcase,
           payment_type: 2
         )
@@ -298,13 +310,11 @@ class UserContributionsController < ApplicationController
         elsif row >= 3
           block_address = ws[row, 2].strip
           contribution = ws[row, 3].strip
-          tagihan = ws[row, 4].strip
           bayar = ws[row, 5].strip
           address = Address.where(block_address: block_address).first
           if address
-            total_paid = UserContribution.where(address_id: address.id).where("year = 2024").count
-            total_paid_should_be = (year.to_i - 2024) * 12 + month.to_i
-            ws[row, 4] = address.arrears + (total_paid_should_be - total_paid)
+            total_paid = UserContribution.where(address_id: address.id).where(year: Time.now.year).count
+            ws[row, 4] = address.free? ? 0 : month.to_i - total_paid
             ws[row, 5] = nil
             ws[row, 6] = nil
             ws[row, 7] = nil

@@ -1,4 +1,4 @@
-<%= form_tag url, remote: true, class: 'form-inline ajax-form-request' do  %>
+<%= form_tag url, method: :get, class: 'form-inline ajax-form-request' do  %>
   <%= select_tag 'q[c][0][a][0][name]', options_for_select(attributes),  class: 'form-control  mb-2 mr-sm-2' %>
   <%= select_tag 'q[c][0][p]', options_for_select(predicates), class: 'form-control  mb-2 mr-sm-2' %>
   <%= text_field_tag 'q[c][0][v][0][value]','', class: 'form-control mb-2 mr-sm-2' %>

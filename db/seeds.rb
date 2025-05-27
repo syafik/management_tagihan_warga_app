@@ -74,3 +74,40 @@ csv.each do |row|
                             pay_at: "2020-#{i}-2 10:00:00", payment_type: 1, receiver_id: receiver)
   end
 end
+
+blocks = {
+  'A' => idan.id,
+  'B' => yudi.id,
+  'C' => yudi.id,
+  'D' => yadi.id,
+  'F' => slamet.id
+}
+
+session = GoogleDrive::Session.from_service_account_key(StringIO.new(GDRIVE_CONFIG.to_json))
+(0..3).each do |block|
+  ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[block]
+  (1..ws.num_rows).each do |row|
+    p ws[row, 2].strip
+    address = Address.find_by(block_address: ws[row, 2].strip)
+    next if address.nil?
+
+    tagihan = ws[row, 4].to_i
+
+    bulan_april = 4
+
+    1.upto(bulan_april-tagihan).each do |i|
+      UserContribution.create(
+        address_id: address.id,
+        month: i,
+        year: 2025,
+        contribution: ws[row, 3].to_i,
+        pay_at: "2025-#{i}-2 10:00:00",
+        payment_type: 1,
+        blok: address.block_address[0],
+        receiver_id: 72
+      )
+    end
+    address.update!(arrears: ws[row, 8].to_i)
+  end
+end
+
