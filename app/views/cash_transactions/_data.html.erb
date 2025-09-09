@@ -1,61 +1,287 @@
-<div class="table-responsive border rounded p-1">
-  <table class="table table-hover" id="table-content">
-    <thead>
-     <tr>
-       <th colspan="7" align="right" style='text-align:center'>
-        <% if current_user.is_admin? %>
-          <% if !@cash_closed %>
-            <a href="<%= new_cash_transaction_path %>" class="btn btn-primary ml-auto mb-3 mb-sm-0"> Buat Transaksi</a>
-            <a href="<%= import_data_cash_transactions_path %>" class="btn btn-primary ml-2 mb-3 mb-sm-0"> Import Transaksi</a>
-            <a href="<%= close_transaction_cash_transactions_path(@year_selected, @month_selected) %>" class="btn btn-primary ml-2 mb-3 mb-sm-0"> Close Transaksi</a>
+<div class="bg-white rounded-lg shadow overflow-hidden" data-controller="confirm-modal" data-action="keydown@window->confirm-modal#keydown">
+  <!-- Action Buttons - Only for Admin -->
+  <% if current_user.is_admin? %>
+    <div class="px-3 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200">
+      <div class="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 justify-center">
+        <% if !@cash_closed %>
+          <%= link_to new_cash_transaction_path, 
+                      class: 'inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 text-sm' do %>
+            <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span class="hidden sm:inline">Buat Transaksi</span>
+            <span class="sm:hidden">Buat</span>
           <% end %>
-          <a href="<%= show_report_cash_transactions_path('warga',@year_selected, @month_selected) %>" class="btn btn-primary ml-2 mb-3 mb-sm-0"> Lihat Laporan Ke Warga</a>
+          
+          <%= link_to import_data_cash_transactions_path, 
+                      class: 'inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 text-sm' do %>
+            <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+            <span class="hidden sm:inline">Import Transaksi</span>
+            <span class="sm:hidden">Import</span>
+          <% end %>
+          
+          <%= link_to close_transaction_cash_transactions_path(@year_selected, @month_selected), 
+                      class: 'inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200 text-sm',
+                      data: { confirm: 'Yakin ingin menutup transaksi bulan ini?' } do %>
+            <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+            <span class="hidden sm:inline">Close Transaksi</span>
+            <span class="sm:hidden">Close</span>
+          <% end %>
         <% end %>
-       </th>
-     </tr>
-      <tr>
-        <th>No</th>
-        <th>Tanggal</th>
-        <th>Deskripsi</th>
-        <th>Debit</th>
-        <th>Kredit</th>
-        <th>Group</th>
-        <th>PIC</th>
-        <% if !@cash_closed %>
-          <th>Action</th>
+        
+        <%= link_to show_report_cash_transactions_path('warga',@year_selected, @month_selected), 
+                    class: 'inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-purple-600 text-white font-medium rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200 text-sm' do %>
+          <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          <span class="hidden sm:inline">Lihat Laporan</span>
+          <span class="sm:hidden">Laporan</span>
         <% end %>
-      </tr>
-    </thead>
-    <tbody>
-    <% @cash_transactions.each_with_index do |ct, i| %>
-      <tr>
-        <td><%= (i + 1)%> </td>
-        <td><%= ct.transaction_date.strftime('%d %B %Y') %></td>
-        <td><%= ct.description %></td>
-        <% if ct.transaction_type == 1 %>
-          <td><%= number_to_currency(ct.total, unit: "Rp. ", separator: ",", delimiter: ".") %></td>
-          <td></td>
-        <% else %>
-          <td></td>
-          <td><%= number_to_currency(ct.total, unit: "Rp. ", separator: ",", delimiter: ".") %></td>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Desktop Table View -->
+  <div class="hidden lg:block overflow-x-auto">
+    <table class="w-full divide-y divide-gray-200" id="table-content">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">No</th>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Tanggal</th>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
+          <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Jumlah</th>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Group</th>
+          <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">PIC</th>
+          <% if current_user.is_admin? && !@cash_closed %>
+            <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Aksi</th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @cash_transactions.each_with_index do |ct, i| %>
+          <tr class="hover:bg-gray-50 transition-colors duration-150">
+            <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900 text-center"><%= (i + 1) %></td>
+            <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900"><%= ct.transaction_date.strftime('%d/%m/%y') %></td>
+            <td class="px-3 py-3 text-sm text-gray-900" title="<%= ct.description %>">
+              <div class="max-w-xs truncate"><%= ct.description %></div>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-right <%= ct.transaction_type == 1 ? 'text-green-600' : 'text-red-600' %>">
+              <%= number_to_currency(ct.total, unit: "Rp ", separator: ",", delimiter: ".", precision: 0) %>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
+              <div class="max-w-24 truncate"><%= CashTransaction::GROUP.invert[ct.transaction_group] %></div>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
+              <div class="max-w-20 truncate"><%= ct.pic.try(:name) %></div>
+            </td>
+            <% if current_user.is_admin? && !@cash_closed %>
+              <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-center">
+                <div class="flex space-x-2 justify-center">
+                  <%= link_to edit_cash_transaction_path(ct), 
+                              class: 'inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded hover:bg-blue-200 transition-colors duration-150' do %>
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    Ubah
+                  <% end %>
+                  
+                  <%= button_to ct, 
+                                method: :delete, 
+                                class: 'inline-flex items-center px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded hover:bg-red-200 transition-colors duration-150 border-0',
+                                data: { 
+                                  action: "click->confirm-modal#show",
+                                  confirm_title: "Hapus Transaksi",
+                                  confirm_message: "Apakah Anda yakin ingin menghapus transaksi ini? Data yang dihapus tidak dapat dikembalikan.",
+                                  confirm_text: "Ya, Hapus",
+                                  cancel_text: "Batal",
+                                  confirm_class: "bg-red-600 hover:bg-red-700 focus:ring-red-500"
+                                } do %>
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    Hapus
+                  <% end %>
+                </div>
+              </td>
+            <% end %>
+          </tr>
         <% end %>
-        <td><%= CashTransaction::GROUP.invert[ct.transaction_group] %></td>
-        <td><%= ct.pic.try(:name) %></td>
-        <% if !@cash_closed %>
-          <td>
-            <%= link_to 'Lihat', ct, class: 'btn-sm btn-success' %>
-            <%= link_to 'Ubah', edit_cash_transaction_path(ct), class: 'btn-sm btn-info'  if current_user.is_admin? %>
-            <%= link_to 'Destroy', ct, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn-sm btn-danger'%>
+        
+        <!-- Desktop Summary Row -->
+        <tr class="bg-gray-50 font-semibold">
+          <td colspan="3" class="px-3 py-3 text-sm text-gray-900 text-right">SALDO</td>
+          <td class="px-3 py-3 whitespace-nowrap text-sm font-bold text-right <%= (@debit_total - @credit_total) >= 0 ? 'text-green-600' : 'text-red-600' %>">
+            <%= number_to_currency((@debit_total - @credit_total), unit: "Rp ", separator: ",", delimiter: ".", precision: 0) %>
           </td>
-        <% end %>
-      </tr>
+          <td colspan="<%= (current_user.is_admin? && !@cash_closed) ? '3' : '2' %>" class="px-3 py-3 text-xs text-gray-600">
+            Debit: <span class="text-green-600 font-medium"><%= number_to_currency(@debit_total, unit: "Rp ", separator: ",", delimiter: ".", precision: 0) %></span> | 
+            Kredit: <span class="text-red-600 font-medium"><%= number_to_currency(@credit_total, unit: "Rp ", separator: ",", delimiter: ".", precision: 0) %></span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile Card View -->
+  <div class="lg:hidden space-y-3">
+    <% @cash_transactions.each_with_index do |ct, i| %>
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+        <!-- Card Header -->
+        <div class="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-t-lg">
+          <div class="flex items-center space-x-2">
+            <span class="inline-flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
+              <%= (i + 1) %>
+            </span>
+            <span class="text-sm font-medium text-gray-900">
+              <%= ct.transaction_date.strftime('%d/%m/%y') %>
+            </span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <% if ct.transaction_type == 1 %>
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Debit
+              </span>
+            <% else %>
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                Kredit
+              </span>
+            <% end %>
+          </div>
+        </div>
+        
+        <!-- Card Body -->
+        <div class="px-4 py-3 space-y-3">
+          <!-- Description -->
+          <div>
+            <p class="text-sm font-medium text-gray-900 leading-5"><%= ct.description %></p>
+          </div>
+          
+          <!-- Amount -->
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">Jumlah</span>
+            <span class="text-lg font-bold <%= ct.transaction_type == 1 ? 'text-green-600' : 'text-red-600' %>">
+              <%= number_to_currency(ct.total, unit: "Rp ", separator: ",", delimiter: ".", precision: 0) %>
+            </span>
+          </div>
+          
+          <!-- Group and PIC -->
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span class="text-gray-500">Kategori</span>
+              <p class="font-medium text-gray-900 truncate"><%= CashTransaction::GROUP.invert[ct.transaction_group] %></p>
+            </div>
+            <div>
+              <span class="text-gray-500">PIC</span>
+              <p class="font-medium text-gray-900 truncate"><%= ct.pic.try(:name) %></p>
+            </div>
+          </div>
+          
+          <!-- Actions - Only for Admin -->
+          <% if current_user.is_admin? && !@cash_closed %>
+            <div class="flex space-x-3 pt-2 border-t border-gray-100">
+              <%= link_to edit_cash_transaction_path(ct), 
+                          class: 'flex-1 inline-flex items-center justify-center px-3 py-2 bg-blue-50 text-blue-700 text-sm font-medium rounded-md hover:bg-blue-100 transition-colors duration-150' do %>
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                Edit
+              <% end %>
+              
+              <%= button_to ct, 
+                            method: :delete, 
+                            class: 'flex-1 inline-flex items-center justify-center px-3 py-2 bg-red-50 text-red-700 text-sm font-medium rounded-md hover:bg-red-100 transition-colors duration-150 border-0',
+                            data: { 
+                              action: "click->confirm-modal#show",
+                              confirm_title: "Hapus Transaksi",
+                              confirm_message: "Apakah Anda yakin ingin menghapus transaksi ini? Data yang dihapus tidak dapat dikembalikan.",
+                              confirm_text: "Ya, Hapus",
+                              cancel_text: "Batal",
+                              confirm_class: "bg-red-600 hover:bg-red-700 focus:ring-red-500"
+                            } do %>
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                Hapus
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
     <% end %>
-    <tr>
-      <td colspan="3" align='right'><b>TOTAL</b></td>
-      <td><b><%= number_to_currency(@debit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
-      <td><b><%= number_to_currency(@credit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
-      <td colspan='2'><b>SISA : <%= number_to_currency((@debit_total - @credit_total), unit: "Rp. ", separator: ",", delimiter: ".")   %></b></td>
-    </tr>
-    </tbody>
-  </table>
+    
+    <!-- Mobile Summary Card -->
+    <div class="bg-gray-50 rounded-lg p-4 mt-4 border-2 border-gray-200">
+      <h3 class="text-lg font-bold text-gray-900 mb-3">Ringkasan</h3>
+      <div class="grid grid-cols-2 gap-4 mb-3">
+        <div class="text-center">
+          <p class="text-sm text-gray-500 mb-1">Total Debit</p>
+          <p class="text-lg font-bold text-green-600">
+            <%= number_to_currency(@debit_total, unit: "Rp ", separator: ",", delimiter: ".", precision: 0) %>
+          </p>
+        </div>
+        <div class="text-center">
+          <p class="text-sm text-gray-500 mb-1">Total Kredit</p>
+          <p class="text-lg font-bold text-red-600">
+            <%= number_to_currency(@credit_total, unit: "Rp ", separator: ",", delimiter: ".", precision: 0) %>
+          </p>
+        </div>
+      </div>
+      <div class="text-center pt-3 border-t border-gray-300">
+        <p class="text-sm text-gray-500 mb-1">Saldo</p>
+        <p class="text-xl font-bold <%= (@debit_total - @credit_total) >= 0 ? 'text-green-600' : 'text-red-600' %>">
+          <%= number_to_currency((@debit_total - @credit_total), unit: "Rp ", separator: ",", delimiter: ".", precision: 0) %>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Confirmation Modal -->
+  <div class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden" data-confirm-modal-target="modal" data-action="click->confirm-modal#clickOutside">
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all">
+        <!-- Modal Header -->
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-lg font-medium text-gray-900" data-confirm-modal-target="title">
+                Konfirmasi
+              </h3>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="px-6 py-4">
+          <p class="text-sm text-gray-600" data-confirm-modal-target="message">
+            Apakah Anda yakin?
+          </p>
+        </div>
+        
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 bg-gray-50 flex flex-col-reverse sm:flex-row justify-end space-y-2 space-y-reverse sm:space-y-0 sm:space-x-3 rounded-b-lg">
+          <button type="button" 
+                  class="w-full sm:w-auto px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
+                  data-action="click->confirm-modal#cancel"
+                  data-confirm-modal-target="cancelButton">
+            Batal
+          </button>
+          <button type="button"
+                  class="w-full sm:w-auto px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
+                  data-action="click->confirm-modal#confirm"
+                  data-confirm-modal-target="confirmButton">
+            Ya, Hapus
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

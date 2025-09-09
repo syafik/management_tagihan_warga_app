@@ -1,40 +1,206 @@
-<div class="table-responsive border rounded p-1" style='height: 600px; min-height: 100%; max-height: 100%; overflow-x: scroll;'> 
-  <table class="table table-hover table-bordered" id="table-content">
-    <thead>
-    <tr>
-      <th class="font-weight-bold">Blok</th>
-      <% (1..12).each do |i| %>
-        <th class="font-weight-bold"><%= i %></th>
+<!-- Desktop & Tablet View -->
+<div class="hidden lg:block">
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <!-- Header Row -->
+    <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+      <div class="grid grid-cols-13 gap-2 items-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+        <div class="text-left">Alamat</div>
+        <% UserContribution::MONTHNAMES.each do |month_name, month_num| %>
+          <div class="text-center"><%= month_name.first(3) %></div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Data Rows -->
+    <div class="divide-y divide-gray-200">
+      <% if @addresses.any? %>
+        <% @addresses.each_with_index do |address, index| %>
+          <div class="hover:bg-gray-50 transition-colors duration-150">
+            <div class="grid grid-cols-13 gap-2 items-center px-4 py-3">
+              <!-- Address (Clickable) -->
+              <div>
+                <%= link_to contribution_by_address_user_contribution_path(address), 
+                            class: 'font-semibold text-indigo-600 hover:text-indigo-800 hover:underline transition-colors' do %>
+                  <%= address.block_address&.upcase %>
+                <% end %>
+              </div>
+
+              <!-- Monthly Status -->
+              <% UserContribution::MONTHNAMES.each do |month_name, month_num| %>
+                <% contribution = address.user_contributions.find { |uc| uc.month == month_num && uc.year == @year_selected.to_i } %>
+                <div class="flex justify-center">
+                  <div class="relative group">
+                    <% if contribution %>
+                      <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-green-600 transition-colors">
+                        <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                      </div>
+                      <!-- Tooltip -->
+                      <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                        Rp <%= number_with_delimiter(contribution.contribution, delimiter: '.') %><br>
+                        <%= contribution.tgl_bayar %>
+                      </div>
+                    <% else %>
+                      <div class="w-6 h-6 bg-red-300 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-400 transition-colors">
+                        <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                      </div>
+                      <!-- Tooltip -->
+                      <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                        Belum bayar
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="px-4 py-8 text-center">
+          <div class="text-gray-500">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada data</h3>
+            <p class="mt-1 text-sm text-gray-500">Tidak ada alamat yang ditemukan untuk kriteria pencarian ini.</p>
+          </div>
+        </div>
       <% end %>
-      <th class="font-weight-bold">Action</th>
-    </tr>
-    </thead>
-    <tbody>
-    <% @addresses.each do |address| %>
-      <tr>
-        <td><%= address.try(:block_address).try(:upcase) %></td>
-        <% address.user_contributions.each do |uc| %>
-          <td class="font-weight-bold" bgcolor="green"><%= '' %></td>
-        <% end %>
-        <% (address.user_contributions.size + 1).upto(12).each do |i| %>
-          <td class="font-weight-bold" bgcolor="grey"><%= '' %></td>
-        <% end %>
-        <td>
-          <%= link_to 'Lihat Data', contribution_by_address_user_contribution_path(address), class: 'btn-sm btn-success' %>
-        </td>
-      </tr>
-    <% end %>
-    </tbody>
-  </table>
+    </div>
+  </div>
 </div>
 
-<script>
-$(document).ready(function(){
-  $(".table-responsive").freezeTable({
-    'scrollable': true,
-    'shadow': true,
-    'columnNum': 2,
-  });
-})
+<!-- Tablet View (Medium screens) -->
+<div class="hidden md:block lg:hidden">
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <% if @addresses.any? %>
+      <div class="divide-y divide-gray-200">
+        <% @addresses.each do |address| %>
+          <div class="p-4">
+            <div class="flex justify-between items-center mb-4">
+              <%= link_to contribution_by_address_user_contribution_path(address), 
+                          class: 'text-lg font-semibold text-indigo-600 hover:text-indigo-800 hover:underline' do %>
+                <%= address.block_address&.upcase %>
+              <% end %>
+            </div>
+            
+            <!-- Monthly Status Grid for Tablet -->
+            <div class="grid grid-cols-6 gap-3">
+              <% UserContribution::MONTHNAMES.each do |month_name, month_num| %>
+                <% contribution = address.user_contributions.find { |uc| uc.month == month_num && uc.year == @year_selected.to_i } %>
+                <div class="text-center">
+                  <div class="text-xs text-gray-500 mb-2 font-medium"><%= month_name.first(3) %></div>
+                  <div class="w-10 h-10 mx-auto <%= contribution ? 'bg-green-500 hover:bg-green-600' : 'bg-red-300 hover:bg-red-400' %> rounded-full flex items-center justify-center transition-colors cursor-pointer">
+                    <% if contribution %>
+                      <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                      </svg>
+                    <% else %>
+                      <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                      </svg>
+                    <% end %>
+                  </div>
+                  <% if contribution %>
+                    <div class="text-xs text-green-600 mt-1 font-medium">
+                      Rp <%= number_with_delimiter(contribution.contribution, delimiter: '.') %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="p-8 text-center">
+        <div class="text-gray-500">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada data</h3>
+          <p class="mt-1 text-sm text-gray-500">Tidak ada alamat yang ditemukan untuk kriteria pencarian ini.</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
 
-</script>
+<!-- Mobile View (Small screens) -->
+<div class="block md:hidden">
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <% if @addresses.any? %>
+      <div class="divide-y divide-gray-200">
+        <% @addresses.each do |address| %>
+          <div class="p-4">
+            <div class="flex justify-between items-center mb-4">
+              <%= link_to contribution_by_address_user_contribution_path(address), 
+                          class: 'text-lg font-semibold text-indigo-600 hover:text-indigo-800 hover:underline' do %>
+                <%= address.block_address&.upcase %>
+              <% end %>
+            </div>
+            
+            <!-- Monthly Status Grid for Mobile -->
+            <div class="grid grid-cols-4 gap-2">
+              <% UserContribution::MONTHNAMES.each do |month_name, month_num| %>
+                <% contribution = address.user_contributions.find { |uc| uc.month == month_num && uc.year == @year_selected.to_i } %>
+                <div class="text-center">
+                  <div class="text-xs text-gray-500 mb-1 font-medium"><%= month_name.first(3) %></div>
+                  <div class="w-8 h-8 mx-auto <%= contribution ? 'bg-green-500' : 'bg-red-300' %> rounded-full flex items-center justify-center">
+                    <% if contribution %>
+                      <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                      </svg>
+                    <% else %>
+                      <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                      </svg>
+                    <% end %>
+                  </div>
+                  <% if contribution %>
+                    <div class="text-xs text-green-600 mt-1 font-medium truncate">
+                      <%= number_with_delimiter(contribution.contribution, delimiter: '.') %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="p-6 text-center">
+        <div class="text-gray-500">
+          <svg class="mx-auto h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada data</h3>
+          <p class="mt-1 text-xs text-gray-500">Tidak ada alamat yang ditemukan untuk kriteria pencarian ini.</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<style>
+.grid-cols-13 {
+  grid-template-columns: 120px repeat(12, 1fr);
+}
+
+/* Ensure proper responsive breakpoints */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .grid-cols-6 {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+</style>
+

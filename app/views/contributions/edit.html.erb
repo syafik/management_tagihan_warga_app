@@ -1,0 +1,45 @@
+<div class="row">
+  <div class="col-md-8 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Edit Contribution Rate</h4>
+        <p class="card-description">
+          Modify the contribution rate details
+        </p>
+        <%= render 'form', contribution: @contribution %>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Rate Information</h5>
+        <div class="mb-3">
+          <strong>Current Amount:</strong><br>
+          <%= number_to_currency(@contribution.amount, unit: "Rp. ", separator: ",", delimiter: ".") %>
+        </div>
+        <div class="mb-3">
+          <strong>Applies To:</strong><br>
+          <%= @contribution.block || "All Blocks" %>
+        </div>
+        <div class="mb-3">
+          <strong>Status:</strong><br>
+          <% if @contribution.active? %>
+            <% if @contribution.effective_from <= Date.current %>
+              <span class="badge badge-success">Currently Active</span>
+            <% else %>
+              <span class="badge badge-warning">Future Rate</span>
+            <% end %>
+          <% else %>
+            <span class="badge badge-secondary">Inactive</span>
+          <% end %>
+        </div>
+        <div class="mb-3">
+          <strong>Created:</strong><br>
+          <span class="text-muted"><%= @contribution.created_at.strftime('%d %b %Y at %H:%M') %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

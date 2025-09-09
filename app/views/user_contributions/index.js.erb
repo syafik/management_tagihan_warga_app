@@ -1,2 +1,11 @@
 $('#content-data').html("<%= escape_javascript(render partial: 'data') %>");
 $('#year-selected').html("<%= @year_selected %>");
+
+// Update the subtitle to show current filter status
+<% if @block_selected.present? && @search_term.blank? %>
+  $('.text-gray-500').html('Kelola data iuran dan pembayaran warga tahun <%= @year_selected %> • Blok <%= @block_selected %>');
+<% elsif @search_term.present? %>
+  $('.text-gray-500').html('Kelola data iuran dan pembayaran warga tahun <%= @year_selected %> • Pencarian: "<%= @search_term %>"');
+<% else %>
+  $('.text-gray-500').html('Kelola data iuran dan pembayaran warga tahun <%= @year_selected %>');
+<% end %>

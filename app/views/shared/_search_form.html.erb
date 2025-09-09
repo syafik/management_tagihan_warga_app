@@ -1,6 +1,6 @@
-<%= form_tag url, method: :get, class: 'form-inline ajax-form-request' do  %>
-  <%= select_tag 'q[c][0][a][0][name]', options_for_select(attributes),  class: 'form-control  mb-2 mr-sm-2' %>
-  <%= select_tag 'q[c][0][p]', options_for_select(predicates), class: 'form-control  mb-2 mr-sm-2' %>
-  <%= text_field_tag 'q[c][0][v][0][value]','', class: 'form-control mb-2 mr-sm-2' %>
-  <%= submit_tag "Search", class: 'form-control btn btn-primary mb-2 mr-sm-2' %><br>
+<%= form_tag url, method: :get, class: 'flex flex-wrap items-center gap-3 ajax-form-request' do  %>
+  <%= select_tag 'q[c][0][a][0][name]', options_for_select(attributes), class: 'block w-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' %>
+  <%= select_tag 'q[c][0][p]', options_for_select(predicates), class: 'block w-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' %>
+  <%= text_field_tag 'q[c][0][v][0][value]','', placeholder: 'Search value...', class: 'block w-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' %>
+  <%= submit_tag "Search", class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
 <% end %>

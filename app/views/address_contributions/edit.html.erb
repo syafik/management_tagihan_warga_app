@@ -1,0 +1,13 @@
+<div class="row">
+  <div class="col-md-8 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Edit Special Rate for <%= @address.block_address.upcase %></h4>
+        <p class="card-description">
+          Modify the special contribution rate for this address
+        </p>
+        <%= render 'form', address_contribution: @address_contribution %>
+      </div>
+    </div>
+  </div>
+</div>

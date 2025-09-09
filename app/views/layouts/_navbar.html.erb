@@ -1,19 +1,30 @@
-<nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
-  <div class="navbar-brand-wrapper d-flex align-items-center">
-    <a class="navbar-brand brand-logo text-white" href="/">
-      <h2>Puri Ayana</h2>
-    </a>
-    <a class="navbar-brand brand-logo-mini" href="/"><img src="<%= asset_path('logo-mini.svg') %>" alt="logo" /></a>
-  </div>
-  <div class="navbar-menu-wrapper d-flex align-items-center flex-grow-1">
-    <h5 class="mb-0 font-weight-medium d-none d-lg-flex">Welcome PuriAyana App!</h5>
-    <ul class="navbar-nav navbar-nav-right ml-auto">
-      <li class="nav-item">
-        <%= link_to "Sign Out", destroy_user_session_path, class: 'nav-link', method: :delete, data: { confirm: 'Are you sure?' } %>
-      </li>
-    </ul>
-    <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
-      <span class="icon-menu"></span>
-    </button>
+<nav class="bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
+  <div class="max-w-full px-4 lg:pl-64">
+    <div class="flex items-center justify-between h-16">
+      <!-- Brand -->
+      <div class="flex items-center">
+        <a href="/" class="text-indigo-600 font-bold text-xl lg:hidden">
+          Puri Ayana
+        </a>
+        <h1 class="text-gray-900 text-lg font-medium hidden lg:block">Welcome PuriAyana App!</h1>
+      </div>
+      
+      <!-- Navigation items -->
+      <div class="flex items-center space-x-4">
+        <%= form_with url: destroy_user_session_path, method: :delete, local: true, 
+              data: { 'turbo-confirm': 'Are you sure you want to sign out?' }, 
+              style: 'display: inline;' do %>
+          <%= submit_tag 'Sign Out', class: 'text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium bg-transparent border-0 cursor-pointer' %>
+        <% end %>
+        
+        <!-- Mobile menu button -->
+        <button type="button" class="lg:hidden text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" data-action="click->mobile-menu#toggle" onclick="console.log('Button clicked'); document.getElementById('sidebar').classList.toggle('-translate-x-full')">
+          <span class="sr-only">Open main menu</span>
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
 </nav>

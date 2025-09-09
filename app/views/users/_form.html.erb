@@ -1,66 +1,83 @@
-<%= form_for(user) do |f| %>
-  <%= errors_for(user) %>
-  <div class="form-group">
-    <%= f.label :email %>
-    <%= f.email_field :email, autofocus: true, class: 'form-control', placeholder: 'email address' %>
-  </div>
+<div data-controller="user-form">
+  <%= form_for(user, html: { class: "space-y-6" }) do |f| %>
+    <%= errors_for(user) %>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div>
+        <%= f.label :email, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.email_field :email, 
+                          autofocus: true, 
+                          class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", 
+                          placeholder: "Alamat email" %>
+      </div>
 
-  <div class="form-group">
-    <%= f.label :name %>
-    <%= f.text_field :name, class: 'form-control', placeholder: 'nama' %>
-  </div>
+      <div>
+        <%= f.label :name, "Nama Lengkap", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.text_field :name, 
+                        class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", 
+                        placeholder: "Nama lengkap" %>
+      </div>
 
-  <div class="form-group">
-    <%= f.label :phone_number %>
-    <%= f.text_field :phone_number, class: 'form-control', placeholder: 'no tlp' %>
-  </div>
+      <div>
+        <%= f.label :phone_number, "No. Telepon", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.text_field :phone_number, 
+                        class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", 
+                        placeholder: "No. telepon" %>
+      </div>
 
-  <div class="form-group">
-    <%= f.label :role %>
-     <%= f.select :role, [["Warga", 1], ["Admin", 2], ["Sekuriti", 3]], {}, {id: 'role-pick', class: 'select-field-js', style: 'width:100%'}  %>
-  </div>
+      <div>
+        <%= f.label :role, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.select :role, 
+                    [["Warga", 1], ["Admin", 2], ["Sekuriti", 3]], 
+                    {}, 
+                    {
+                      data: { 
+                        "user-form-target": "roleSelect",
+                        action: "change->user-form#roleChanged"
+                      },
+                      class: "select-field-js w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    } %>
+      </div>
+    </div>
 
-  <div id="address-box" class="form-group <%= user.is_security? ? "d-none": ""%>">
-    <%= f.label :block %>
-    <%= f.select :address_id, Address.select('id, block_address').collect {|p| [ p.block_address.try(:upcase), p.id ] }, {include_blank: true}, {class: 'select-field-js', style: 'width:100%'}  %>
-  </div>
-  
-  <div id="pic-box" class="form-group <%= user.is_security? ? "": "d-none"%>">
-    <%= f.label :pic_blok %>
-    <%= f.text_field :pic_blok, class: 'form-control', placeholder: 'pic retribution'  %>
-  </div>
+    <div data-user-form-target="addressBox" class="<%= user.is_security? ? "hidden": ""%>">
+      <%= f.label :address_id, "Blok Rumah", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= f.select :address_id, 
+                  Address.select('id, block_address').collect {|p| [ p.block_address.try(:upcase), p.id ] }, 
+                  {include_blank: "Pilih blok rumah"}, 
+                  {
+                    data: { "user-form-target": "addressSelect" },
+                    class: "select-field-js w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  } %>
+    </div>
+    
+    <div data-user-form-target="picBox" class="<%= user.is_security? ? "": "hidden"%>">
+      <%= f.label :pic_blok, "PIC Blok", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= f.text_field :pic_blok, 
+                      class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", 
+                      placeholder: "PIC retribution" %>
+    </div>
 
-  <div class="form-group">
-    <%= f.label :avatar %>
-     <%= f.file_field :avatar, class: 'form-control' %>
-  </div>
+    <div>
+      <%= f.label :avatar, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= f.file_field :avatar, 
+                      class: "w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" %>
+    </div>
 
-  <% if user.new_record? %>
-    <div class="form-group">
-      <%= f.label :password %>
-      <%= f.password_field :password, class: 'form-control', placeholder: 'password' %>
+    <% if user.new_record? %>
+      <div>
+        <%= f.label :password, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.password_field :password, 
+                           class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", 
+                           placeholder: "Password" %>
+      </div>
+    <% end %>
+
+    <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
+      <%= f.submit 'Simpan', 
+                  class: 'inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+      <%= link_to 'Batal', users_path, 
+                  class: 'inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
     </div>
   <% end %>
-
-  <%= f.submit 'Submit', class: 'btn btn-primary mr-2' %>
-  <%= link_to 'Cancel', users_path, class: 'btn btn-light' %>
-<% end %>
-
-<script type="text/javascript">
-  $(document).ready(function(){
-    if ($(".select-field-js").length) {
-      $(".select-field-js").select2();
-    }
-    $('#role-pick').change(function(){
-      if($(this).val() == 3){
-        $('#address-box').addClass('d-none');  
-        $('#user_address_id').val('');
-        $('#user_address_id').trigger('change'); 
-        $('#pic-box').removeClass('d-none');
-        $('#user_pic_blok').val('')
-      }else{
-        $('#address-box').removeClass('d-none');
-      }
-    })
-  })
-</script>
+</div>

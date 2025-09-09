@@ -1,79 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-gray-50">
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>PuriAyana App!</title>
   <%= csrf_meta_tags %>
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  <%= csp_meta_tag %>
+  
+  <!-- Vite assets -->
+  <%= vite_client_tag %>
+  <%= vite_stylesheet_tag 'application' %>
+  <%= vite_javascript_tag 'application' %>
+  
+  <!-- CKEditor -->
   <%= javascript_include_tag Ckeditor.cdn_url %>
-  <!-- plugins:css -->
-  <%= stylesheet_link_tag 'simple-line-icons', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <%= stylesheet_link_tag 'vendor.bundle.base.css', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <!-- endinject -->
-  <!-- Plugin css for this page -->
-  <%#= stylesheet_link_tag 'daterangepicker.css', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <%= stylesheet_link_tag 'chartist.min.css', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <!--  <link rel="stylesheet" href="./vendors/chartist/chartist.min.css">-->
-  <!-- End plugin css for this page -->
-  <!-- inject:css -->
-  <!-- endinject -->
-  <!-- Layout styles -->
-  <%= stylesheet_link_tag 'style.css', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <%= stylesheet_link_tag 'bootstrap-datepicker.min.css', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <!-- End layout styles -->
+  
   <link rel="shortcut icon" href="<%= asset_path('img_305218.png') %>" />
 </head>
-<body>
-<div class="container-scroller">
-  <!-- partial:partials/_navbar.html -->
-  <%= render partial: 'layouts/navbar' %>
-  <!-- partial -->
-  <div class="container-fluid page-body-wrapper">
-    <!-- partial:partials/_sidebar.html -->
-    <%= render partial: 'layouts/sidebar' %>
-    <!-- partial -->
-    <div class="main-panel">
-      <div class="content-wrapper">
-        <%= render partial: 'shared/flash_message' if !flash.empty? %>
-        <%= yield %>
-      </div>
-      <!-- content-wrapper ends -->
-      <!-- partial:partials/_footer.html -->
-      <footer class="footer">
-        <div class="d-sm-flex justify-content-center justify-content-sm-between">
-          <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2020 PAD2 Solution</a>. All rights reserved.</span>
-          <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i class="icon-heart text-danger"></i></span>
+<body class="h-full">
+  <div class="min-h-full" data-controller="mobile-menu">
+    <!-- Navigation -->
+    <%= render partial: 'layouts/navbar' %>
+    
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <%= render partial: 'layouts/sidebar' %>
+      
+      <!-- Main content wrapper -->
+      <main class="flex-1 lg:ml-64 flex flex-col">
+        <!-- Main content area -->
+        <div class="flex-1 px-4 sm:px-6 pt-20 pb-6">
+          <%= render partial: 'shared/flash_message' if !flash.empty? %>
+          <%= yield %>
         </div>
-      </footer>
-      <!-- partial -->
+        
+        <!-- Footer - always at bottom -->
+        <footer class="bg-white border-t border-gray-200 mt-auto">
+          <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 sm:flex sm:items-center sm:justify-between">
+            <span class="text-gray-500 text-xs sm:text-sm block sm:inline">Copyright © 2020 PAD2 Solution. All rights reserved.</span>
+            <span class="text-gray-500 text-xs sm:text-sm mt-2 sm:mt-0 block sm:inline">Hand-crafted & made with <i class="text-red-500">❤</i></span>
+          </div>
+        </footer>
+      </main>
     </div>
-    <!-- main-panel ends -->
   </div>
-  <!-- page-body-wrapper ends -->
-</div>
-<!-- container-scroller -->
-<!-- plugins:js -->
-<%= javascript_include_tag "vendor.bundle.base.js" %>
-<!-- endinject -->
-<!-- Plugin js for this page -->
-<!--<script src="./vendors/chart.js/Chart.min.js"></script>-->
-<!--<script src="./vendors/moment/moment.min.js"></script>-->
-<!--<script src="./vendors/daterangepicker/daterangepicker.js"></script>-->
-<!--<script src="./vendors/chartist/chartist.min.js"></script>-->
-<!-- End plugin js for this page -->
-<!-- inject:js -->
-
-<%= javascript_include_tag "select2.min.js" %>
-<%= javascript_include_tag "off-canvas.js" %>
-<%= javascript_include_tag "misc.js" %>
-<%= javascript_include_tag "jquery-freezetable.js" %>
-<%= javascript_include_tag "bootstrap-datepicker.min.js" %>
-<!-- endinject -->
-<!-- Custom js for this page -->
-<!--<script src="./js/dashboard.js"></script>-->
-<!-- End custom js for this page -->
 </body>
 </html>

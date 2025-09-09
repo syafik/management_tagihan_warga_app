@@ -1,0 +1,60 @@
+<div class="table-responsive border rounded p-1">
+  <table class="table table-hover" id="table-content">
+    <thead>
+    <tr>
+      <th class="font-weight-bold">No</th>
+      <th class="font-weight-bold">Amount</th>
+      <th class="font-weight-bold">Effective From</th>
+      <th class="font-weight-bold">Block</th>
+      <th class="font-weight-bold">Description</th>
+      <th class="font-weight-bold">Status</th>
+      <th class="font-weight-bold">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% cur_page = @contributions.current_page %>
+    <% @contributions.each_with_index do |contribution, i| %>
+      <tr>
+        <td><%= (i + 1) + ((cur_page - 1)*Kaminari.config.default_per_page) %></td>
+        <td>
+          <strong><%= number_to_currency(contribution.amount, unit: "Rp. ", separator: ",", delimiter: ".") %></strong>
+        </td>
+        <td><%= contribution.effective_from.strftime('%d %b %Y') %></td>
+        <td>
+          <% if contribution.block.present? %>
+            <span class="badge badge-info">Block <%= contribution.block %></span>
+          <% else %>
+            <span class="badge badge-success">All Blocks</span>
+          <% end %>
+        </td>
+        <td>
+          <%= truncate(contribution.description, length: 50) if contribution.description.present? %>
+        </td>
+        <td>
+          <% if contribution.active? %>
+            <% if contribution.effective_from <= Date.current %>
+              <span class="badge badge-success">Active</span>
+            <% else %>
+              <span class="badge badge-warning">Future</span>
+            <% end %>
+          <% else %>
+            <span class="badge badge-secondary">Inactive</span>
+          <% end %>
+        </td>
+        <td>
+          <%= link_to 'View', contribution, class: 'btn btn-sm btn-success' %>
+          <% if current_user.is_admin? %>
+            <%= link_to 'Edit', edit_contribution_path(contribution), class: 'btn btn-sm btn-info' %>
+            <%= link_to 'Delete', contribution, method: :delete, 
+                        confirm: 'Are you sure?', class: 'btn btn-sm btn-danger' %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+<div class="d-flex mt-4 flex-wrap">
+  <p class="text-muted"><%= page_entries_info @contributions, entry_name: 'contribution rate' %></p>
+  <%= paginate @contributions, remote: true %>
+</div>

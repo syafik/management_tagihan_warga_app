@@ -1,33 +1,117 @@
-<div class="table-responsive border rounded p-1">
-  <table class="table table-hover" id="table-content">
-    <thead>
+<!-- Desktop table view -->
+<div class="hidden md:block overflow-x-auto border border-gray-200 rounded-lg shadow">
+  <table class="min-w-full divide-y divide-gray-200" id="table-content">
+    <thead class="bg-gray-50">
     <tr>
-      <th class="font-weight-bold">No</th>
-      <th class="font-weight-bold"><%= sort_link(@q, :block_address, 'Blok',{}, {remote: true, class: 'ajax-request'}) %></th>
-      <th class="font-weight-bold"><%= sort_link(@q, :contribution, 'Iuran',{}, {remote: true, class: 'ajax-request'}) %></th>
-      <th class="font-weight-bold"><%= sort_link(@q, :arrears, 'Tunggakan',{}, {remote: true, class: 'ajax-request'}) %></th>
-      <th class="font-weight-bold">Action</th>
+      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><%= sort_link(@q, :block_address, 'Blok',{}, {remote: true, class: 'ajax-request hover:text-gray-700'}) %></th>
+      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kepala Keluarga</th>
+      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
     </tr>
     </thead>
-    <tbody>
-    <% cur_page = @addresses.current_page %>
+    <tbody class="bg-white divide-y divide-gray-200">
     <% @addresses.each_with_index do |address, i| %>
-      <tr>
-        <td><%= (i + 1) + ((cur_page - 1)*Kaminari.config.default_per_page) %> </td>
-        <td><%= address.block_address.upcase %></td>
-        <td><%= number_to_currency(address.contribution, unit: "Rp. ", separator: ",", delimiter: ".") %></td>
-        <td><%= address.arrears %></td>
-        <td>
-          <%= link_to 'Lihat', address, class: 'btn-sm btn-success' %>
-          <%= link_to 'Ubah', edit_address_path(address), class: 'btn-sm btn-info'  if current_user.is_admin? %>
-          <%#= link_to 'Destroy', user, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn-sm btn-danger'%>
+      <tr class="hover:bg-gray-50">
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= (i + 1) + @pagy.offset %></td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= address.block_address.upcase %></td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          <% if address.head_of_family.present? %>
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-8 w-8">
+                <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                  <span class="text-indigo-600 font-medium text-xs"><%= address.head_of_family.name.first.upcase %></span>
+                </div>
+              </div>
+              <div class="ml-3">
+                <div class="text-sm font-medium text-gray-900"><%= address.head_of_family.name %></div>
+                <% if address.head_of_family.phone_number.present? %>
+                  <div class="text-sm text-gray-500"><%= address.head_of_family.phone_number %></div>
+                <% end %>
+              </div>
+            </div>
+          <% else %>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+              Tidak ada
+            </span>
+          <% end %>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+          <%= link_to 'Lihat', address, class: 'inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700' %>
+          <%= link_to 'Ubah', edit_address_path(address), class: 'inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700' if current_user.is_admin? %>
+          <% if current_user.is_admin? && address.special_rate? %>
+            <%= link_to 'Special Rates', address_address_contributions_path(address), class: 'inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-yellow-600 hover:bg-yellow-700' %>
+          <% elsif current_user.is_admin? %>
+            <%= link_to 'Set Rate', new_address_address_contribution_path(address), class: 'inline-flex items-center px-2.5 py-1.5 border border-yellow-300 text-xs font-medium rounded text-yellow-700 bg-white hover:bg-yellow-50' %>
+          <% end %>
         </td>
       </tr>
     <% end %>
     </tbody>
   </table>
 </div>
-<div class="d-flex mt-4 flex-wrap">
-  <p class="text-muted"><%= page_entries_info @addresses, entry_name: 'item' %></p>
-  <%= paginate @addresses, remote: true %>
+
+<!-- Mobile card view -->
+<div class="md:hidden space-y-4">
+  <% @addresses.each_with_index do |address, i| %>
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mr-2">
+            #<%= (i + 1) + @pagy.offset %>
+          </span>
+          <h3 class="text-lg font-semibold text-gray-900"><%= address.block_address.upcase %></h3>
+        </div>
+        <div class="flex space-x-1">
+          <%= link_to 'Lihat', address, class: 'inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700' %>
+          <% if current_user.is_admin? %>
+            <%= link_to 'Ubah', edit_address_path(address), class: 'inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700' %>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- Head of family section -->
+      <div class="mb-3">
+        <dt class="text-xs font-medium text-gray-500 mb-1">Kepala Keluarga</dt>
+        <dd>
+          <% if address.head_of_family.present? %>
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-8 w-8">
+                <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                  <span class="text-indigo-600 font-medium text-xs"><%= address.head_of_family.name.first.upcase %></span>
+                </div>
+              </div>
+              <div class="ml-2">
+                <div class="text-sm font-medium text-gray-900"><%= address.head_of_family.name %></div>
+                <% if address.head_of_family.phone_number.present? %>
+                  <div class="text-xs text-gray-500"><%= address.head_of_family.phone_number %></div>
+                <% end %>
+              </div>
+            </div>
+          <% else %>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+              Tidak ada
+            </span>
+          <% end %>
+        </dd>
+      </div>
+      
+      
+      <!-- Admin actions for mobile -->
+      <% if current_user.is_admin? %>
+        <div class="mt-3 pt-3 border-t border-gray-200">
+          <div class="flex space-x-2">
+            <% if address.special_rate? %>
+              <%= link_to 'Special Rates', address_address_contributions_path(address), class: 'flex-1 inline-flex items-center justify-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-yellow-600 hover:bg-yellow-700' %>
+            <% else %>
+              <%= link_to 'Set Rate', new_address_address_contribution_path(address), class: 'flex-1 inline-flex items-center justify-center px-3 py-1.5 border border-yellow-300 text-xs font-medium rounded text-yellow-700 bg-white hover:bg-yellow-50' %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="mt-6">
+  <%== pagy_tailwind_nav(@pagy) if @pagy.pages > 1 %>
 </div>

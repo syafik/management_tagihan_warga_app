@@ -1,11 +1,23 @@
-<div class="row">
-  <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <h4 class="card-title">Buat Iuran Baru</h4>
-        <p class="card-description"> Isi form di bawah ini. </p>
-        <%= render 'form', user_contribution: @user_contribution %>
+<div class="max-w-4xl mx-auto">
+  <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <!-- Header Section -->
+      <div class="mb-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Buat Iuran Baru</h1>
+            <p class="mt-1 text-sm text-gray-500">Isi form di bawah ini untuk mencatat pembayaran iuran warga</p>
+          </div>
+          <%= link_to user_contributions_path, class: 'inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' do %>
+            <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Kembali
+          <% end %>
+        </div>
       </div>
+
+      <%= render 'form', user_contribution: @user_contribution %>
     </div>
   </div>
 </div>

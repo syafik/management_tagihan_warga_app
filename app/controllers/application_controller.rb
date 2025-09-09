@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
+  include Pagy::Backend
   before_action :authenticate_user!, except: [:show_report], unless: -> { request.format.json? }
   before_action :action_allowed, only: %i[new create edit update], unless: lambda { |controller|
                                                                              controller.request.format.json?

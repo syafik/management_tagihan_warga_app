@@ -6,12 +6,41 @@ class UserContributionsController < ApplicationController
   # GET /user_contributions
   # GET /user_contributions.json
   def index
-    @year_selected = params[:year_eq] || Date.current.year
-    conditions = params[:block_address_eq].blank? ? {} : { block_address: params[:block_address_eq] }
-    @addresses = Address.where(conditions)
-    conditions = { year: @year_selected }
-    ActiveRecord::Associations::Preloader.new(records: @addresses, associations: :user_contributions,
-                                              scope: UserContribution.where(conditions)).call
+    @year_selected = (params[:year_eq] || Date.current.year).to_i
+    @block_selected = params[:block_eq]
+    @search_term = params[:search_address]
+    
+    # Default to Block A if no parameters provided
+    @block_selected = 'A' if @block_selected.blank? && @search_term.blank?
+    
+    # Debug logging
+    Rails.logger.debug "Index - Year: #{@year_selected}, Block: #{@block_selected}, Search: #{@search_term}"
+    Rails.logger.debug "Params: #{params.inspect}"
+    
+    # Start with all addresses
+    addresses = Address.all
+    
+    # Filter by search term first (has priority)
+    if @search_term.present?
+      addresses = addresses.where("UPPER(block_address) LIKE UPPER(?)", "%#{@search_term}%")
+      Rails.logger.debug "Searching for: %#{@search_term}% - Found: #{addresses.count}"
+    elsif @block_selected.present?
+      # Filter by block if no search term
+      addresses = addresses.where("block_address LIKE ?", "#{@block_selected}%")
+      Rails.logger.debug "Filtering by block: #{@block_selected}% - Found: #{addresses.count}"
+    end
+    
+    # Order by block letter first, then by number (alphanumeric sort)
+    addresses = addresses.order(
+      Arel.sql("SUBSTRING(block_address FROM '^[A-Za-z]+'), CAST(SUBSTRING(block_address FROM '[0-9]+') AS INTEGER)")
+    )
+    
+    contribution_conditions = { year: @year_selected.to_i }
+    ActiveRecord::Associations::Preloader.new(records: addresses, associations: :user_contributions,
+                                              scope: UserContribution.where(contribution_conditions)).call
+    
+    @addresses = addresses
+    
     respond_to do |format|
       format.html
       format.js
@@ -19,14 +48,49 @@ class UserContributionsController < ApplicationController
   end
 
   def search
-    @year_selected = params[:year_eq] || Date.current.year
-    conditions = params[:block_address_eq].blank? ? {} : { block_address: params[:block_address_eq] }
-    @addresses = Address.where(conditions)
-    conditions = { year: @year_selected }
-    ActiveRecord::Associations::Preloader.new(records: @addresses, associations: :user_contributions,
-                                              scope: UserContribution.where(conditions)).call
+    @year_selected = (params[:year_eq] || Date.current.year).to_i
+    @block_selected = params[:block_eq]
+    @search_term = params[:search_address]
+    
+    # Default to Block A if no parameters provided
+    @block_selected = 'A' if @block_selected.blank? && @search_term.blank?
+    
+    # Debug logging
+    Rails.logger.debug "Search - Year: #{@year_selected}, Block: #{@block_selected}, Search: #{@search_term}"
+    Rails.logger.debug "Search Params: #{params.inspect}"
+    
+    # Start with all addresses
+    addresses = Address.all
+    
+    # Filter by search term first (has priority)
+    if @search_term.present?
+      addresses = addresses.where("UPPER(block_address) LIKE UPPER(?)", "%#{@search_term}%")
+      Rails.logger.debug "Search - Searching for: %#{@search_term}% - Found: #{addresses.count}"
+    elsif @block_selected.present?
+      # Filter by block if no search term
+      addresses = addresses.where("block_address LIKE ?", "#{@block_selected}%")
+      Rails.logger.debug "Search - Filtering by block: #{@block_selected}% - Found: #{addresses.count}"
+    end
+    
+    # Order by block letter first, then by number (alphanumeric sort)
+    addresses = addresses.order(
+      Arel.sql("SUBSTRING(block_address FROM '^[A-Za-z]+'), CAST(SUBSTRING(block_address FROM '[0-9]+') AS INTEGER)")
+    )
+
+    contribution_conditions = { year: @year_selected.to_i }
+    ActiveRecord::Associations::Preloader.new(records: addresses, associations: :user_contributions,
+                                              scope: UserContribution.where(contribution_conditions)).call
+
+    @addresses = addresses
+
     respond_to do |format|
-      format.html { redirect_to admins_path }
+      format.html { render 'index' }
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.replace('content-data', partial: 'data'),
+          turbo_stream.update('year-selected', @year_selected.to_s)
+        ]
+      end
       format.js { render 'index' }
     end
   end
@@ -72,11 +136,23 @@ class UserContributionsController < ApplicationController
         month_before = i.zero? ? month_selected : months_paid[i - 1].to_i
         year_selected = month_before == 12 && month_selected < month_before ? (year_selected + 1) : year_selected
 
+        # Get the expected contribution rate for this specific month/year
+        # This will use the Contribution model to get the correct rate based on:
+        # 1. Address-specific rates (AddressContribution)
+        # 2. Block-specific rates (Contribution for this block)
+        # 3. Global rates (Contribution with no block specified)
+        expected_amount = address.expected_contribution_for(month_selected, year_selected)
+
+        # Use the expected amount as the paid amount since the spreadsheet shows 
+        # they paid the correct amount for that period
+        paid_amount = expected_amount
+
         UserContribution.create(
           month: month_selected,
           year: year_selected,
           address_id: address.id,
-          contribution: contribution.gsub(/[^\d]/, '').to_f,
+          contribution: paid_amount,
+          expected_contribution: expected_amount,
           receiver_id: params[:receiver_id],
           pay_at: tgl_bayar.to_date,
           blok: blok_name,
@@ -186,7 +262,25 @@ class UserContributionsController < ApplicationController
   # GET /user_contributions/new
   def new
     @user_contribution = UserContribution.new
-    @month_info = generate_month_info
+    @year_selected = (params[:year] || [Date.current.year, 2025].max).to_i
+    @month_info = generate_month_info(@year_selected)
+    @selected_address_id = params[:address_id]
+    
+    respond_to do |format|
+      format.html
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.replace('month-selection-content', 
+            partial: 'month_selection', 
+            locals: { 
+              year_selected: @year_selected, 
+              month_info: @month_info,
+              selected_address_id: @selected_address_id
+            }
+          )
+        ]
+      end
+    end
   end
 
   # GET /user_contributions/1/edit
@@ -196,30 +290,52 @@ class UserContributionsController < ApplicationController
   # POST /user_contributions.json
   def create
     success = false
+    total_contribution_amount = 0
+    address = Address.find_by(id: params[:user_contribution][:address_id])
+    user_contributions_created = []
+
     UserContribution.transaction do
       params[:user_contribution_month].each do |value|
         month, month_text, year = value.split(",")
-        address = Address.find_by(id: params[:user_contribution][:address_id])
+
+        # Get the expected contribution for this specific address, month, and year
+        expected_contribution = address.expected_contribution_for(month.to_i, year.to_i)
+
         params[:user_contribution][:month] = month.to_i
         params[:user_contribution][:year] = year.to_i
         params[:user_contribution][:description] = "#{address.block_address} Pembayaran bulan #{month_text} #{year}"
+        params[:user_contribution][:contribution] = expected_contribution
+        params[:user_contribution][:expected_contribution] = expected_contribution
+
         @user_contribution = UserContribution.new(user_contribution_params)
         @user_contribution.blok = @user_contribution.address.block_address.gsub(/[^A-Za-z]/,'') rescue ''
+
         if @user_contribution.save
-          CashTransaction.create(
-            month: @user_contribution.month,
-            year: @user_contribution.year,
-            transaction_date: @user_contribution.pay_at,
-            transaction_type: CashTransaction::TYPE['DEBIT'],
-            transaction_group: CashTransaction::GROUP['IURAN WARGA'],
-            description: @user_contribution.description,
-            total: @user_contribution.contribution,
-            pic_id: @user_contribution.receiver_id
-          )
+          user_contributions_created << @user_contribution
+          total_contribution_amount += expected_contribution
         else
           raise ActiveRecord::Rollback
         end
       end
+
+      # Create single grouped cash transaction for all contributions
+      if user_contributions_created.any?
+        first_contribution = user_contributions_created.first
+        months_count = user_contributions_created.count
+        months_text = user_contributions_created.map { |uc| UserContribution::MONTHNAMES.invert[uc.month] }.join(', ')
+
+        CashTransaction.create(
+          month: first_contribution.month,
+          year: first_contribution.year,
+          transaction_date: first_contribution.pay_at,
+          transaction_type: CashTransaction::TYPE['DEBIT'],
+          transaction_group: CashTransaction::GROUP['IURAN WARGA'],
+          description: "#{address.block_address} pembayaran iuran #{months_count} bulan (#{months_text})",
+          total: total_contribution_amount,
+          pic_id: current_user.id
+        )
+      end
+
       success = true
     end
     respond_to do |format|
@@ -300,6 +416,7 @@ class UserContributionsController < ApplicationController
     rescue StandardError
       Date.current.year
     end
+    # TODO: how to get active contiburion based on month and year and by address.. we have lllop te get address below
     session = GoogleDrive::Session.from_service_account_key(StringIO.new(GDRIVE_CONFIG.to_json))
     Address::BLOK_NAME.each do |_key, value|
       ws = session.spreadsheet_by_key('1hiDj-EOxQ_vFtUMx9Wvp-gvq8J7QgElcrix6JN4VZtk').worksheets[value]
@@ -309,13 +426,16 @@ class UserContributionsController < ApplicationController
             "DAFTAR IURAN BULAN WARGA  #{UserContribution::MONTHNAMES.invert[month.to_i].upcase} #{year}  BLOK #{Address::BLOK_NAME.invert[value]}"
         elsif row >= 3
           block_address = ws[row, 2].strip
-          contribution = ws[row, 3].strip
-          bayar = ws[row, 5].strip
           address = Address.where(block_address: block_address).first
           if address
+            # Get the active contribution rate for this address for the specific month/year
+            contribution = address.expected_contribution_for(month.to_i, year.to_i)
             total_paid = UserContribution.where(address_id: address.id).where(year: Time.now.year).count
-            ws[row, 4] = address.free? ? 0 : month.to_i - total_paid
+            tagihan = month.to_i - total_paid
+            ws[row, 3] = contribution
+            ws[row, 4] = address.free? ? 0 : (tagihan.positive? ? tagihan : 0)
             ws[row, 5] = nil
+
             ws[row, 6] = nil
             ws[row, 7] = nil
           end
@@ -375,7 +495,77 @@ class UserContributionsController < ApplicationController
 
   def contribution_by_address
     @address = Address.find(params[:id])
-    @contributions = @address.user_contributions
+    @year_selected = (params[:year] || Date.current.year).to_i
+    @contributions = @address.user_contributions.where(year: @year_selected)
+    @all_contributions = @address.user_contributions # Keep all for overall stats if needed
+  end
+
+  def get_contribution_rate
+    address_id = params[:address_id]
+    month = params[:month] || Date.current.month
+    year = params[:year] || Date.current.year
+    
+    if address_id.present?
+      address = Address.find(address_id)
+      rate = address.expected_contribution_for(month.to_i, year.to_i)
+      
+      render json: { 
+        success: true, 
+        rate: rate,
+        formatted_rate: format_currency(rate)
+      }
+    else
+      render json: { success: false, error: 'Address ID required' }
+    end
+  end
+
+  def payment_status
+    address_id = params[:address_id]
+    year = (params[:year] || Date.current.year).to_i
+
+    if address_id.present?
+      address = Address.find(address_id)
+
+      months_data = build_months_payment_data(address, year)
+
+      render json: {
+        success: true,
+        months: months_data,
+        address_name: address.block_address&.upcase
+      }
+    else
+      render json: { success: false, error: 'Address ID required' }
+    end
+  end
+
+  def search_addresses
+    query = params[:q]&.strip
+    
+    if query.blank? || query.length < 2
+      render json: []
+      return
+    end
+
+    # Search by block address or head of family name
+    addresses = Address.joins(:head_of_family)
+                      .where(
+                        "UPPER(addresses.block_address) LIKE UPPER(?) OR UPPER(users.name) LIKE UPPER(?)",
+                        "%#{query}%", "%#{query}%"
+                      )
+                      .includes(:head_of_family)
+                      .order('addresses.block_address')
+                      .limit(10)
+
+    results = addresses.map do |address|
+      {
+        id: address.id,
+        block_address: address.block_address&.upcase,
+        head_of_family_name: address.head_of_family&.name&.upcase,
+        display_text: "#{address.block_address&.upcase} - #{address.head_of_family&.name&.upcase}"
+      }
+    end
+
+    render json: results
   end
 
   private
@@ -391,15 +581,55 @@ class UserContributionsController < ApplicationController
                                               :description, :transaction_date, :imported_cash_transaction)
   end
 
-  def generate_month_info
-    current_date = Date.today - 4.month
+  def generate_month_info(year = Date.current.year)
     months_info = []
 
-    15.times do
-      months_info << { month: current_date.strftime('%_m'), month_text: current_date.strftime('%B'), year: current_date.year }
-      current_date = current_date >> 1
+    # Generate all 12 months for the given year
+    1.upto(12) do |month_num|
+      date = Date.new(year, month_num, 1)
+      month_name = UserContribution::MONTHNAMES.invert[month_num]
+
+      months_info << {
+        month: month_num.to_s,
+        month_text: month_name,
+        year: year,
+        date: date
+      }
     end
 
-    return months_info
+    months_info
+  end
+
+  def build_months_payment_data(address, year)
+    months_data = []
+    1.upto(12) do |month_num|
+      contribution_rate = address.expected_contribution_for(month_num, year)
+
+      paid_contribution = UserContribution.find_by(
+        address_id: address.id,
+        month: month_num,
+        year: year
+      )
+
+      months_data << {
+        month: month_num,
+        month_text: UserContribution::MONTHNAMES.invert[month_num],
+        year: year,
+        contribution_rate: contribution_rate,
+        formatted_rate: format_currency(contribution_rate),
+        is_paid: paid_contribution.present?,
+        paid_amount: paid_contribution&.contribution,
+        pay_date: paid_contribution&.pay_at&.strftime('%d/%m/%Y'),
+        payment_id: paid_contribution&.id
+      }
+    end
+    months_data
+  end
+
+  def format_currency(amount)
+    return '0' if amount.nil? || amount.zero?
+    
+    # Format with Indonesian locale (using period as thousands separator)
+    amount.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1.').reverse
   end
 end

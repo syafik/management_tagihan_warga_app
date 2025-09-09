@@ -1,0 +1,30 @@
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-sm-flex align-items-center mb-4">
+          <h4 class="card-title mb-sm-0">Contribution Rates</h4>
+          <% if current_user.is_admin? %>
+            <%= link_to 'New Contribution Rate', new_contribution_path, class: 'btn btn-primary ml-auto mb-3 mb-sm-0' %>
+          <% end %>
+        </div>
+        
+        <%= render partial: 'shared/search_form',
+                  locals: {
+                      url: search_contributions_path,
+                      attributes: %w[amount effective_from block description active],
+                      predicates: [
+                        ['Contains', 'cont'],
+                        ['Equal', 'eq'],
+                        ['Greater Than', 'gt'],
+                        ['Less Than', 'lt']
+                      ]
+                  } %>
+        
+        <div id="content-data">
+          <%= render partial: 'data' %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

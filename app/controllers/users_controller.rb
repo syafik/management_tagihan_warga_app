@@ -8,7 +8,7 @@ class UsersController < ApplicationController
   def index
     @q = User.ransack(params[:q])
     @q.sorts = 'id asc' if @q.sorts.empty?
-    @users = @q.result.includes(:address).page(params[:page])
+    @users = @q.result.includes(:addresses, :primary_address).page(params[:page])
 
     respond_to do |format|
       format.html
@@ -88,6 +88,6 @@ class UsersController < ApplicationController
   # Only allow a list of trusted parameters through.
   def user_params
     params.fetch(:user, {}).permit(:email, :name, :phone_number, :password, :contribution, :block_address, :role,
-                                   :pic_blok, :avatar)
+                                   :pic_blok, :avatar, :address_id)
   end
 end

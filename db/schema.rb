@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_03_01_090726) do
+ActiveRecord::Schema[7.0].define(version: 2025_08_27_035125) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,11 +42,26 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_01_090726) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "address_contributions", force: :cascade do |t|
+    t.bigint "address_id", null: false
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.date "effective_from", null: false
+    t.date "effective_until"
+    t.text "reason"
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_address_contributions_on_active"
+    t.index ["address_id", "effective_from", "effective_until"], name: "index_address_contributions_on_period", unique: true
+    t.index ["address_id", "effective_from"], name: "index_address_contributions_on_address_id_and_effective_from"
+    t.index ["address_id"], name: "index_address_contributions_on_address_id"
+    t.index ["effective_from"], name: "index_address_contributions_on_effective_from"
+  end
+
   create_table "addresses", force: :cascade do |t|
     t.string "block_address"
     t.string "block_number"
     t.string "block"
-    t.decimal "contribution", precision: 13, scale: 2
     t.integer "arrears", default: 0
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
@@ -105,6 +120,19 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_01_090726) do
     t.index ["type"], name: "index_ckeditor_assets_on_type"
   end
 
+  create_table "contributions", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.date "effective_from", null: false
+    t.string "block", limit: 1
+    t.text "description"
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_contributions_on_active"
+    t.index ["block"], name: "index_contributions_on_block"
+    t.index ["effective_from", "block"], name: "index_contributions_on_effective_from_and_block"
+  end
+
   create_table "debts", force: :cascade do |t|
     t.integer "user_id"
     t.float "value"
@@ -150,6 +178,17 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_01_090726) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
+  create_table "otps", force: :cascade do |t|
+    t.string "phone_number"
+    t.string "code"
+    t.datetime "expires_at"
+    t.datetime "verified_at"
+    t.integer "attempts"
+    t.string "ip_address"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "template_transactions", force: :cascade do |t|
     t.text "description"
     t.integer "transaction_type"
@@ -170,6 +209,20 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_01_090726) do
     t.index ["month", "year", "blok"], name: "index_total_contributions_on_month_and_year_and_blok"
   end
 
+  create_table "user_addresses", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "address_id", null: false
+    t.boolean "primary", default: false
+    t.boolean "kk", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id", "kk"], name: "index_user_addresses_on_address_id_and_kk"
+    t.index ["address_id"], name: "index_user_addresses_on_address_id"
+    t.index ["user_id", "address_id"], name: "index_user_addresses_on_user_id_and_address_id", unique: true
+    t.index ["user_id", "primary"], name: "index_user_addresses_on_user_id_and_primary"
+    t.index ["user_id"], name: "index_user_addresses_on_user_id"
+  end
+
   create_table "user_contributions", force: :cascade do |t|
     t.integer "year"
     t.integer "month"
@@ -183,7 +236,9 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_01_090726) do
     t.integer "address_id"
     t.string "blok"
     t.boolean "imported_cash_transaction", default: false
+    t.decimal "expected_contribution", precision: 10, scale: 2
     t.index ["address_id"], name: "index_user_contributions_on_address_id"
+    t.index ["expected_contribution"], name: "index_user_contributions_on_expected_contribution"
     t.index ["pay_at"], name: "index_user_contributions_on_pay_at"
     t.index ["year", "month"], name: "index_user_contributions_on_year_and_month"
   end
@@ -218,16 +273,15 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_01_090726) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.string "phone_number"
-    t.integer "address_id"
     t.string "pic_blok"
     t.string "provider", default: "email", null: false
     t.string "uid", default: "", null: false
     t.json "tokens"
-    t.boolean "kk", default: false
     t.boolean "allow_password_change", default: false, null: false
     t.string "device_type"
     t.string "device_token"
-    t.index ["address_id"], name: "index_users_on_address_id"
+    t.string "login_code"
+    t.datetime "login_code_expires_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
@@ -235,4 +289,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_01_090726) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "address_contributions", "addresses"
+  add_foreign_key "user_addresses", "addresses"
+  add_foreign_key "user_addresses", "users"
 end

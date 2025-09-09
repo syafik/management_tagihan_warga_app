@@ -23,9 +23,9 @@ default: &default
 
 development:
   <<: *default
-  database: <%= ENV['DEV_DB_NAME'] %>
-  username: <%= ENV['DEV_DB_USERNAME'] %>
-  password: <%= ENV['DEV_DB_PASSWORD'] %>
+  database: puriayana_dev
+  username: syafik
+  password: password
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.

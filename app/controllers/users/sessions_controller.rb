@@ -5,22 +5,63 @@ module Users
     # before_action :configure_sign_in_params, only: [:create]
 
     layout 'user_authentication'
+
     # GET /resource/sign_in
-    # def new
-    #   super
-    # end
+    def new
+      self.resource = resource_class.new(sign_in_params)
+      clean_up_passwords(resource)
+      yield resource if block_given?
+      respond_with(resource, serialize_options(resource))
+    end
 
     # POST /resource/sign_in
-    # def create
-    #   super
-    # end
+    def create
+      # Check if this is a phone login request
+      if params[:phone_number].present?
+        handle_phone_login_request
+      else
+        super
+      end
+    end
 
     # DELETE /resource/sign_out
     # def destroy
     #   super
     # end
 
-    # protected
+    protected
+
+    def after_sign_out_path_for(_resource_or_scope)
+      new_user_session_path
+    end
+
+    private
+
+    def handle_phone_login_request
+      phone_number = params[:phone_number]&.strip
+
+      if phone_number.blank?
+        flash.now[:error] = 'Silakan masukkan nomor telepon Anda'
+        render :new and return
+      end
+
+      @user = User.find_by_phone(phone_number)
+
+      if @user.nil?
+        flash.now[:error] = 'Nomor telepon tidak ditemukan. Silakan hubungi administrator.'
+        render :new and return
+      end
+
+      result = @user.send_login_code!
+
+      if result[:success]
+        session[:login_phone_number] = phone_number
+        redirect_to verify_phone_login_path
+      else
+        flash.now[:error] = result[:message] || 'Gagal mengirimkan kode login. Silakan coba lagi.'
+        render :new
+      end
+    end
 
     # If you have extra params to permit, append them to the sanitizer.
     # def configure_sign_in_params

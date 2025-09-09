@@ -1,0 +1,152 @@
+<div class="bg-white py-8 px-4 shadow-2xl rounded-lg sm:px-10">
+  <!-- Logo and Header -->
+  <div class="text-center mb-8">
+    <div class="mx-auto h-12 w-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+      <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <h2 class="text-3xl font-bold text-gray-900">Verifikasi Kode</h2>
+    <p class="mt-2 text-sm text-gray-600">Periksa pesan WhatsApp Anda</p>
+  </div>
+
+  <!-- Instruction Message -->
+  <div class="text-center mb-6">
+    <h3 class="text-xl font-semibold text-gray-900">Masukkan Kode Login</h3>
+    <p class="mt-1 text-sm text-gray-600">
+      Kami telah mengirimkan kode 6 digit ke WhatsApp Anda
+      <br>
+      <span class="font-medium text-gray-700"><%= session[:login_phone_number] %></span>
+    </p>
+  </div>
+
+  <!-- Success Messages -->
+  <% if flash[:success] %>
+    <div class="rounded-md bg-green-50 p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-green-700"><%= flash[:success] %></p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Error Messages -->
+  <% if flash[:error] %>
+    <div class="rounded-md bg-red-50 p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"/>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-red-700"><%= flash[:error] %></p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Login Code Form -->
+  <%= form_with url: authenticate_phone_login_path, method: :post, local: true, html: { class: "space-y-6" } do |f| %>
+    <!-- Login Code Field -->
+    <div>
+      <label for="login_code" class="block text-sm font-medium text-gray-700">Kode Login</label>
+      <div class="mt-1">
+        <%= text_field_tag :login_code, 
+            params[:login_code], 
+            placeholder: "123456", 
+            id: "login_code",
+            autofocus: true,
+            maxlength: 6,
+            pattern: "[0-9]{6}",
+            inputmode: "numeric",
+            class: "block w-full px-3 py-4 text-center text-2xl font-mono border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out tracking-widest" %>
+      </div>
+      <p class="mt-2 text-xs text-gray-500">Masukkan kode 6 digit dari WhatsApp</p>
+    </div>
+
+    <!-- Verify Button -->
+    <div>
+      <%= submit_tag "Verifikasi & Masuk", 
+          data: { disable_with: "Memverifikasi..." },
+          class: "group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out" %>
+    </div>
+  <% end %>
+
+  <!-- Resend Code -->
+  <div class="mt-6">
+    <div class="text-center">
+      <p class="text-sm text-gray-600">
+        Tidak menerima kode?
+      </p>
+      <%= form_with url: resend_phone_login_path, method: :post, local: true, html: { class: "inline-block mt-2" } do |f| %>
+        <%= submit_tag "Kirim Ulang Kode", 
+            data: { disable_with: "Mengirim..." },
+            class: "text-sm text-blue-600 hover:text-blue-500 font-medium underline transition duration-150 ease-in-out border-0 bg-transparent cursor-pointer" %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Back to Phone Input -->
+  <div class="mt-6">
+    <div class="relative">
+      <div class="absolute inset-0 flex items-center">
+        <div class="w-full border-t border-gray-300"></div>
+      </div>
+      <div class="relative flex justify-center text-sm">
+        <span class="px-2 bg-white text-gray-500">atau</span>
+      </div>
+    </div>
+
+    <div class="mt-4 text-center">
+      <%= link_to "Gunakan Nomor Telepon Lain", new_user_session_path, 
+          class: "text-sm text-gray-500 hover:text-gray-700 font-medium transition duration-150 ease-in-out" %>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mt-8 text-center">
+    <p class="text-xs text-gray-500">
+      Kode akan kedaluwarsa dalam 10 menit
+    </p>
+  </div>
+</div>
+
+<!-- Auto-format login code input -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const loginCodeInput = document.getElementById('login_code');
+  
+  if (loginCodeInput) {
+    // Auto-focus and select all text
+    loginCodeInput.focus();
+    loginCodeInput.select();
+    
+    // Only allow numbers
+    loginCodeInput.addEventListener('input', function(e) {
+      this.value = this.value.replace(/[^0-9]/g, '');
+      
+      // Auto-submit when 6 digits are entered
+      if (this.value.length === 6) {
+        // Small delay to show the complete code
+        setTimeout(() => {
+          this.form.submit();
+        }, 200);
+      }
+    });
+    
+    // Prevent non-numeric characters
+    loginCodeInput.addEventListener('keypress', function(e) {
+      if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'Tab', 'Enter'].includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+  }
+});
+</script>

@@ -1,0 +1,68 @@
+<!-- Month Selection Content -->
+<div id="month-selection-content" data-selected-address="<%= selected_address_id %>" data-user-contribution-form-target="monthSelectionContent">
+  <!-- Year Navigation -->
+  <div class="flex items-center justify-between mb-4">
+    <label class="block text-sm font-medium text-gray-700">Pilih Bulan</label>
+    <div class="flex items-center space-x-4">
+      <% if year_selected > 2025 %>
+        <a href="#" 
+           class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+           data-action="click->user-contribution-form#yearNavigation"
+           data-year="<%= year_selected - 1 %>">
+          <svg class="-ml-1 mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          <%= year_selected - 1 %>
+        </a>
+      <% else %>
+        <div class="inline-flex items-center px-3 py-1 text-sm font-medium text-gray-400 cursor-not-allowed">
+          <svg class="-ml-1 mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          <%= year_selected - 1 %>
+        </div>
+      <% end %>
+      
+      <span class="px-4 py-1 text-lg font-semibold text-indigo-600" data-user-contribution-form-target="yearDisplay"><%= year_selected %></span>
+      
+      <a href="#" 
+         class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+         data-action="click->user-contribution-form#yearNavigation"
+         data-year="<%= year_selected + 1 %>">
+        <%= year_selected + 1 %>
+        <svg class="-mr-1 ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+  
+
+  <!-- Month Grid -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3" data-user-contribution-form-target="monthsGrid">
+    <% month_info.each do |info| %>
+      <div class="relative">
+        <input type="checkbox" name="user_contribution_month[]" 
+               value="<%= "#{info[:month]},#{info[:month_text]},#{info[:year]}" %>" 
+               id="<%= "month_#{info[:month]}_#{info[:year]}" %>"
+               class="sr-only peer month-checkbox"
+               data-month="<%= info[:month] %>" 
+               data-year="<%= info[:year] %>"
+               data-user-contribution-form-target="monthCheckbox"
+               data-action="change->user-contribution-form#monthToggled">
+        <label for="<%= "month_#{info[:month]}_#{info[:year]}" %>" 
+               class="flex flex-col items-center justify-center px-3 py-3 text-sm font-medium rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50 peer-checked:bg-indigo-50 peer-checked:border-indigo-200 peer-checked:text-indigo-900 transition-colors min-h-[100px] month-label">
+          <span class="text-center">
+            <div class="font-medium"><%= info[:month_text] %></div>
+            <div class="text-xs text-gray-500 mb-1"><%= info[:year] %></div>
+            <div class="text-xs contribution-display hidden bg-green-50 px-2 py-1 rounded">Rp 0</div>
+            <div class="text-xs payment-status hidden mt-1">
+              <div class="paid-indicator text-green-600 font-bold hidden">✓ LUNAS</div>
+              <div class="unpaid-indicator text-red-600 font-bold hidden">BELUM LUNAS</div>
+            </div>
+          </span>
+        </label>
+      </div>
+    <% end %>
+  </div>
+</div>

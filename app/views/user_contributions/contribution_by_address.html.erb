@@ -1,87 +1,209 @@
-<div class="row">
-  <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-sm-flex align-items-center mb-4">
-          <h4 class="card-title mb-sm-0">Address Contribution Detail</h4>
-        </div>
-        <div class="table-responsive rounded p-1">
-          <table class="table">
-            <thead></thead>
-            <tbody>
-            <tr>
-              <td class="font-weight-bold">ID</td>
-              <td><%= @address.id %></td>
-            </tr>
-            <tr>
-              <td class="font-weight-bold">Block</td>
-              <td><%= @address.block_address.upcase %></td>
-            </tr>
-            <tr>
-              <td class="font-weight-bold">User</td>
-              <td><%= @address.main_user.try(:name).try(:upcase) %></td>
-            </tr>
-            <tr>
-              <td class="font-weight-bold">Iuran</td>
-              <td><%= number_to_currency(@address.contribution, unit: "Rp. ", separator: ",", delimiter: ".") %></td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <%= link_to 'Edit Address', edit_address_path(@address), class: 'btn btn-primary mr-2' if current_user.role == 2 %>
-                <%= link_to 'Cancel', user_contributions_path, class: 'btn btn-light' %>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <br />
-        <div class="d-sm-flex align-items-center mb-4">
-          <p class="card-title mb-sm-0">
-          ** Dari Januari, 2020 sampai per bulan <%= UserContribution::MONTHNAMES.invert[Date.current.month] %>, <%= Date.current.year %>
-          </p>          
-        </div>
-        <div class="table-responsive rounded p-1">
-          <table class="table">
-            <thead></thead>
-            <tbody>
-              <tr>
-                <td class="font-weight-bold">Total Tagihan</td>
-                <td><%= (Date.current.year.to_i-2020)*12 + Date.current.month.to_i %> kali</td>
-              </tr>
-              <tr>
-                <td class="font-weight-bold">Yang sudah di bayar</td>
-                <td><%= @address.user_contributions.count %> kali</td>
-              </tr>
-              <tr>
-                <td class="font-weight-bold">Tagihan yang harus di bayar</td>
-                <td><%= ((Date.current.year.to_i-2020)*12 + Date.current.month.to_i) - @address.user_contributions.count %> kali pembayaran</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <br /> 
-        <div class="d-sm-flex align-items-center mb-4">
-          <p class="card-title mb-sm-0">Contribution List</p> 
-        </div>
-        <div class="table-responsive rounded p-1">
-          <table class="table">
-            <tbody>
-            <% 1.upto((Date.current.year.to_i-2020)*12 + Date.current.month.to_i) do |i| %>
-              <tr>
-                <% uc = @address.user_contributions[i-1] %>
-                <td style="width:10%" class="font-weight-bold">Tagihan ke <%= i%></td>
-                <td  style="width:20%"><%= uc.nil? ? "BELUM BAYAR" : uc.contribution_long_desc %></td>
-                <td  style="width:40%">
-                  <% if uc && current_user.is_admin? %>
-                    <%= link_to "Edit", edit_user_contribution_path(uc), class: 'btn btn-success' %>
-                    <%= link_to "Destroy", user_contribution_path(uc), method: :delete, confirm: 'are you sure?', class: 'btn btn-danger' %>
-                  <% end %>
-                </td>
-              </tr>  
+<div class="max-w-7xl mx-auto">
+  <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <!-- Header Section -->
+      <div class="mb-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Detail Iuran Alamat</h1>
+            <p class="mt-1 text-sm text-gray-500">Informasi lengkap pembayaran iuran untuk alamat ini</p>
+          </div>
+          <div class="flex space-x-3">
+            <% if current_user.is_admin? %>
+              <%= link_to edit_address_path(@address), class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' do %>
+                <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Edit Alamat
+              <% end %>
             <% end %>
-            </tbody>
-          </table>
+            <%= link_to user_contributions_path, class: 'inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' do %>
+              <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+              </svg>
+              Kembali
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Address Information Card -->
+      <div class="bg-gray-50 rounded-lg p-6 mb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Informasi Alamat</h3>
+        <dl class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <dt class="text-sm font-medium text-gray-500">ID</dt>
+            <dd class="mt-1 text-sm text-gray-900 font-semibold"><%= @address.id %></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Blok</dt>
+            <dd class="mt-1 text-sm text-gray-900 font-semibold"><%= @address.block_address&.upcase %></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Kepala Keluarga</dt>
+            <dd class="mt-1 text-sm text-gray-900 font-semibold"><%= @address.head_of_family&.name&.upcase || 'Tidak ada' %></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Tarif Iuran</dt>
+            <dd class="mt-1 text-sm text-gray-900 font-semibold">
+              <%= number_to_currency(@address.current_contribution_rate || 0, unit: "Rp ", separator: ",", delimiter: ".") %>
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Year Filter -->
+      <div class="mb-6">
+        <%= form_tag(contribution_by_address_user_contribution_path(@address), method: :get, class: 'flex items-center gap-3') do %>
+          <div class="flex-shrink-0">
+            <%= label_tag :year, "Filter Tahun:", class: 'block text-sm font-medium text-gray-700' %>
+          </div>
+          <div class="flex-shrink-0">
+            <%= select_tag :year, options_for_select((2025..2035).to_a.map { |y| [y, y] }, @year_selected), 
+                          { class: 'rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm',
+                            onchange: 'this.form.submit();' } %>
+          </div>
+          <noscript>
+            <%= submit_tag "Filter", class: 'inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+          </noscript>
+        <% end %>
+      </div>
+
+      <!-- Summary Statistics -->
+      <div class="mb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">
+          Ringkasan Pembayaran Tahun <span class="font-semibold text-indigo-600"><%= @year_selected %></span>
+        </h3>
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+          <div class="bg-white overflow-hidden shadow rounded-lg border-l-4 border-blue-500">
+            <div class="p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                  <dt class="text-sm font-medium text-gray-500 truncate">Total Tagihan</dt>
+                  <dd class="text-lg font-semibold text-gray-900">
+                    <% total_months = @year_selected == Date.current.year ? Date.current.month : 12 %>
+                    <%= total_months %> kali
+                  </dd>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white overflow-hidden shadow rounded-lg border-l-4 border-green-500">
+            <div class="p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                  <dt class="text-sm font-medium text-gray-500 truncate">Sudah Dibayar</dt>
+                  <dd class="text-lg font-semibold text-gray-900"><%= @contributions.count %> kali</dd>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white overflow-hidden shadow rounded-lg border-l-4 border-red-500">
+            <div class="p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                  <dt class="text-sm font-medium text-gray-500 truncate">Belum Dibayar</dt>
+                  <dd class="text-lg font-semibold text-gray-900">
+                    <% total_months = @year_selected == Date.current.year ? Date.current.month : 12 %>
+                    <%= total_months - @contributions.count %> kali
+                  </dd>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contribution List -->
+      <div>
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Riwayat Pembayaran Tahun <%= @year_selected %></h3>
+        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+          <ul class="divide-y divide-gray-200">
+            <% 
+              # Determine months to show (1-12 for past years, 1-current_month for current year)
+              max_month = @year_selected == Date.current.year ? Date.current.month : 12
+              
+              1.upto(max_month) do |month_num|
+                # Find contribution for this specific month and year
+                uc = @contributions.find { |contrib| contrib.month == month_num }
+                month_name = UserContribution::MONTHNAMES.invert[month_num]
+            %>
+              <li class="<%= uc ? 'bg-green-50' : 'bg-red-50' %>">
+                <div class="px-4 py-4 sm:px-6">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0">
+                        <% if uc %>
+                          <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                          </div>
+                        <% else %>
+                          <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                          </div>
+                        <% end %>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">
+                          <%= month_name %> <%= @year_selected %>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          <% if uc %>
+                            Rp <%= number_with_delimiter(uc.contribution, delimiter: '.') %> - Dibayar: <%= uc.tgl_bayar %>
+                          <% else %>
+                            BELUM BAYAR
+                          <% end %>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <% if uc && current_user.is_admin? %>
+                        <%= link_to edit_user_contribution_path(uc), class: 'inline-flex items-center px-3 py-2 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500' do %>
+                          <svg class="-ml-1 mr-1 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                          </svg>
+                          Edit
+                        <% end %>
+                        <%= link_to user_contribution_path(uc), method: :delete, confirm: 'Yakin ingin menghapus?', class: 'inline-flex items-center px-3 py-2 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500' do %>
+                          <svg class="-ml-1 mr-1 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                          </svg>
+                          Hapus
+                        <% end %>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+          </ul>
         </div>
       </div>
     </div>

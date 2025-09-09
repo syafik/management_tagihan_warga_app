@@ -1,75 +1,59 @@
-<nav class="sidebar sidebar-offcanvas" id="sidebar">
-  <ul class="nav">
-    <li class="nav-item nav-profile">
-      <a href="<%= users_path(current_user) %>" class="nav-link">
-        <div class="text-wrapper">
-          <p class="profile-name"><%= current_user.email %></p>
-          <p class="designation">Administrator</p>
+<aside class="fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg border-r border-gray-200 pt-16 lg:translate-x-0 -translate-x-full transition-transform duration-300" id="sidebar">
+  <div class="h-full px-3 py-4 overflow-y-auto">
+    <!-- Mobile close button -->
+    <div class="flex justify-end lg:hidden mb-4">
+      <button type="button" class="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" data-action="click->mobile-menu#close">
+        <span class="sr-only">Close sidebar</span>
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Profile section -->
+    <div class="mb-6 pb-4 border-b border-gray-200">
+      <a href="<%= users_path(current_user) %>" class="flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100 group">
+        <div class="flex-1">
+          <p class="text-sm font-medium text-gray-900"><%= current_user.email %></p>
+          <p class="text-xs text-gray-500">Administrator</p>
         </div>
       </a>
-    </li>
-    <li class="nav-item nav-category">
-      <span class="nav-link">Applikasi</span>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="<%= addresses_path %>">
-        <span class="menu-title">Daftar Rumah</span>
-        <i class="icon-ghost menu-icon"></i>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="<%= users_path %>">
-        <span class="menu-title">Daftar Warga</span>
-        <i class="icon-ghost menu-icon"></i>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="<%= user_contributions_path %>">
-        <span class="menu-title">Data Iuran Warga</span>
-        <i class="icon-ghost menu-icon"></i>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="<%= cash_transactions_path %>">
-        <span class="menu-title">Daftar Transaksi</span>
-        <i class="icon-ghost menu-icon"></i>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="<%= debts_path %>">
-        <span class="menu-title">Daftar Hutang Piutang</span>
-        <i class="icon-ghost menu-icon"></i>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="<%= cash_flows_path %>">
-        <span class="menu-title">Daftar Cash Flow</span>
-        <i class="icon-ghost menu-icon"></i>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="<%= installments_path %>">
-        <span class="menu-title">Daftar Cicilan RT</span>
-        <i class="icon-ghost menu-icon"></i>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="<%= notifications_path %>">
-        <span class="menu-title">Daftar Pengumuman</span>
-        <i class="icon-ghost menu-icon"></i>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="<%= template_transactions_path %>">
-        <span class="menu-title">Template Transaction</span>
-        <i class="icon-ghost menu-icon"></i>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="<%= app_settings_path %>">
-        <span class="menu-title">Application Setting</span>
-        <i class="icon-ghost menu-icon"></i>
-      </a>
-    </li>
-  </ul>
-</nav>
+    </div>
+    
+    <!-- Navigation section -->
+    <div class="mb-4">
+      <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Aplikasi</h3>
+    </div>
+    
+    <nav class="space-y-1">
+      <%= link_to root_path, class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
+        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        Dashboard
+      <% end %>
+
+      <%= link_to addresses_path, class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
+        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+        </svg>
+        Daftar Rumah
+      <% end %>
+
+      <%= link_to user_contributions_path, class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
+        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+        </svg>
+        Data Iuran Warga
+      <% end %>
+      
+      <%= link_to cash_transactions_path, class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
+        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        Daftar Transaksi
+      <% end %>
+
+    </nav>
+  </div>
+</aside>

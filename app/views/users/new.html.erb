@@ -1,11 +1,14 @@
-<div class="row">
-  <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <h4 class="card-title">Create New User</h4>
-        <p class="card-description"> Fill the form below to create new user. </p>
-        <%= render 'form', user: @user %>
+<div class="max-w-4xl mx-auto">
+  <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Buat Pengguna Baru</h1>
+        <p class="mt-1 text-sm text-gray-500">Lengkapi form di bawah untuk membuat pengguna baru</p>
       </div>
+    </div>
+    
+    <div class="p-6">
+      <%= render 'form', user: @user %>
     </div>
   </div>
 </div>

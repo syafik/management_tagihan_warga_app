@@ -1,0 +1,158 @@
+<div class="row">
+  <div class="col-md-8 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-sm-flex align-items-center mb-4">
+          <h4 class="card-title mb-sm-0">Contribution Rate Details</h4>
+          <% if current_user.is_admin? %>
+            <div class="ml-auto">
+              <%= link_to 'Edit', edit_contribution_path(@contribution), class: 'btn btn-info mr-2' %>
+              <%= link_to 'Delete', @contribution, method: :delete, 
+                          confirm: 'Are you sure?', class: 'btn btn-danger' %>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label"><strong>Amount</strong></label>
+              <div class="form-control-plaintext h4 text-primary">
+                <%= number_to_currency(@contribution.amount, unit: "Rp. ", separator: ",", delimiter: ".") %>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label"><strong>Status</strong></label>
+              <div class="form-control-plaintext">
+                <% if @contribution.active? %>
+                  <% if @contribution.effective_from <= Date.current %>
+                    <span class="badge badge-success">Currently Active</span>
+                  <% else %>
+                    <span class="badge badge-warning">Future Rate</span>
+                  <% end %>
+                <% else %>
+                  <span class="badge badge-secondary">Inactive</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label"><strong>Effective From</strong></label>
+              <div class="form-control-plaintext">
+                <%= @contribution.effective_from.strftime('%A, %d %B %Y') %>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label"><strong>Applies To</strong></label>
+              <div class="form-control-plaintext">
+                <% if @contribution.block.present? %>
+                  <span class="badge badge-info">Block <%= @contribution.block %></span>
+                <% else %>
+                  <span class="badge badge-success">All Blocks</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <% if @contribution.description.present? %>
+          <div class="form-group">
+            <label class="form-label"><strong>Description</strong></label>
+            <div class="form-control-plaintext">
+              <%= simple_format(@contribution.description) %>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label"><strong>Created</strong></label>
+              <div class="form-control-plaintext text-muted">
+                <%= @contribution.created_at.strftime('%d %B %Y at %H:%M') %>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label"><strong>Last Updated</strong></label>
+              <div class="form-control-plaintext text-muted">
+                <%= @contribution.updated_at.strftime('%d %B %Y at %H:%M') %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <%= link_to 'All Contribution Rates', contributions_path, class: 'btn btn-light' %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Rate Impact</h5>
+        <% if @contribution.block.present? %>
+          <p class="card-text">
+            This rate applies specifically to <strong>Block <%= @contribution.block %></strong>.
+          </p>
+          <% block_addresses = Address.where("block_address LIKE ?", "#{@contribution.block}%") %>
+          <p class="small text-muted">
+            Affects <%= pluralize(block_addresses.count, 'address') %> in Block <%= @contribution.block %>
+          </p>
+        <% else %>
+          <p class="card-text">
+            This is a <strong>global rate</strong> that applies to all blocks unless overridden by block-specific rates.
+          </p>
+          <p class="small text-muted">
+            Affects all addresses without specific rates
+          </p>
+        <% end %>
+        
+        <hr>
+        
+        <h6>Rate Hierarchy</h6>
+        <ol class="small">
+          <li>Address-specific rates</li>
+          <li>Block-specific rates</li>
+          <li>Global rates (default)</li>
+        </ol>
+      </div>
+    </div>
+
+    <% if @contribution.active? && @contribution.effective_from <= Date.current %>
+      <div class="card mt-3">
+        <div class="card-body">
+          <h6 class="card-title">Addresses Using This Rate</h6>
+          <% sample_addresses = @contribution.block.present? ? 
+                                Address.where("block_address LIKE ?", "#{@contribution.block}%").limit(5) :
+                                Address.limit(5) %>
+          <% sample_addresses.each do |address| %>
+            <div class="small mb-1">
+              <%= link_to address.block_address.upcase, address, class: "text-decoration-none" %>
+              <% if address.special_rate? %>
+                <span class="badge badge-warning badge-sm">Special Rate</span>
+              <% end %>
+            </div>
+          <% end %>
+          <% if sample_addresses.count == 5 %>
+            <div class="small text-muted">... and more</div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

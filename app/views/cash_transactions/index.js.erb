@@ -1,2 +1,0 @@
-$('#content-data').html("<%= escape_javascript(render partial: 'data') %>");
-$('#month-year-selected').html('<%= "#{UserContribution::MONTHNAMES.invert[@month_selected.to_i]},  #{@year_selected} " %>')

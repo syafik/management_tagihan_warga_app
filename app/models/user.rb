@@ -1,20 +1,21 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
-  # Include default devise modules.
-  devise :database_authenticatable, :registerable,
-         :rememberable, :validatable
-  include DeviseTokenAuth::Concerns::User
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable, :validatable, :timeoutable
+  include DeviseTokenAuth::Concerns::User
 
   validates :name, :phone_number, presence: true
   validate :password_complexity
   validate :phone_number_format_validation
 
-  belongs_to :address, optional: true
+  # New many-to-many relationship with addresses
+  has_many :user_addresses, dependent: :destroy
+  has_many :addresses, through: :user_addresses
+  has_one :primary_address_relation, -> { where(primary: true) }, class_name: 'UserAddress'
+  has_one :primary_address, through: :primary_address_relation, source: :address
   before_validation :set_uid
 
   has_one_attached :avatar
@@ -98,6 +99,109 @@ class User < ApplicationRecord
     %w[email name addresses_block_address role]
   end
 
+  # Check if user is head of family at any address
+  def head_of_family?
+    user_addresses.where(kk: true).exists?
+  end
+
+  # Check if user is head of family at specific address
+  def head_of_family_at?(address)
+    user_addresses.where(address:, kk: true).exists?
+  end
+
+  # Check if user can be warga (resident)
+  def can_be_warga?
+    is_warga? && addresses.present?
+  end
+
+  # Get primary address or first address
+  def address
+    primary_address || addresses.first
+  end
+
+  # Add user to an address (with optional primary and kk flags)
+  def add_address!(address, primary: false, kk: false)
+    user_address = user_addresses.find_or_create_by(address:)
+    user_address.set_as_primary! if primary
+    user_address.set_as_head_of_family! if kk
+    user_address
+  end
+
+  # Remove user from an address
+  def remove_address!(address)
+    user_addresses.where(address:).destroy_all
+  end
+
+  # Virtual attribute for forms - sets the primary address
+  def address_id=(address_id)
+    return if address_id.blank?
+    
+    # Clear existing primary address
+    user_addresses.where(primary: true).update_all(primary: false)
+    
+    # Find or create the new primary address relationship
+    address = Address.find(address_id)
+    add_address!(address, primary: true)
+  end
+
+  def address_id
+    primary_address&.id
+  end
+
+  # WhatsApp Login Code Methods
+  def generate_login_code!
+    self.login_code = SecureRandom.random_number(100_000..999_999).to_s
+    self.login_code_expires_at = 10.minutes.from_now
+    save!
+    login_code
+  end
+
+  def login_code_valid?(code)
+    return false if login_code.blank? || login_code_expired?
+
+    login_code == code
+  end
+
+  def login_code_expired?
+    login_code_expires_at.blank? || login_code_expires_at < Time.current
+  end
+
+  def clear_login_code!
+    self.login_code = nil
+    self.login_code_expires_at = nil
+    save!
+  end
+
+  def send_login_code!
+    code = generate_login_code!
+
+    if Rails.env.production?
+      whatsapp_service = WhatsappService.new
+      Rails.logger.info "Sending WhatsApp login code #{code} to #{phone_number}"
+      result = whatsapp_service.send_login_code(phone_number, code)
+
+      unless result[:success]
+        # Clear the code if sending failed
+        clear_login_code!
+        Rails.logger.error "Failed to send WhatsApp login code #{code} to #{phone_number}: #{result[:message]}"
+      end
+    else
+      # In development/test environments, just log the code
+      Rails.logger.info "WhatsApp login code for #{phone_number}: #{code} (not sent - not in production)"
+      result = { success: true, message: 'Code generated (not sent in non-production environment)' }
+    end
+
+    result
+  end
+
+  def self.find_by_phone(phone_number)
+    # Normalize phone number for search
+    normalized = normalize_phone_number(phone_number)
+    where(phone_number: normalized).first
+  end
+
+  private
+
   def self.ransortable_attributes(_auth_object = nil)
     column_names
   end
@@ -107,7 +211,7 @@ class User < ApplicationRecord
     send_smtp_email = SibApiV3Sdk::SendSmtpEmail.new
     sender = SibApiV3Sdk::SendSmtpEmailSender.new(name: 'admin-puri-ayana', email: 'no-reply@puriayanagempol.com')
     send_smtp_email.subject = '[Puri Ayana App] - Ini reset password token anda!'
-    send_smtp_email.to = [{name: name, email: email}]
+    send_smtp_email.to = [{ name:, email: }]
     send_smtp_email.sender = sender
     send_smtp_email.html_content = "<html>
     <head>
@@ -126,7 +230,7 @@ class User < ApplicationRecord
       <p>
         Terima Kasih dan Selamat beraktifitas.
         Semoga Anda senantiasa sehat dan diberikan kemurahan rejeki, Aamiin..
-  
+
         Salam, <br />
         Pengurus
       </p>
@@ -134,7 +238,7 @@ class User < ApplicationRecord
   </html>
   "
     begin
-      result = api_instance.send_transac_email(send_smtp_email)    
+      result = api_instance.send_transac_email(send_smtp_email)
       p result
     rescue SibApiV3Sdk::ApiError => e
       puts "Exception when calling TransactionalEmailsApi->send_transac_email: #{e}"
@@ -143,11 +247,33 @@ class User < ApplicationRecord
 
   def has_debt?
     return false unless debts.exists?
-    debts.select{|d| d.debt_type == 1}.sum(&:value) > debts.select{|d| d.debt_type == 2}.sum(&:value) 
+
+    debts.select { |d| d.debt_type == 1 }.sum(&:value) > debts.select { |d| d.debt_type == 2 }.sum(&:value)
   end
 
   def blok_name
     address.try(:block_address)
   end
 
+  class << self
+    private
+
+    def normalize_phone_number(phone)
+      return nil unless phone
+
+      # Remove all non-digit characters except +
+      cleaned = phone.gsub(/[^\d+]/, '')
+
+      # Add +62 for Indonesian numbers if no country code
+      if cleaned.match(/^0\d+/)
+        cleaned = "+62#{cleaned[1..-1]}"
+      elsif cleaned.match(/^8\d+/)
+        cleaned = "+62#{cleaned}"
+      elsif !cleaned.start_with?('+')
+        cleaned = "+62#{cleaned}"
+      end
+
+      cleaned
+    end
+  end
 end

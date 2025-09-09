@@ -19,6 +19,11 @@ class CashTransaction < ApplicationRecord
     'PEMASUKAN LAINNYA' => 6
   }.freeze
 
+  TYPE_GROUP = {
+    'DEBIT' => [1, 4, 6],
+    'KREDIT' => [2, 3, 5]
+  }.freeze
+
   REPORT_WARGA = {
     'PEMASUKAN IURAN WARGA' => [GROUP['IURAN WARGA'], GROUP['BAYAR KASBON']],
     'PEMASUKAN LAINNYA' => GROUP['PEMASUKAN LAINNYA'],
@@ -29,13 +34,13 @@ class CashTransaction < ApplicationRecord
   belongs_to :pic, class_name: 'User'
 
   def self.closed?(month, year)
-    CashFlow.where(month: month, year: year).exists?
+    CashFlow.where(month:, year:).exists?
   end
 
   def self.last_5_transaction
-    where(month: Date.current.month, year: Date.current.year).order("transaction_date desc").map{|a|
-      {tgl: a.transaction_date.strftime("%d %B %Y"), deskripsi: a.description, type: a.transaction_type == 2 ? "OUT" : "IN", nilai: a.total}
-    }
+    where(month: Date.current.month, year: Date.current.year).order('transaction_date desc').map do |a|
+      { tgl: a.transaction_date.strftime('%d %B %Y'), deskripsi: a.description,
+        type: a.transaction_type == 2 ? 'OUT' : 'IN', nilai: a.total }
+    end
   end
-
 end

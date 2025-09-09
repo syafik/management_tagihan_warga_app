@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   mount Ckeditor::Engine => '/ckeditor'
   get '/api' => redirect('/swagger/dist/index.html?url=/apidocs/api-docs.json')
   devise_for :users, skip: :registrations, controllers: {
@@ -44,6 +45,14 @@ Rails.application.routes.draw do
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   root to: 'home#index'
+  
+  # Admin routes
+  get 'backup_database', to: 'admin#backup_database', as: :backup_database
+  
+  # WhatsApp Login Routes (verification step)
+  get '/phone_login/verify', to: 'phone_logins#verify', as: :verify_phone_login
+  post '/phone_login/authenticate', to: 'phone_logins#authenticate', as: :authenticate_phone_login
+  post '/phone_login/resend', to: 'phone_logins#resend', as: :resend_phone_login
   resources :users do
     collection do
       match :search, via: %i[get post]
@@ -73,9 +82,19 @@ Rails.application.routes.draw do
     collection do
       match :search, via: %i[get post]
     end
+    member do
+      post :pay_arrears
+    end
+    resources :address_contributions
   end
 
   resources :notifications do
+    collection do
+      match :search, via: %i[get post]
+    end
+  end
+
+  resources :contributions do
     collection do
       match :search, via: %i[get post]
     end
@@ -102,6 +121,9 @@ Rails.application.routes.draw do
       post :do_generate_data
       get :import_data_transfer
       post :do_import_data_transfer
+      get :contribution_rate, to: 'user_contributions#get_contribution_rate'
+      get :payment_status, to: 'user_contributions#payment_status'
+      get :search_addresses, to: 'user_contributions#search_addresses'
     end
     member do
       get :contribution_by_address

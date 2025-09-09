@@ -1,25 +1,42 @@
 <%= form_for(address) do |f| %>
   <%= errors_for(address) %>
-  <div class="form-group">
-    <%= f.label :block_address %>
-    <%= f.text_field :block_address, autofocus: true, class: 'form-control', placeholder: 'Blok' %>
+  <div class="mb-6">
+    <%= f.label :block_address, class: 'block text-sm font-medium text-gray-700 mb-2' %>
+    <%= f.text_field :block_address, autofocus: true, class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm', placeholder: 'Blok' %>
   </div>
 
-  <div class="form-group">
-    <%= f.label :iuran %>
-    <%= f.number_field :contribution, class: 'form-control', placeholder: 'Besar Iuran' %>
+  <div class="mb-6">
+    <label class="block text-sm font-medium text-gray-700 mb-2">Current Contribution Rate</label>
+    <div class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
+      <% if address.persisted? %>
+        <%= number_to_currency(address.current_contribution_rate, unit: "Rp. ", separator: ",", delimiter: ".") %>
+        <% if address.special_rate? %>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 ml-2">Special Rate Active</span>
+        <% end %>
+      <% else %>
+        <em>Will use default rate after saving</em>
+      <% end %>
+    </div>
+    <% if address.persisted? %>
+      <p class="mt-2 text-sm text-gray-500">
+        To set a custom rate for this address, 
+        <%= link_to "click here", new_address_address_contribution_path(address), class: "text-indigo-600 hover:text-indigo-500" %>
+      </p>
+    <% end %>
   </div>
 
-  <div class="form-group">
-    <%= f.label :tunggakan %>
-    <%= f.number_field :arrears, class: 'form-control', placeholder: 'Tunggakan' %>
+  <div class="mb-6">
+    <%= f.label :tunggakan, class: 'block text-sm font-medium text-gray-700 mb-2' %>
+    <%= f.number_field :arrears, class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm', placeholder: 'Tunggakan' %>
   </div>
 
-  <div class="form-group">
-    <%= f.label :free %>
-    <%= f.check_box :free %>
+  <div class="mb-6 flex items-center">
+    <%= f.check_box :free, class: 'h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded' %>
+    <%= f.label :free, class: 'ml-2 block text-sm text-gray-900' %>
   </div>
 
-  <%= f.submit 'Submit', class: 'btn btn-primary mr-2' %>
-  <%= link_to 'Cancel', users_path, class: 'btn btn-light' %>
+  <div class="flex items-center justify-end space-x-3">
+    <%= f.submit 'Submit', class: 'inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+    <%= link_to 'Cancel', users_path, class: 'inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+  </div>
 <% end %>

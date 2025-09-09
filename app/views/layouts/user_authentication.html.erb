@@ -1,47 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-gray-50">
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Puri Ayana App</title>
-  <!-- plugins:css -->
-  <%= stylesheet_link_tag 'simple-line-icons', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <%= stylesheet_link_tag 'flag-icon.min.css', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <%= stylesheet_link_tag 'vendor.bundle.base.css', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <!-- endinject -->
-  <!-- Plugin css for this page -->
-  <!-- End plugin css for this page -->
-  <!-- inject:css -->
-  <!-- endinject -->
-  <!-- Layout styles -->
-  <%= stylesheet_link_tag 'style', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <!-- End layout styles -->
-  <link rel="shortcut icon" href="<% asset_path('favicon.png') %>" />
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  
+  <!-- Vite assets -->
+  <%= vite_client_tag %>
+  <%= vite_stylesheet_tag 'application' %>
+  <%= vite_javascript_tag 'application' %>
+  
+  <link rel="shortcut icon" href="<%= asset_path('img_305218.png') %>" />
 </head>
-<body>
-<div class="container-scroller">
-  <div class="container-fluid page-body-wrapper full-page-wrapper">
-    <div class="content-wrapper d-flex align-items-center auth">
-      <div class="row flex-grow">
-        <div class="col-lg-4 mx-auto">
-          <%= yield %>
-        </div>
-      </div>
+<body class="h-full">
+  <div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <%= render partial: 'shared/flash_message' if !flash.empty? %>
+      <%= yield %>
     </div>
-    <!-- content-wrapper ends -->
   </div>
-  <!-- page-body-wrapper ends -->
-</div>
-<!-- container-scroller -->
-<!-- plugins:js -->
-<%= javascript_include_tag "vendor.bundle.base.js" %>
-<!-- endinject -->
-<!-- Plugin js for this page -->
-<!-- End plugin js for this page -->
-<!-- inject:js -->
-<%= javascript_include_tag "off-canvas.js" %>
-<%= javascript_include_tag "misc.js" %>
-<!-- endinject -->
 </body>
 </html>

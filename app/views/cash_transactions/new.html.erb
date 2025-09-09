@@ -1,60 +1,130 @@
-<div class="row">
-  <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <h4 class="card-title">Buat Data Transaksi Baru</h4>
-        <p class="card-description"> Fill the form below. </p>
-        <%= form_tag cash_transactions_path do  %>
-          <%= errors_for(@ct) %>
-          <div class="form-group">
-            <%= label_tag :bulan %>
-            <%= select_tag :month, options_for_select(UserContribution::MONTHNAMES, @month_selected), class: 'form-control mb-2 mr-sm-2' %>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+      <h2 class="text-xl font-bold text-gray-900">Buat Data Transaksi Baru</h2>
+      <p class="text-sm text-gray-600 mt-1">Isi formulir di bawah ini untuk membuat transaksi baru</p>
+    </div>
+    
+    <div class="p-6" data-controller="cash-transaction-form">
+      <%= form_tag cash_transactions_path, 
+                   method: :post,
+                   class: 'space-y-6', 
+                   data: { 
+                     turbo: false,
+                   } do %>
+        <%= errors_for(@ct) %>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Bulan -->
+          <div>
+            <%= label_tag :bulan, "Bulan", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+            <%= select_tag :month, 
+                           options_for_select(UserContribution::MONTHNAMES, @month_selected), 
+                           class: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500' %>
           </div>
-          <div class="form-group">
-            <%= label_tag :tahun %>
-            <%= select_tag :year, options_for_select((2020..2050).to_a, @year_selected), class: 'form-control mb-2 mr-sm-2' %>
+          
+          <!-- Tahun -->
+          <div>
+            <%= label_tag :tahun, "Tahun", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+            <%= select_tag :year, 
+                           options_for_select((2025..2050).to_a, @year_selected), 
+                           class: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500' %>
           </div>
-          <div class="form-group">
-            <%= label_tag :jenis_transaksi %>
-            <%= select_tag :transaction_type, options_for_select(CashTransaction::TYPE, @ct.transaction_type), class: 'form-control mb-2 mr-sm-2' %>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Jenis Transaksi -->
+          <div>
+            <%= label_tag :jenis_transaksi, "Jenis Transaksi", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+            <%= select_tag :transaction_type, 
+                           options_for_select([["Pilih Jenis Transaksi", ""]] + CashTransaction::TYPE.to_a, @ct.transaction_type), 
+                           {
+                             required: true,
+                             class: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                             data: { 
+                               cash_transaction_form_target: "transactionType",
+                               action: "change->cash-transaction-form#transactionTypeChanged"
+                             }
+                           } %>
           </div>
-          <div class="form-group">
-            <%= label_tag :group_transaction %>
-            <%= select_tag :transaction_group, options_for_select(CashTransaction::GROUP, @ct.transaction_group), class: 'form-control mb-2 mr-sm-2' %>
+          
+          <!-- Group Transaction -->
+          <div>
+            <%= label_tag :group_transaction, "Kategori", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+            <%= select_tag :transaction_group, 
+                           '<option value="">Pilih Kategori</option>'.html_safe, 
+                           {
+                             required: true,
+                             class: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                             data: { cash_transaction_form_target: "categorySelect" }
+                           } %>
           </div>
-          <div class="form-group">
-            <%= label_tag :keterangan %>
-            <%= text_field_tag :description, @ct.description, class: 'form-control mb-2 mr-sm-2' %>
+        </div>
+        
+        <!-- Keterangan -->
+        <div>
+          <%= label_tag :keterangan, "Keterangan", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+          <%= text_field_tag :description, 
+                             @ct.description, 
+                             placeholder: "Masukkan deskripsi transaksi",
+                             required: true,
+                             class: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Total -->
+          <div>
+            <%= label_tag :total, "Total", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+            <div class="relative">
+              <span class="absolute left-3 top-2 text-gray-500 text-sm">Rp</span>
+              <%= text_field_tag :total, 
+                                 @ct.total, 
+                                 placeholder: "0",
+                                 required: true,
+                                 data: { action: "input->cash-transaction-form#formatCurrency" },
+                                 class: 'w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500' %>
+            </div>
           </div>
-          <div class="form-group">
-            <%= label_tag :total %>
-            <%= text_field_tag :total, @ct.total, class: 'form-control mb-2 mr-sm-2' %>
+          
+          <!-- Tanggal Transaksi -->
+          <div>
+            <%= label_tag :tanggal_transaksi, "Tanggal Transaksi", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+            <%= text_field_tag :transaction_date, 
+                               @ct.transaction_date, 
+                               required: true,
+                               data: { 
+                                 cash_transaction_form_target: "datePicker",
+                                 action: "focus->cash-transaction-form#initDatePicker"
+                               },
+                               class: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500' %>
           </div>
-          <div class="form-group">
-            <%= label_tag :tanggal_transaksi %>
-            <%= text_field_tag :transaction_date, @ct.transaction_date, class: 'form-control mb-2 mr-sm-2 date-picker' %>
-          </div>
-          <div class="form-group">
-            <%= label_tag :penanggung_jawab %>
-            <%= select_tag :pic_id, options_for_select(User.where(:role => [2,3]).collect {|p| [ p.name.try(:upcase), p.id ] }, @ct.pic_id), class: 'form-control mb-2 mr-sm-2' %>
-          </div>
-          <%= submit_tag "Simpan", class: 'btn btn-primary mr-2' %>
-          <%= link_to 'Cancel', users_path, class: 'btn btn-light' %>
-        <% end %>
-      </div>
+        </div>
+        
+        <!-- Penanggung Jawab -->
+        <div>
+          <%= label_tag :penanggung_jawab, "Penanggung Jawab", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+          <%= select_tag :pic_id, 
+                         options_for_select([["Pilih Penanggung Jawab", ""]] + User.where(:role => [2,3]).collect {|p| [ p.name.try(:upcase), p.id ] }, @ct.pic_id), 
+                         {
+                           required: true,
+                           class: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                         } %>
+        </div>
+        
+        <!-- Submit Buttons -->
+        <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+          <%= link_to cash_transactions_path, 
+                      class: 'px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200' do %>
+            <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+            Batal
+          <% end %>
+          
+          <%= submit_tag "Simpan Transaksi", 
+                         class: 'px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200'%>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>
-
-<script type="text/javascript">
-  $(document).ready(function(){
-    var date_input=$('.date-picker'); //our date input has the name "date"
-    var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
-    date_input.datepicker({
-      format: 'yyyy-mm-dd',
-      container: container,
-      todayHighlight: true,
-      autoclose: true,
-    })
-  })
-</script>

@@ -1,80 +1,149 @@
-<%= form_with(model: user_contribution, local: true) do |form| %>
-   <%= errors_for(user_contribution) %>
-  <div class="form-group">
-    <%= form.label :address_id %>
-    <%= form.select :address_id, Address.includes(:main_user).select('id, block_address, contribution').collect {|p| [ "#{p.main_user.try(:name).try(:upcase)} - #{p.block_address.try(:upcase)}", p.id , title: p.contribution] }, {include_blank: true}, {class: 'select-field-js address-select', style: 'width:100%'}  %>
-  </div>
-  <% if user_contribution.new_record? %>
-    <%= form.label :month %>
-    <div class="form-group row">
-      <% @month_info.each do |info| %>
-        <div class="col-3">
-          <%= check_box_tag 'user_contribution_month[]', "#{info[:month]},#{info[:month_text]},#{info[:year]}", false, id: "#{info[:month]}#{info[:year]}" %>
-          <%= label_tag "#{info[:month]}#{info[:year]}", "#{info[:month_text]} #{info[:year]}" %>
+<%= form_with(model: user_contribution, local: true, class: 'space-y-6', data: { controller: 'user-contribution-form', user_contribution_form_year_value: @year_selected }) do |form| %>
+  <% if user_contribution.errors.any? %>
+    <div class="rounded-md bg-red-50 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          </svg>
         </div>
-      <% end %>
-    </div>
-  <% else%>
-    <div class="form-group">
-      <%= form.label :month %>
-      <%= form.select :month, options_for_select(UserContribution::MONTHNAMES, user_contribution.month), {}, {class: 'select-field-js', style: 'width:100%'}  %>
-    </div>
-
-    <div class="form-group">
-      <%= form.label :year %>
-      <%= form.select :year, options_for_select((2020..2050).to_a, user_contribution.year), {},{class: 'select-field-js', style: 'width:100%'}  %>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">Ada kesalahan dalam form:</h3>
+          <ul class="mt-2 list-disc list-inside text-sm text-red-700">
+            <% user_contribution.errors.full_messages.each do |error| %>
+              <li><%= error %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
     </div>
   <% end %>
-   <div class="form-group">
-    <%= form.label :payment_type %>
-    <%= form.select :payment_type, options_for_select([["CASH", 1],["TRANSFER", 2]], user_contribution.payment_type), {},{class: 'select-field-js', style: 'width:100%'}  %>
+
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <!-- Address Search -->
+    <div class="sm:col-span-2">
+      <%= form.label :address_id, "Cari Alamat atau Nama Warga", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+      <div class="relative">
+        <%= text_field_tag 'address_search', '', 
+            placeholder: 'Ketik alamat (misal: A12) atau nama warga...', 
+            class: 'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm',
+            data: { 
+              user_contribution_form_target: 'addressSearch',
+              action: 'input->user-contribution-form#searchAddresses',
+              autocomplete: 'off'
+            } %>
+        <%= form.hidden_field :address_id, 
+            data: { user_contribution_form_target: 'addressSelect' } %>
+        
+        <!-- Search Results Dropdown -->
+        <div data-user-contribution-form-target="searchResults" 
+             class="absolute z-10 w-full bg-white shadow-lg border border-gray-300 rounded-md mt-1 max-h-60 overflow-y-auto hidden">
+          <!-- Results will be populated by Stimulus -->
+        </div>
+        
+        <!-- Selected Address Display -->
+        <div data-user-contribution-form-target="selectedAddress" 
+             class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-sm font-medium text-blue-900" data-user-contribution-form-target="selectedAddressText"></span>
+            </div>
+            <button type="button" 
+                    class="text-blue-600 hover:text-blue-800"
+                    data-action="click->user-contribution-form#clearSelection">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <% if user_contribution.new_record? %>
+      <!-- Month Selection for New Records -->
+      <div class="sm:col-span-2">
+        <%= render 'month_selection', year_selected: @year_selected, month_info: @month_info, selected_address_id: params[:address_id] %>
+      </div>
+    <% else %>
+      <!-- Month and Year for Edit -->
+      <div>
+        <%= form.label :month, "Bulan", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+        <%= form.select :month, options_for_select(UserContribution::MONTHNAMES, user_contribution.month), 
+            {}, 
+            { class: 'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' } %>
+      </div>
+
+      <div>
+        <%= form.label :year, "Tahun", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+        <%= form.select :year, options_for_select((2020..2035).to_a, user_contribution.year), 
+            {}, 
+            { class: 'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' } %>
+      </div>
+    <% end %>
+
+    <!-- Payment Type -->
+    <div>
+      <%= form.label :payment_type, "Jenis Pembayaran", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+      <%= form.select :payment_type, 
+          options_for_select([["Cash", 1], ["Transfer", 2]], user_contribution.payment_type), 
+          { include_blank: "Pilih jenis..." }, 
+          { class: 'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' } %>
+    </div>
+
+    <!-- Contribution Amount -->
+    <div>
+      <%= form.label :contribution, "Jumlah Iuran", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+      <div class="relative rounded-md shadow-sm">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-gray-500 sm:text-sm">Rp</span>
+        </div>
+        <%= form.number_field :contribution, 
+            class: 'block w-full pl-10 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm', 
+            placeholder: '0',
+            step: 1000,
+            data: { user_contribution_form_target: 'contributionField' } %>
+      </div>
+    </div>
+
+    <!-- Payment Date -->
+    <div>
+      <%= form.label :pay_at, "Tanggal Bayar", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+      <%= form.date_field :pay_at, 
+          value: user_contribution.pay_at || Date.current,
+          class: 'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' %>
+    </div>
+
+    <!-- Receiver -->
+    <div>
+      <%= form.label :receiver_id, "Penerima", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+      <%= form.select :receiver_id, 
+          User.where(role: 2).order(:name).collect { |u| [u.name.try(:upcase), u.id] }, 
+          { 
+            include_blank: "Pilih penerima...", 
+            selected: user_contribution.new_record? ? current_user.id : user_contribution.receiver_id 
+          }, 
+          { class: 'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' } %>
+    </div>
+
+    <!-- Description -->
+    <div class="sm:col-span-2">
+      <%= form.label :description, "Keterangan", class: 'block text-sm font-medium text-gray-700 mb-2' %>
+      <%= form.text_area :description, 
+          rows: 3,
+          class: 'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm',
+          placeholder: 'Keterangan tambahan (opsional)' %>
+    </div>
   </div>
 
-
-  <div class="form-group">
-    <%= form.label :contribution %>
-    <%= form.number_field :contribution, class: 'form-control'%>
-  </div>
-
-  <div class="form-group">
-    <%= form.label :pay_at %>
-    <%= form.text_field :pay_at, class: 'form-control date-picker' %>
-  </div>
-
-  <div class="form-group">
-    <%= form.label :receiver_id %>
-    <%= form.select :receiver_id, User.select('id, name').where(role: 2).collect {|p| [ p.name.try(:upcase), p.id  ] }, {include_blank: true, selected: user_contribution.new_record? ? current_user.id : user_contribution.receiver_id}, {class: 'select-field-js', style: 'width:100%'}  %>
-  </div>
-
-  <div class="form-group">
-    <%= form.label :description %>
-    <%= form.text_area :description, class: 'form-control' %>
-  </div>
-
-  <div class="actions">
-    <%= form.submit 'Submit', class: 'btn btn-primary mr-2' %>
-    <%= link_to 'Cancel', user_contributions_path, class: 'btn btn-light' %>
+  <!-- Form Actions -->
+  <div class="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
+    <%= link_to user_contributions_path, 
+        class: 'inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' do %>
+      Batal
+    <% end %>
+    <%= form.submit user_contribution.new_record? ? 'Simpan Iuran' : 'Update Iuran', 
+        class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
   </div>
 <% end %>
 
-<script type="text/javascript">
-  $(document).ready(function(){
-    if ($(".select-field-js").length) {
-      $(".select-field-js").select2();
-      $(".address-select").select2();
-      $('.address-select').on('select2:select', function (e) {
-          var data = e.params.data;
-          $('#user_contribution_contribution').val(parseInt(data.title));
-      });
-    }
-
-    var date_input=$('.date-picker'); //our date input has the name "date"
-    var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
-    date_input.datepicker({
-      format: 'yyyy-mm-dd',
-      container: container,
-      todayHighlight: true,
-      autoclose: true,
-    })
-  })
-</script>

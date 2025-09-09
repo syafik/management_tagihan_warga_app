@@ -2,9 +2,19 @@
 
 class CashTransactionsController < ApplicationController
   def index
-    @year_selected = params[:year_eq] || Date.current.year
-    @month_selected = params[:month_eq] || Date.current.month
-    selected_date = Date.parse("#{@year_selected}-#{@month_selected}-10") 
+    current_year = Date.current.year
+    current_month = Date.current.month
+
+    # Set default year to current year if it's 2025 or later, otherwise 2025
+    @year_selected = params[:year_eq]&.to_i || [current_year, 2025].max
+
+    # Set default month to current month if we're in 2025 or later, otherwise January
+    @month_selected = if @year_selected == current_year && current_year >= 2025
+                        params[:month_eq]&.to_i || current_month
+                      else
+                        params[:month_eq]&.to_i || 1
+                      end
+    selected_date = Date.parse("#{@year_selected}-#{@month_selected}-10")
     @cash_transactions = CashTransaction.where(transaction_date: selected_date.beginning_of_month..selected_date.end_of_month)
     @cash_transactions = @cash_transactions.where(pic_id: params[:pic_id_eq]) unless params[:pic_id_eq].blank?
     @cash_transactions = @cash_transactions.order('transaction_date ASC')
@@ -13,21 +23,17 @@ class CashTransactionsController < ApplicationController
     @cash_closed = CashTransaction.closed?(@month_selected, @year_selected)
     respond_to do |format|
       format.html
-      format.js
     end
   end
 
-  def search
-    index
-    respond_to do |format|
-      format.html
-      format.js { render 'index' }
-    end
-  end
 
   def new
-    @year_selected = Date.current.year
-    @month_selected = Date.current.month - 1
+    current_year = Date.current.year
+    current_month = Date.current.month
+
+    @year_selected = [current_year, 2025].max
+    @month_selected = @year_selected == current_year && current_year >= 2025 ? current_month : 1
+
     @ct = CashTransaction.new
   end
 
@@ -74,7 +80,7 @@ class CashTransactionsController < ApplicationController
         pic_id: pic.presence || '72', # pic syafik klo gak di set
         total: total.gsub(/[^\d]/, '').to_f,
         transaction_date: tgl_transaksi,
-        transaction_type: transaction_type,
+        transaction_type:,
         description: deskripsi,
         transaction_group: CashTransaction::GROUP['LAIN-LAIN']
       )
@@ -116,7 +122,7 @@ class CashTransactionsController < ApplicationController
     if CashFlow.where(year: params[:year], month: params[:month]).exists?
       redirect_to cash_transactions_path, alert: 'Already closed!'
     else
-      selected_date = Date.parse("#{params[:year]}-#{params[:month]}-10") 
+      selected_date = Date.parse("#{params[:year]}-#{params[:month]}-10")
       cash_transactions = CashTransaction.select('transaction_type, total, month, year').where(transaction_date: selected_date.beginning_of_month..selected_date.end_of_month)
       debit_total = cash_transactions.select { |t| t.transaction_type == CashTransaction::TYPE['DEBIT'] }.sum(&:total)
       credit_total = cash_transactions.select { |t| t.transaction_type == CashTransaction::TYPE['KREDIT'] }.sum(&:total)
@@ -137,7 +143,7 @@ class CashTransactionsController < ApplicationController
     @report_items = []
     @debit_total = 0
     @credit_total = 0
-    selected_date = Date.parse("#{params[:year]}-#{params[:month]}-10") 
+    selected_date = Date.parse("#{params[:year]}-#{params[:month]}-10")
     cash_transactions = CashTransaction.where(transaction_date: selected_date.beginning_of_month..selected_date.end_of_month).order('transaction_date ASC')
     CashTransaction::REPORT_WARGA.each do |key, value|
       if value.is_a?(Array)
@@ -165,8 +171,8 @@ class CashTransactionsController < ApplicationController
       format.html
       format.pdf do
         html = render_to_string('transaction_report', layout: 'report', locals: { report_items: @report_items,
-                                                                                           month: params[:month], year: params[:year],
-                                                                                           debit_total: @debit_total, credit_total: @credit_total })
+                                                                                  month: params[:month], year: params[:year],
+                                                                                  debit_total: @debit_total, credit_total: @credit_total })
         kit = PDFKit.new(html)
         kit.stylesheets << "#{Rails.root}/app/assets/stylesheets/application.css"
         kit.stylesheets << "#{Rails.root}/app/assets/stylesheets/style.css"

@@ -1,20 +1,86 @@
-<div class="row">
-  <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <%= form_tag(search_cash_transactions_path, remote:true, class: 'form-inline ajax-form-request') do |f| %>
-          <%= label_tag :bulan, nil, class: 'mb-2 mr-sm-2' %>
-          <%= select_tag :month_eq, options_for_select(UserContribution::MONTHNAMES, @month_selected), class: 'form-control mb-2 mr-sm-2' %>
-          <%= label_tag :tahun, nil, class: 'mb-2 mr-sm-2' %>
-          <%= select_tag :year_eq, options_for_select((2020..2050).to_a, @year_selected), class: 'form-control mb-2 mr-sm-2' %>
-          <%= label_tag :penanggung_jawab, nil, class: 'mb-2 mr-sm-2' %>
-          <%= select_tag :pic_id_eq, options_for_select(User.select('id, name').where(role: [2,3]).collect {|p| [ p.name.try(:upcase), p.id ] }), include_blank: "All", class: 'form-control mb-2 mr-sm-2' %>
-          <%= submit_tag "Search", class: 'form-control btn btn-primary mb-2 mr-sm-2' %>
-        <% end %>
-        <br />
-        <h4 class="card-title mb-sm-0 text-center">Daftar Transaksi <span id='month-year-selected'><%= UserContribution::MONTHNAMES.invert[@month_selected] %>, <%= @year_selected %></span></h4>
-        <br />
-        <div id="content-data">
+<div class="min-h-screen bg-gray-50">
+  <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+      <div class="p-3 sm:p-6">
+        <div data-controller="cash-transaction-filter" class="mb-4 sm:mb-6">
+          <%= form_tag(cash_transactions_path, 
+                       method: :get,
+                       data: { cash_transaction_filter_target: "form" },
+                       class: 'bg-gray-50 p-3 sm:p-4 rounded-lg') do |f| %>
+            
+            <!-- Month Navigation -->
+            <div class="flex items-center justify-center mb-4 sm:mb-6">
+              <div class="flex items-center space-x-3 sm:space-x-6">
+                <button type="button" 
+                        class="p-2 sm:px-4 sm:py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        data-action="click->cash-transaction-filter#prevMonth"
+                        data-cash-transaction-filter-target="prevButton">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                  </svg>
+                </button>
+                
+                <div class="text-center min-w-24 sm:min-w-32">
+                  <h3 class="text-base sm:text-xl font-bold text-gray-900" data-cash-transaction-filter-target="monthDisplay">
+                    <%= UserContribution::MONTHNAMES.invert[@month_selected] %>
+                  </h3>
+                </div>
+                
+                <button type="button" 
+                        class="p-2 sm:px-4 sm:py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        data-action="click->cash-transaction-filter#nextMonth"
+                        data-cash-transaction-filter-target="nextButton">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Hidden month input for navigation -->
+            <%= hidden_field_tag :month_eq, @month_selected, data: { cash_transaction_filter_target: "monthInput" } %>
+            
+            <!-- Year and PIC Filter -->
+            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-end">
+              <!-- Year Selector - Always visible -->
+              <div class="flex-1">
+                <%= label_tag :year_eq, "Tahun", class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                <%= select_tag :year_eq, 
+                               options_for_select((2025..2050).to_a, @year_selected), 
+                               { 
+                                 class: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                                 data: { 
+                                   action: "change->cash-transaction-filter#changeYear",
+                                   cash_transaction_filter_target: "yearSelect"
+                                 }
+                               } %>
+              </div>
+              
+              <!-- PIC Selector - Only for admin -->
+              <% if current_user.is_admin? %>
+                <div class="flex-1">
+                  <%= label_tag :penanggung_jawab, "Penanggung Jawab", class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                  <%= select_tag :pic_id_eq, 
+                                 options_for_select(User.select('id, name').where(role: [2,3]).collect {|p| [ p.name.try(:upcase), p.id ] }), 
+                                 { 
+                                   include_blank: "Semua", 
+                                   class: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                                   data: { action: "change->cash-transaction-filter#changePIC" }
+                                 } %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      
+        <h2 class="text-lg sm:text-2xl font-bold text-center text-gray-900 mb-4 sm:mb-6">
+          <span class="block sm:inline">Daftar Transaksi</span>
+          <span id='month-year-selected' data-cash-transaction-filter-target="monthYear" class="block sm:inline text-blue-600 mt-1 sm:mt-0">
+            <%= UserContribution::MONTHNAMES.invert[@month_selected] %>, <%= @year_selected %>
+          </span>
+        </h2>
+        
+        <div id="content-data" data-cash-transaction-filter-target="content">
           <%= render partial: 'data' %>
         </div>
       </div>

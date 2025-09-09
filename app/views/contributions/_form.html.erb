@@ -1,0 +1,49 @@
+<%= form_for(contribution) do |f| %>
+  <% if contribution.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(contribution.errors.count, "error") %> prohibited this contribution rate from being saved:</h4>
+      <ul>
+        <% contribution.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :amount, 'Amount (Rp)' %>
+    <%= f.number_field :amount, step: 0.01, class: 'form-control', placeholder: 'Enter contribution amount' %>
+    <small class="form-text text-muted">Amount in Rupiah (e.g., 50000 for Rp. 50,000)</small>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :effective_from, 'Effective From' %>
+    <%= f.date_field :effective_from, class: 'form-control' %>
+    <small class="form-text text-muted">Date when this rate becomes effective</small>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :block, 'Block (Optional)' %>
+    <%= f.select :block, 
+        options_for_select([['All Blocks', nil]] + Address::BLOK_NAME.keys.map { |k| [k, k] }, contribution.block),
+        { include_blank: false },
+        { class: 'form-control' } %>
+    <small class="form-text text-muted">Leave as 'All Blocks' for global rate, or select specific block</small>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :description, 'Description' %>
+    <%= f.text_area :description, class: 'form-control', rows: 3, placeholder: 'Description or reason for this rate' %>
+  </div>
+
+  <div class="form-group">
+    <div class="form-check">
+      <%= f.check_box :active, class: 'form-check-input' %>
+      <%= f.label :active, 'Active', class: 'form-check-label' %>
+    </div>
+    <small class="form-text text-muted">Uncheck to disable this rate</small>
+  </div>
+
+  <%= f.submit 'Save Contribution Rate', class: 'btn btn-primary mr-2' %>
+  <%= link_to 'Cancel', contributions_path, class: 'btn btn-light' %>
+<% end %>

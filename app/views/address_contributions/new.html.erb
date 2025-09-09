@@ -1,0 +1,14 @@
+<div class="row">
+  <div class="col-md-8 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Set Special Rate for <%= @address.block_address.upcase %></h4>
+        <p class="card-description">
+          Current rate: 
+          <strong><%= number_to_currency(@address.current_contribution_rate, unit: "Rp. ", separator: ",", delimiter: ".") %></strong>
+        </p>
+        <%= render 'form', address_contribution: @address_contribution %>
+      </div>
+    </div>
+  </div>
+</div>
