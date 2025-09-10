@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_08_27_035125) do
+ActiveRecord::Schema[7.0].define(version: 2025_09_09_105337) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -73,6 +73,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_27_035125) do
     t.text "home_page_text"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.decimal "starting_balance", precision: 15, scale: 2, default: "0.0"
+    t.integer "starting_year", default: 2025
   end
 
   create_table "cash_flows", force: :cascade do |t|

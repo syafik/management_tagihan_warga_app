@@ -84,6 +84,6 @@ class AppSettingsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def app_setting_params
-      params.require(:app_setting).permit(:home_page_text)
+      params.require(:app_setting).permit(:home_page_text, :starting_balance, :starting_year)
     end
 end

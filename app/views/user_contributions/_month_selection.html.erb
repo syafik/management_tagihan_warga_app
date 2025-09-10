@@ -4,7 +4,7 @@
   <div class="flex items-center justify-between mb-4">
     <label class="block text-sm font-medium text-gray-700">Pilih Bulan</label>
     <div class="flex items-center space-x-4">
-      <% if year_selected > 2025 %>
+      <% if year_selected > AppSetting.starting_year %>
         <a href="#" 
            class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
            data-action="click->user-contribution-form#yearNavigation"

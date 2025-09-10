@@ -4,8 +4,8 @@ class HomeController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @current_year = 2025
-    @starting_balance = 9081500
+    @current_year = AppSetting.starting_year
+    @starting_balance = AppSetting.starting_balance
     
     # Monthly income/outcome data for current year (2025)
     begin

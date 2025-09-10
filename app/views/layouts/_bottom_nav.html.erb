@@ -1,0 +1,74 @@
+<!-- Bottom Navigation for Mobile -->
+<div class="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-4 py-2">
+  <div class="flex justify-around items-center">
+    <!-- Dashboard -->
+    <div class="flex flex-col items-center">
+      <%= link_to root_path, class: "flex flex-col items-center p-2 text-xs #{request.path == root_path ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors" do %>
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        <span class="text-xs">Dashboard</span>
+      <% end %>
+    </div>
+
+    <!-- Daftar Rumah -->
+    <div class="flex flex-col items-center">
+      <%= link_to addresses_path, class: "flex flex-col items-center p-2 text-xs #{request.path.start_with?('/addresses') ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors" do %>
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+        </svg>
+        <span class="text-xs">Rumah</span>
+      <% end %>
+    </div>
+
+    <!-- Iuran / Data Iuran -->
+    <div class="flex flex-col items-center">
+      <%= link_to user_contributions_path, class: "flex flex-col items-center p-2 text-xs #{request.path.start_with?('/user_contributions') ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors" do %>
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+        </svg>
+        <span class="text-xs">
+          <%= current_user.is_warga? ? 'Iuran Ku' : 'Data Iuran' %>
+        </span>
+      <% end %>
+    </div>
+
+    <!-- Transaksi -->
+    <div class="flex flex-col items-center">
+      <% if current_user.is_warga? %>
+        <%= link_to show_report_cash_transactions_path('warga', Date.current.year, Date.current.month), class: "flex flex-col items-center p-2 text-xs #{request.path.include?('show_report') ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors" do %>
+          <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+          <span class="text-xs">Keuangan</span>
+        <% end %>
+      <% else %>
+        <%= link_to cash_transactions_path, class: "flex flex-col items-center p-2 text-xs #{request.path.start_with?('/cash_transactions') ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors" do %>
+          <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+          <span class="text-xs">Transaksi</span>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Profile / More Menu -->
+    <div class="flex flex-col items-center">
+      <%= link_to user_path(current_user), class: "flex flex-col items-center p-2 text-xs #{request.path.start_with?('/users') ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors", data: { turbo: false } do %>
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        <span class="text-xs">Profile</span>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Add padding bottom to main content to avoid overlap with bottom nav -->
+<style>
+  @media (max-width: 1023px) {
+    main {
+      padding-bottom: 80px; /* Space for bottom nav */
+    }
+  }
+</style>

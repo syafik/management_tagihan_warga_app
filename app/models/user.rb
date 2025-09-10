@@ -135,10 +135,10 @@ class User < ApplicationRecord
   # Virtual attribute for forms - sets the primary address
   def address_id=(address_id)
     return if address_id.blank?
-    
+
     # Clear existing primary address
     user_addresses.where(primary: true).update_all(primary: false)
-    
+
     # Find or create the new primary address relationship
     address = Address.find(address_id)
     add_address!(address, primary: true)
@@ -189,6 +189,36 @@ class User < ApplicationRecord
       # In development/test environments, just log the code
       Rails.logger.info "WhatsApp login code for #{phone_number}: #{code} (not sent - not in production)"
       result = { success: true, message: 'Code generated (not sent in non-production environment)' }
+    end
+
+    result
+  end
+
+  def send_invitation_notification!(address)
+    if Rails.env.production?
+      whatsapp_service = WhatsappService.new
+      Rails.logger.info "Sending WhatsApp invitation to #{phone_number} for address #{address.block_address}"
+
+      # Determine app URL based on environment
+      app_url = Rails.env.production? ? 'https://app.puriayana.com' : 'http://localhost:3100'
+
+      message = "Selamat! Anda telah diberi akses ke sistem PuriAyana App.\n\n" \
+                "🏠 Alamat: #{address.block_address&.upcase}\n" \
+                "👤 Kepala Keluarga: #{address.head_of_family&.name || 'Belum diset'}\n" \
+                "📱 Nomor HP: #{phone_number}\n" \
+                "🌐 Akses aplikasi di: #{app_url}\n\n" \
+                'Gunakan nomor HP Anda untuk login dengan kode OTP.'
+
+      result = whatsapp_service.send_message(phone_number, message)
+
+      unless result[:success]
+        Rails.logger.error "Failed to send WhatsApp invitation to #{phone_number}: #{result[:message]}"
+      end
+    else
+      # In development/test environments, just log the invitation
+      app_url = 'http://localhost:3100'
+      Rails.logger.info "WhatsApp invitation for #{phone_number}: Access granted to #{address.block_address} at #{app_url} (not sent - not in production)"
+      result = { success: true, message: 'Invitation generated (not sent in non-production environment)' }
     end
 
     result

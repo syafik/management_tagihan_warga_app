@@ -3,13 +3,19 @@
     <div class="p-6">
       <div class="sm:flex sm:items-center sm:justify-between mb-6">
         <div class="mb-4 sm:mb-0">
-          <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Daftar Iuran Warga</h1>
+          <h1 class="text-xl sm:text-2xl font-bold text-gray-900">
+            <%= current_user.is_warga? ? "Iuran Ku" : "Daftar Iuran Warga" %>
+          </h1>
           <p class="mt-1 text-sm text-gray-500">
-            Kelola data iuran dan pembayaran warga tahun <span id='year-selected'><%= @year_selected %></span>
-            <% if @block_selected.present? && @search_term.blank? %>
-              • Blok <%= @block_selected %>
-            <% elsif @search_term.present? %>
-              • Pencarian: "<%= @search_term %>"
+            <% if current_user.is_warga? %>
+              Riwayat pembayaran iuran Anda tahun <span id='year-selected'><%= @year_selected %></span>
+            <% else %>
+              Kelola data iuran dan pembayaran warga tahun <span id='year-selected'><%= @year_selected %></span>
+              <% if @block_selected.present? && @search_term.blank? %>
+                • Blok <%= @block_selected %>
+              <% elsif @search_term.present? %>
+                • Pencarian: "<%= @search_term %>"
+              <% end %>
             <% end %>
           </p>
         </div>
@@ -47,33 +53,67 @@
         <% end %>
       </div>
       
-      <div class="mb-6">
-        <%= form_tag(search_user_contributions_path, method: :post, local: false, class: 'flex flex-col lg:flex-row gap-3', data: { turbo: false }) do |f| %>
-          <div class="flex flex-col sm:flex-row gap-3 flex-1">
-            <div class="flex-1 min-w-0">
-              <%= label_tag :tahun, "Tahun", class: 'block text-sm font-medium text-gray-700 mb-1' %>
-              <%= select_tag :year_eq, options_for_select((2020..2035).to_a, @year_selected), class: 'w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' %>
+      <% unless current_user.is_warga? %>
+        <div class="mb-6">
+          <%= form_tag(search_user_contributions_path, method: :post, local: false, class: 'flex flex-col lg:flex-row gap-3', data: { turbo: false }) do |f| %>
+            <div class="flex flex-col sm:flex-row gap-3 flex-1">
+              <div class="flex-1 min-w-0">
+                <%= label_tag :tahun, "Tahun", class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                <%= select_tag :year_eq, options_for_select((AppSetting.starting_year..2035).to_a, @year_selected), class: 'w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' %>
+              </div>
+              <div class="flex-1 min-w-0">
+                <%= label_tag :blok, "Blok", class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                <%= select_tag :block_eq, options_for_select(Address::BLOK_NAME.keys.map { |k| [k, k] }, @block_selected), include_blank: "Semua Blok", class: 'w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' %>
+              </div>
+              <div class="flex-1 min-w-0">
+                <%= label_tag :search_address, "Cari Alamat", class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                <%= text_field_tag :search_address, @search_term, placeholder: 'Contoh: A12, B5...', class: 'w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' %>
+              </div>
             </div>
-            <div class="flex-1 min-w-0">
-              <%= label_tag :blok, "Blok", class: 'block text-sm font-medium text-gray-700 mb-1' %>
-              <%= select_tag :block_eq, options_for_select(Address::BLOK_NAME.keys.map { |k| [k, k] }, @block_selected), include_blank: "Semua Blok", class: 'w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' %>
+            <div class="flex items-end gap-2">
+              <%= submit_tag "Cari", class: 'w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+              <%= link_to user_contributions_path, class: 'w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' do %>
+                Reset
+              <% end %>
             </div>
-            <div class="flex-1 min-w-0">
-              <%= label_tag :search_address, "Cari Alamat", class: 'block text-sm font-medium text-gray-700 mb-1' %>
-              <%= text_field_tag :search_address, @search_term, placeholder: 'Contoh: A12, B5...', class: 'w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' %>
-            </div>
-          </div>
-          <div class="flex items-end gap-2">
-            <%= submit_tag "Cari", class: 'w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
-            <%= link_to user_contributions_path, class: 'w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' do %>
-              Reset
+          <% end %>
+        </div>
+      <% else %>
+        <!-- Address filter for Warga users -->
+        <% if current_user.addresses.count > 1 %>
+          <div class="mb-6">
+            <%= form_tag(search_user_contributions_path, method: :post, local: false, class: 'flex flex-row gap-3', data: { turbo: false }) do |f| %>
+              <%= hidden_field_tag :year_eq, @year_selected %>
+              <div class="flex-1 max-w-xs">
+                <%= label_tag :address_filter, "Pilih Alamat", class: 'block text-sm font-medium text-gray-700 mb-1' %>
+                <% 
+                  # Get current address for default selection
+                  current_address_id = params[:address_filter].presence || 
+                                      (current_user.primary_address&.id || current_user.addresses.order(:block_address).first&.id)
+                %>
+                <%= select_tag :address_filter, 
+                    options_for_select(
+                      current_user.addresses.order(:block_address).map { |addr| 
+                        ["#{addr.block_address&.upcase} - #{addr.head_of_family&.name&.upcase}", addr.id] 
+                      }, 
+                      current_address_id
+                    ), 
+                    class: 'w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' %>
+              </div>
+              <div class="flex items-end">
+                <%= submit_tag "Ganti", class: 'inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+              </div>
             <% end %>
           </div>
         <% end %>
-      </div>
+      <% end %>
       
       <div id="content-data">
-        <%= render partial: 'data' %>
+        <% if current_user.is_warga? %>
+          <%= render partial: 'warga_view' %>
+        <% else %>
+          <%= render partial: 'data' %>
+        <% end %>
       </div>
     </div>
   </div>

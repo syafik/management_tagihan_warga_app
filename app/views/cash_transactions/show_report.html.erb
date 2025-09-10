@@ -1,50 +1,234 @@
-<div class="row">
-  <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <a href="<%= show_report_cash_transactions_path(params[:type],params[:year], params[:month], format: :pdf) %>" target="_blank" class="btn btn-primary ml-2 mb-3 mb-sm-0"> Generate Laporan PDF</a>
-        <h4 class="card-title mb-sm-0 text-center">Komplek Puri Ayana Gempol</h4>
-        <h4 class="card-title mb-sm-0 text-center">Laporan Transaksi per <%= UserContribution::MONTHNAMES.invert[params[:month].to_i] %>, <%= params[:year] %></span></h4>
-        <br />
-        <div id="content-data">
-          <div class="table-responsive border rounded p-1">
-            <table class="table table-bordered table-striped" id="table-content">
-              <thead>
-                <tr>
-                  <th><b>No</b></th>
-                  <th><b>Tanggal</b></th>
-                  <th><b>Deskripsi</b></th>
-                  <th><b>Debit</b></th>
-                  <th><b>Kredit</b></th>
-                </tr>
-              </thead>
-              <tbody>
-              <% @report_items.each_with_index do |ri, i| %>
-                <tr>
-                <td><%= i+1 %></td>
-                <td><%= ri[1] %></td>
-                <td><%= ri[2] %></td>
-                <% if ri[0] == 'cash_in' %>
-                  <td align='right'><%= number_to_currency(ri[3], unit: "Rp. ", separator: ",", delimiter: ".") %></td>
-                  <td></td>
-                <% else %>
-                  <td></td>
-                  <td align='right'><%= number_to_currency(ri[3], unit: "Rp. ", separator: ",", delimiter: ".") %></td>
-                <% end %>
-                </tr>
-              <% end %>
-              <tr>
-                <td colspan="3"  align='right'><b>TOTAL</b></td>
-                <td align='right'><b><%= number_to_currency(@debit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
-                <td  align='right'><b><%= number_to_currency(@credit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
-              </tr>
-              <tr>
-                <td colspan="3"  align='right'><b>SISA</b></td>
-                <td colspan="2" align='right' style='color:<%=  @debit_total-@credit_total >= 0 ? 'black' : 'red' %>'><b><%= number_to_currency(@debit_total-@credit_total, unit: "Rp. ", separator: ",", delimiter: ".") %></b></td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6" 
+     data-controller="cash-report" 
+     data-cash-report-current-year-value="<%= params[:year] %>"
+     data-cash-report-current-month-value="<%= params[:month] %>"
+     data-cash-report-report-type-value="<%= params[:type] %>"
+     data-cash-report-starting-year-value="<%= AppSetting.starting_year %>">
+  
+  <!-- Header Section -->
+  <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-6">
+    <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-800">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div class="mb-4 sm:mb-0">
+          <h1 class="text-2xl font-bold text-white">Komplek Puri Ayana Gempol</h1>
+          <p class="text-blue-100 text-sm mt-1">Laporan Transaksi Keuangan</p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <a href="<%= show_report_cash_transactions_path(params[:type], params[:year], params[:month], format: :pdf) %>" 
+             target="_blank" 
+             class="inline-flex items-center px-4 py-2 bg-white text-blue-600 font-medium text-sm rounded-lg hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Generate PDF
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Month Navigation -->
+    <div class="px-6 py-4 bg-gray-50 border-b">
+      <div class="flex items-center justify-center">
+        <div class="flex items-center space-x-4">
+          <% 
+            current_month = params[:month].to_i
+            current_year = params[:year].to_i
+            starting_year = AppSetting.starting_year
+            is_at_beginning = (current_year == starting_year && current_month == 1)
+            is_at_end = (current_year == 2050 && current_month == 12)
+            
+            # Calculate previous month
+            if current_month == 1
+              prev_month = 12
+              prev_year = current_year - 1
+            else
+              prev_month = current_month - 1
+              prev_year = current_year
+            end
+            
+            # Calculate next month
+            if current_month == 12
+              next_month = 1
+              next_year = current_year + 1
+            else
+              next_month = current_month + 1
+              next_year = current_year
+            end
+          %>
+          
+          <% if is_at_beginning %>
+            <div class="inline-flex items-center px-3 py-1 text-sm font-medium text-gray-400 cursor-not-allowed">
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Sebelumnya
+            </div>
+          <% else %>
+            <button class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                    data-action="click->cash-report#navigateMonth"
+                    data-direction="prev">
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Sebelumnya
+            </button>
+          <% end %>
+          
+          <span class="px-6 py-2 text-xl font-bold text-blue-600 bg-white rounded-lg shadow-sm border border-blue-200 min-w-[200px] text-center" data-cash-report-target="monthDisplay">
+            <%= UserContribution::MONTHNAMES.invert[current_month] %> <%= current_year %>
+          </span>
+          
+          <% if is_at_end %>
+            <div class="inline-flex items-center px-3 py-1 text-sm font-medium text-gray-400 cursor-not-allowed">
+              Selanjutnya
+              <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          <% else %>
+            <button class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                    data-action="click->cash-report#navigateMonth"
+                    data-direction="next">
+              Selanjutnya
+              <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Table -->
+  <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="w-12 px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+            <th class="w-24 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
+            <th class="w-32 px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @report_items.each_with_index do |ri, i| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-center"><%= i+1 %></td>
+              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">
+                <div class="hidden sm:block"><%= ri[1] %></div>
+                <div class="sm:hidden text-xs"><%= Date.parse(ri[1]).strftime('%d/%m') rescue ri[1] %></div>
+              </td>
+              <td class="px-4 py-4 text-sm text-gray-900">
+                <div class="<%= ri[0] == 'cash_in' ? 'text-green-800' : 'text-red-800' %>">
+                  <span class="inline-flex items-center text-xs font-medium px-2 py-1 rounded-full <%= ri[0] == 'cash_in' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %> sm:hidden mb-1">
+                    <%= ri[0] == 'cash_in' ? 'Masuk' : 'Keluar' %>
+                  </span>
+                </div>
+                <div class="font-medium"><%= ri[2] %></div>
+              </td>
+              <td class="px-3 py-4 whitespace-nowrap text-sm font-semibold text-right <%= ri[0] == 'cash_in' ? 'text-green-600' : 'text-red-600' %>">
+                <div class="flex flex-col items-end">
+                  <span class="<%= ri[0] == 'cash_in' ? 'text-green-600' : 'text-red-600' %>">
+                    <%= ri[0] == 'cash_in' ? '+' : '-' %><%= number_to_currency(ri[3], unit: "Rp ", separator: ",", delimiter: ".") %>
+                  </span>
+                  <span class="text-xs text-gray-500 sm:hidden">
+                    <%= ri[0] == 'cash_in' ? 'Pemasukan' : 'Pengeluaran' %>
+                  </span>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot class="bg-gray-100">
+          <tr class="border-t-2 border-gray-300">
+            <td colspan="3" class="px-4 py-4 text-sm font-bold text-gray-900 text-right">
+              <div class="flex flex-col sm:flex-row sm:justify-end sm:space-x-6">
+                <div class="flex justify-between sm:block">
+                  <span>Total Pemasukan:</span>
+                  <span class="text-green-600 font-bold">
+                    <%= number_to_currency(@debit_total, unit: "Rp ", separator: ",", delimiter: ".") %>
+                  </span>
+                </div>
+                <div class="flex justify-between sm:block">
+                  <span>Total Pengeluaran:</span>
+                  <span class="text-red-600 font-bold">
+                    <%= number_to_currency(@credit_total, unit: "Rp ", separator: ",", delimiter: ".") %>
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td class="px-3 py-4 text-right">
+              <div class="text-xs text-gray-500 hidden sm:block">TOTAL</div>
+            </td>
+          </tr>
+          <tr class="bg-gray-200">
+            <td colspan="3" class="px-4 py-4 text-sm font-bold text-gray-900 text-right">
+              <span class="text-lg">SISA SALDO</span>
+            </td>
+            <td class="px-3 py-4 whitespace-nowrap text-lg font-bold text-right <%= @debit_total - @credit_total >= 0 ? 'text-green-600' : 'text-red-600' %>">
+              <div class="flex flex-col items-end">
+                <span>
+                  <%= @debit_total - @credit_total >= 0 ? '+' : '' %><%= number_to_currency(@debit_total - @credit_total, unit: "Rp ", separator: ",", delimiter: ".") %>
+                </span>
+                <div class="text-xs font-normal <%= @debit_total - @credit_total >= 0 ? 'text-green-500' : 'text-red-500' %>">
+                  <%= @debit_total - @credit_total >= 0 ? 'Surplus' : 'Defisit' %>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Summary Cards (Mobile-friendly) -->
+  <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <dt class="text-sm font-medium text-green-800">Total Pemasukan</dt>
+          <dd class="mt-1 text-lg font-semibold text-green-900">
+            <%= number_to_currency(@debit_total, unit: "Rp ", separator: ",", delimiter: ".") %>
+          </dd>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-6 w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <dt class="text-sm font-medium text-red-800">Total Pengeluaran</dt>
+          <dd class="mt-1 text-lg font-semibold text-red-900">
+            <%= number_to_currency(@credit_total, unit: "Rp ", separator: ",", delimiter: ".") %>
+          </dd>
+        </div>
+      </div>
+    </div>
+
+    <div class="<%= @debit_total - @credit_total >= 0 ? 'bg-blue-50 border-blue-200' : 'bg-yellow-50 border-yellow-200' %> border rounded-lg p-4">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-6 w-6 <%= @debit_total - @credit_total >= 0 ? 'text-blue-400' : 'text-yellow-400' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <dt class="text-sm font-medium <%= @debit_total - @credit_total >= 0 ? 'text-blue-800' : 'text-yellow-800' %>">Sisa Saldo</dt>
+          <dd class="mt-1 text-lg font-semibold <%= @debit_total - @credit_total >= 0 ? 'text-blue-900' : 'text-yellow-900' %>">
+            <%= number_to_currency(@debit_total - @credit_total, unit: "Rp ", separator: ",", delimiter: ".") %>
+          </dd>
         </div>
       </div>
     </div>

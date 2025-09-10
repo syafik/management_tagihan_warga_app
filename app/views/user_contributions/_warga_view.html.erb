@@ -1,0 +1,261 @@
+<!-- Warga View - Box Layout -->
+<div class="space-y-8">
+  <% if @addresses.any? %>
+    <% @addresses.each do |address| %>
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <!-- Address Header -->
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-white">
+              <%= address.block_address&.upcase %>
+            </h3>
+            <div class="text-sm text-indigo-100">
+              <%= address.head_of_family&.name&.upcase %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Year Navigation -->
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h4 class="text-sm font-medium text-gray-700">Status Pembayaran Iuran <%= @year_selected %></h4>
+            <div class="flex items-center space-x-4">
+              <% if @year_selected > AppSetting.starting_year %>
+                <%= form_tag(search_user_contributions_path, method: :post, local: false, class: 'inline', data: { turbo: false }) do %>
+                  <%= hidden_field_tag :year_eq, @year_selected - 1 %>
+                  <%= hidden_field_tag :address_filter, params[:address_filter] if params[:address_filter].present? %>
+                  <%= button_tag type: 'submit', class: 'inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50' do %>
+                    <svg class="-ml-1 mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    <%= @year_selected - 1 %>
+                  <% end %>
+                <% end %>
+              <% else %>
+                <div class="inline-flex items-center px-3 py-1 text-sm font-medium text-gray-400 cursor-not-allowed">
+                  <svg class="-ml-1 mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                  </svg>
+                  <%= @year_selected - 1 %>
+                </div>
+              <% end %>
+              
+              <span class="px-4 py-1 text-lg font-semibold text-indigo-600"><%= @year_selected %></span>
+              
+              <%= form_tag(search_user_contributions_path, method: :post, local: false, class: 'inline', data: { turbo: false }) do %>
+                <%= hidden_field_tag :year_eq, @year_selected + 1 %>
+                <%= hidden_field_tag :address_filter, params[:address_filter] if params[:address_filter].present? %>
+                <%= button_tag type: 'submit', class: 'inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50' do %>
+                  <%= @year_selected + 1 %>
+                  <svg class="-mr-1 ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monthly Status Grid -->
+        <div class="p-6">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <% 
+              current_date = Date.current
+              UserContribution::MONTHNAMES.each do |month_name, month_num| 
+                contribution = address.user_contributions.find { |uc| uc.month == month_num && uc.year == @year_selected.to_i }
+                expected_amount = address.expected_contribution_for(month_num, @year_selected)
+                
+                # Determine month status
+                if @year_selected == current_date.year
+                  is_due = month_num < current_date.month  # Only previous months are due
+                  is_future = month_num >= current_date.month  # Current month and future are not due yet
+                elsif @year_selected < current_date.year
+                  is_due = true
+                  is_future = false
+                else
+                  is_due = false
+                  is_future = true
+                end
+            %>
+              
+              <div class="relative group">
+                <% if contribution %>
+                  <!-- PAID -->
+                  <div class="flex flex-col items-center justify-between p-4 rounded-lg border-2 transition-all duration-200 h-[140px] border-green-200 bg-green-50 hover:bg-green-100">
+                <% elsif is_future %>
+                  <!-- FUTURE MONTH -->
+                  <div class="flex flex-col items-center justify-between p-4 rounded-lg border-2 transition-all duration-200 h-[140px] border-gray-200 bg-gray-50 hover:bg-gray-100">
+                <% else %>
+                  <!-- UNPAID AND DUE -->
+                  <div class="flex flex-col items-center justify-between p-4 rounded-lg border-2 transition-all duration-200 h-[140px] border-red-200 bg-red-50 hover:bg-red-100">
+                <% end %>
+                
+                  <!-- Top Section: Month Name -->
+                  <div class="text-center">
+                    <div class="text-sm font-medium text-gray-700"><%= month_name %></div>
+                  </div>
+                  
+                  <!-- Middle Section: Status Icon -->
+                  <div class="flex-1 flex items-center justify-center">
+                    <% if contribution %>
+                      <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                      </div>
+                    <% elsif is_future %>
+                      <div class="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                      </div>
+                    <% else %>
+                      <div class="w-10 h-10 bg-red-400 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                      </div>
+                    <% end %>
+                  </div>
+                  
+                  <!-- Bottom Section: Status Text and Amount -->
+                  <div class="text-center">
+                    <% if contribution %>
+                      <div class="text-xs font-bold text-green-700 mb-1">LUNAS</div>
+                      <div class="text-xs text-green-600">
+                        Rp <%= number_with_delimiter(contribution.contribution, delimiter: '.') %>
+                      </div>
+                      <% if contribution.pay_at %>
+                        <div class="text-xs text-gray-500 mt-1">
+                          <%= contribution.pay_at.strftime('%d/%m/%Y') %>
+                        </div>
+                      <% end %>
+                    <% elsif is_future %>
+                      <div class="text-xs text-gray-600">
+                        Rp <%= number_with_delimiter(expected_amount, delimiter: '.') %>
+                      </div>
+                    <% else %>
+                      <div class="text-xs font-bold text-red-700 mb-1">BELUM LUNAS</div>
+                      <div class="text-xs text-red-600">
+                        Rp <%= number_with_delimiter(expected_amount, delimiter: '.') %>
+                      </div>
+                    <% end %>
+                  </div>
+                  
+                  <!-- Payment Type Badge -->
+                  <% if contribution && contribution.payment_type %>
+                    <div class="absolute top-2 right-2">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <%= contribution.payment_type == 1 ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800' %>">
+                        <%= contribution.payment_type == 1 ? 'Cash' : 'Transfer' %>
+                      </span>
+                    </div>
+                  <% end %>
+                </div>
+                
+                <!-- Hover Tooltip -->
+                <% if contribution %>
+                  <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-xs text-white bg-gray-800 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                    <div class="font-medium">Detail Pembayaran</div>
+                    <div>Jumlah: Rp <%= number_with_delimiter(contribution.contribution, delimiter: '.') %></div>
+                    <% if contribution.pay_at %>
+                      <div>Tanggal: <%= contribution.pay_at.strftime('%d %B %Y') %></div>
+                    <% end %>
+                    <% if contribution.receiver %>
+                      <div>Penerima: <%= contribution.receiver.name %></div>
+                    <% end %>
+                    <% if contribution.payment_type %>
+                      <div>Jenis: <%= contribution.payment_type == 1 ? 'Cash' : 'Transfer' %></div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Summary Statistics -->
+        <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <% 
+              # Calculate due months (only previous months are due, current month is not due yet)
+              current_date = Date.current
+              if @year_selected == current_date.year
+                # For current year, only count previous months (current month is not due yet)
+                due_months = current_date.month - 1
+              elsif @year_selected < current_date.year
+                # For past years, all 12 months are due
+                due_months = 12
+              else
+                # For future years, no months are due yet
+                due_months = 0
+              end
+              
+              total_paid = address.user_contributions.where(year: @year_selected).count
+              total_amount_paid = address.user_contributions.where(year: @year_selected).sum(:contribution)
+              completion_percentage = due_months > 0 ? (total_paid.to_f / due_months * 100).round(1) : 0
+              unpaid_due = [due_months - total_paid, 0].max
+            %>
+            <div>
+              <div class="text-2xl font-bold text-indigo-600"><%= total_paid %></div>
+              <div class="text-sm text-gray-500">Bulan Terbayar</div>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-green-600">Rp <%= number_with_delimiter(total_amount_paid, delimiter: '.') %></div>
+              <div class="text-sm text-gray-500">Total Dibayar</div>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-purple-600"><%= completion_percentage %>%</div>
+              <div class="text-sm text-gray-500">Tingkat Kepatuhan</div>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-orange-600"><%= unpaid_due %></div>
+              <div class="text-sm text-gray-500">
+                <% if @year_selected == current_date.year %>
+                  Belum Terbayar
+                <% elsif @year_selected < current_date.year %>
+                  Tunggakan
+                <% else %>
+                  Belum Jatuh Tempo
+                <% end %>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Additional info for current year -->
+          <% if @year_selected == current_date.year %>
+            <div class="mt-4 text-center">
+              <div class="text-xs text-gray-600">
+                <% if due_months > 0 %>
+                  Status dihitung sampai bulan <%= Date.new(@year_selected, current_date.month - 1, 1).strftime('%B') %> <%= @year_selected %>
+                  • Bulan <%= Date.new(@year_selected, current_date.month, 1).strftime('%B') %> dan seterusnya belum jatuh tempo
+                <% else %>
+                  Bulan <%= Date.new(@year_selected, current_date.month, 1).strftime('%B') %> <%= @year_selected %> dan seterusnya belum jatuh tempo
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <!-- Empty State -->
+    <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+      <div class="text-gray-500">
+        <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-gray-900">Belum Ada Data Alamat</h3>
+        <p class="mt-2 text-sm text-gray-500">
+          Anda belum terdaftar pada alamat tertentu atau belum memiliki akses ke data iuran.<br>
+          Silakan hubungi admin untuk mendaftarkan alamat Anda ke sistem.
+        </p>
+        <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+          <div class="text-xs text-blue-800">
+            <strong>Info:</strong> Satu user dapat terdaftar di multiple alamat (misalnya sebagai pemilik rumah dan kontrakan).
+            Setiap alamat akan ditampilkan dalam card terpisah di halaman ini.
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

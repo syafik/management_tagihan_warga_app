@@ -5,11 +5,11 @@ class CashTransactionsController < ApplicationController
     current_year = Date.current.year
     current_month = Date.current.month
 
-    # Set default year to current year if it's 2025 or later, otherwise 2025
-    @year_selected = params[:year_eq]&.to_i || [current_year, 2025].max
+    # Set default year to current year if it's starting_year or later, otherwise starting_year
+    @year_selected = params[:year_eq]&.to_i || [current_year, AppSetting.starting_year].max
 
-    # Set default month to current month if we're in 2025 or later, otherwise January
-    @month_selected = if @year_selected == current_year && current_year >= 2025
+    # Set default month to current month if we're in starting_year or later, otherwise January
+    @month_selected = if @year_selected == current_year && current_year >= AppSetting.starting_year
                         params[:month_eq]&.to_i || current_month
                       else
                         params[:month_eq]&.to_i || 1
@@ -31,8 +31,8 @@ class CashTransactionsController < ApplicationController
     current_year = Date.current.year
     current_month = Date.current.month
 
-    @year_selected = [current_year, 2025].max
-    @month_selected = @year_selected == current_year && current_year >= 2025 ? current_month : 1
+    @year_selected = [current_year, AppSetting.starting_year].max
+    @month_selected = @year_selected == current_year && current_year >= AppSetting.starting_year ? current_month : 1
 
     @ct = CashTransaction.new
   end

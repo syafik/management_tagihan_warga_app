@@ -2,8 +2,12 @@
   <div class="bg-white overflow-hidden shadow rounded-lg">
     <div class="px-6 py-4 border-b border-gray-200">
       <div>
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Edit Pengguna</h1>
-        <p class="mt-1 text-sm text-gray-500">Lengkapi form di bawah untuk mengubah data pengguna</p>
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">
+          <%= current_user.is_warga? && current_user == @user ? "Edit Profile" : "Edit Pengguna" %>
+        </h1>
+        <p class="mt-1 text-sm text-gray-500">
+          <%= current_user.is_warga? && current_user == @user ? "Lengkapi form di bawah untuk mengubah profil Anda" : "Lengkapi form di bawah untuk mengubah data pengguna" %>
+        </p>
       </div>
     </div>
     
