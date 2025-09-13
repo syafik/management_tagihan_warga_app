@@ -3,6 +3,11 @@
 Rails.application.routes.draw do
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   mount Ckeditor::Engine => '/ckeditor'
+
+  # Delayed Job Web Interface - Admin Only
+  authenticate :user, ->(u) { u.is_admin? } do
+    mount DelayedJobWeb, at: '/jobs'
+  end
   get '/api' => redirect('/swagger/dist/index.html?url=/apidocs/api-docs.json')
   devise_for :users, skip: :registrations, controllers: {
     sessions: 'users/sessions',
@@ -45,10 +50,10 @@ Rails.application.routes.draw do
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   root to: 'home#index'
-  
+
   # Admin routes
   get 'backup_database', to: 'admin#backup_database', as: :backup_database
-  
+
   # WhatsApp Login Routes (verification step)
   get '/phone_login/verify', to: 'phone_logins#verify', as: :verify_phone_login
   post '/phone_login/authenticate', to: 'phone_logins#authenticate', as: :authenticate_phone_login

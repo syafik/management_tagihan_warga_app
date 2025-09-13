@@ -176,15 +176,10 @@ class User < ApplicationRecord
     code = generate_login_code!
 
     if Rails.env.production?
-      whatsapp_service = WhatsappService.new
-      Rails.logger.info "Sending WhatsApp login code #{code} to #{phone_number}"
-      result = whatsapp_service.send_login_code(phone_number, code)
-
-      unless result[:success]
-        # Clear the code if sending failed
-        clear_login_code!
-        Rails.logger.error "Failed to send WhatsApp login code #{code} to #{phone_number}: #{result[:message]}"
-      end
+      # Queue the WhatsApp sending job
+      SendWhatsappLoginCodeJob.perform_later(phone_number, code)
+      Rails.logger.info "Queued WhatsApp login code job for #{phone_number}"
+      result = { success: true, message: 'Login code queued for sending' }
     else
       # In development/test environments, just log the code
       Rails.logger.info "WhatsApp login code for #{phone_number}: #{code} (not sent - not in production)"
@@ -196,24 +191,10 @@ class User < ApplicationRecord
 
   def send_invitation_notification!(address)
     if Rails.env.production?
-      whatsapp_service = WhatsappService.new
-      Rails.logger.info "Sending WhatsApp invitation to #{phone_number} for address #{address.block_address}"
-
-      # Determine app URL based on environment
-      app_url = Rails.application.credentials.app_url
-
-      message = "Selamat! Anda telah diberi akses ke sistem PuriAyana App.\n\n" \
-                "🏠 Alamat: #{address.block_address&.upcase}\n" \
-                "👤 Kepala Keluarga: #{address.head_of_family&.name || 'Belum diset'}\n" \
-                "📱 Nomor HP: #{phone_number}\n" \
-                "🌐 Akses aplikasi di: #{app_url}\n\n" \
-                'Gunakan nomor HP Anda untuk login dengan kode OTP.'
-
-      result = whatsapp_service.send_message(phone_number, message)
-
-      unless result[:success]
-        Rails.logger.error "Failed to send WhatsApp invitation to #{phone_number}: #{result[:message]}"
-      end
+      # Queue the invitation notification job
+      SendInvitationNotificationJob.perform_later(id, address.id)
+      Rails.logger.info "Queued invitation notification job for #{phone_number}"
+      result = { success: true, message: 'Invitation notification queued for sending' }
     else
       # In development/test environments, just log the invitation
       app_url = 'http://localhost:3100'
