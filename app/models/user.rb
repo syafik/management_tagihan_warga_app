@@ -200,7 +200,7 @@ class User < ApplicationRecord
       Rails.logger.info "Sending WhatsApp invitation to #{phone_number} for address #{address.block_address}"
 
       # Determine app URL based on environment
-      app_url = Rails.env.production? ? 'https://app.puriayana.com' : 'http://localhost:3100'
+      app_url = Rails.application.credentials.app_url
 
       message = "Selamat! Anda telah diberi akses ke sistem PuriAyana App.\n\n" \
                 "🏠 Alamat: #{address.block_address&.upcase}\n" \
