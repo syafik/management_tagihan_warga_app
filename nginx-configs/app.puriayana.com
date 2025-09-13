@@ -1,5 +1,6 @@
 upstream puma_app {
     server unix:///var/www/puriayana-app/tmp/sockets/puma.sock fail_timeout=0;
+    keepalive 32;
 }
 
 server {
@@ -9,8 +10,13 @@ server {
     server_name app.puriayana.com;
     root /var/www/puriayana-app/public;
     
-    # Increase client max body size for file uploads
+    # Performance optimizations
     client_max_body_size 100M;
+    client_body_timeout 30;
+    client_header_timeout 30;
+    send_timeout 30;
+    keepalive_timeout 65;
+    keepalive_requests 1000;
     
     # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
@@ -59,7 +65,7 @@ server {
         try_files $uri @puma;
     }
 
-    # Proxy to Puma
+    # Proxy to Puma with optimizations
     location @puma {
         proxy_pass http://puma_app;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -67,9 +73,21 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header Host $http_host;
         proxy_redirect off;
-        proxy_read_timeout 300;
-        proxy_connect_timeout 300;
-        proxy_send_timeout 300;
+        
+        # Optimized timeouts
+        proxy_read_timeout 60;
+        proxy_connect_timeout 10;
+        proxy_send_timeout 60;
+        
+        # Connection reuse
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        
+        # Buffer optimizations
+        proxy_buffering on;
+        proxy_buffer_size 8k;
+        proxy_buffers 16 8k;
+        proxy_busy_buffers_size 16k;
     }
 
     # Health check endpoint
