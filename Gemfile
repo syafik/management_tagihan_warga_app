@@ -45,6 +45,7 @@ gem 'wkhtmltopdf-binary'
 gem 'swagger-docs'
 gem 'rails_admin'
 gem 'cancancan'
+gem 'sassc-rails'
 
 group :development, :test do
   # Call 'byebug' to stop execution and get a debugger console
