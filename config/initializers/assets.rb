@@ -4,4 +4,7 @@
 Rails.application.config.assets.version = "1.0"
 
 # Minimal asset pipeline configuration for gem compatibility (CKEditor, etc.)
-Rails.application.config.assets.precompile += %w[]
+Rails.application.config.assets.precompile += %w[
+  delayed_job_web/application.css
+  delayed_job_web/application.js
+]
