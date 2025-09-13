@@ -22,7 +22,6 @@ bind 'unix:///var/www/puriayana-app/tmp/sockets/puma.sock?backlog=1024'
 
 # Performance optimizations
 preload_app!
-plugin :tmp_restart
 
 # Memory management
 worker_timeout 60
@@ -31,7 +30,6 @@ worker_shutdown_timeout 30
 
 # Restart workers after serving requests (prevents memory leaks)
 worker_culling_strategy :oldest
-max_ram 1536 # MB (leave 512MB for system)
 
 on_restart do
   puts 'Refreshing Gemfile'
