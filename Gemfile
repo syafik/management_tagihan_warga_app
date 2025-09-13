@@ -46,6 +46,9 @@ gem 'swagger-docs'
 gem 'rails_admin'
 gem 'cancancan'
 gem 'sassc-rails'
+gem 'coffee-rails'
+gem 'redis'
+gem 'redis-rails'
 
 group :development, :test do
   # Call 'byebug' to stop execution and get a debugger console

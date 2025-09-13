@@ -3,10 +3,18 @@
     <div class="flex items-center justify-between h-16">
       <!-- Brand -->
       <div class="flex items-center">
-        <a href="/" class="text-indigo-600 font-bold text-xl lg:hidden">
-          Puri Ayana
+        <a href="/" class="flex items-center space-x-2 lg:hidden">
+          <%= image_tag "logo-puri-ayana.png", 
+              alt: "Puri Ayana Logo", 
+              class: "h-8 w-auto object-contain" %>
+          <span class="text-indigo-600 font-bold text-xl">Puri Ayana</span>
         </a>
-        <h1 class="text-gray-900 text-lg font-medium hidden lg:block">Welcome PuriAyana App!</h1>
+        <div class="hidden lg:flex lg:items-center lg:space-x-3">
+          <%= image_tag "logo-puri-ayana.png", 
+              alt: "Puri Ayana Logo", 
+              class: "h-10 w-auto object-contain" %>
+          <h1 class="text-gray-900 text-lg font-medium">Welcome PuriAyana App!</h1>
+        </div>
       </div>
       
       <!-- Navigation items -->
