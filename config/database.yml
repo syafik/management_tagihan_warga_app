@@ -23,9 +23,9 @@ default: &default
 
 development:
   <<: *default
-  database: puriayana_dev
-  username: syafik
-  password: password
+  database: <%= Rails.application.credentials.dig(:database, :name) %>
+  username: <%= Rails.application.credentials.dig(:database, :username) %>
+  password: <%= Rails.application.credentials.dig(:database, :password) %>
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.
@@ -59,9 +59,9 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: <%= ENV['TEST_DB_NAME'] %>
-  username: <%= ENV['TEST_DB_USERNAME'] %>
-  password: <%= ENV['TEST_DB_PASSWORD'] %>
+  database: <%= Rails.application.credentials.dig(:database_test, :name) %>
+  username: <%= Rails.application.credentials.dig(:database_test, :username) %>
+  password: <%= Rails.application.credentials.dig(:database_test, :password) %>
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -84,7 +84,8 @@ test:
 #
 production:
   <<: *default
-  database: <%= ENV['PROD_DB_NAME'] %>
-  username: <%= ENV['PROD_DB_USERNAME'] %>
-  password: <%= ENV['PROD_DB_PASSWORD'] %>
+  database: <%= Rails.application.credentials.dig(:database, :name) %>
+  username: <%= Rails.application.credentials.dig(:database, :username) %>
+  password: <%= Rails.application.credentials.dig(:database, :password) %>
+
 
