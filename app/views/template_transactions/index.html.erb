@@ -23,10 +23,10 @@
               </tr>
               </thead>
               <tbody>
-              <% cur_page = @template_transactions.current_page %>
+              <% cur_page = @pagy.page %>
               <% @template_transactions.each_with_index do |template_transaction, i| %>
                 <tr>
-                  <td><%= (i + 1) + ((cur_page - 1)*Kaminari.config.default_per_page) %> </td>
+                  <td><%= (i + 1) + ((@pagy.page - 1) * @pagy.items) %> </td>
                   <td><%= template_transaction.description %></td>
                   <td><%= template_transaction.transaction_type %></td>
                   <td><%= template_transaction.transaction_group %></td>
@@ -42,8 +42,8 @@
             </table>
           </div>
           <div class="d-flex mt-4 flex-wrap">
-            <p class="text-muted"><%= page_entries_info @template_transactions, entry_name: 'item' %></p>
-            <%= paginate @template_transactions, remote: true %>
+            <p class="text-muted">Showing <%= pagy_info(@pagy) %></p>
+            <%== pagy_nav(@pagy) %>
           </div>
         </div>
       </div>

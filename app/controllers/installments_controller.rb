@@ -8,7 +8,7 @@ class InstallmentsController < ApplicationController
   def index
     @q = Installment.ransack(params[:q])
     @q.sorts = 'id asc' if @q.sorts.empty?
-    @installments = @q.result.includes(:installment_transactions).where('parent_id IS NULL').page(params[:page])
+    @pagy, @installments = pagy(@q.result.includes(:installment_transactions).where('parent_id IS NULL'), items: 20)
     respond_to do |format|
       format.html
       format.js

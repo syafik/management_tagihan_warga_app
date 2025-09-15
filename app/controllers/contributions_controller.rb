@@ -8,7 +8,7 @@ class ContributionsController < ApplicationController
   def index
     @q = Contribution.ransack(params[:q])
     @q.sorts = 'effective_from desc' if @q.sorts.empty?
-    @contributions = @q.result.page(params[:page])
+    @pagy, @contributions = pagy(@q.result, items: 20)
 
     respond_to do |format|
       format.html

@@ -15,7 +15,7 @@
     <% cur_page = @users.current_page %>
     <% @users.each_with_index do |user, i| %>
       <tr class="hover:bg-gray-50">
-        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= (i + 1) + ((cur_page - 1)*Kaminari.config.default_per_page) %></td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= (i + 1) + ((@pagy.page - 1) * @pagy.items) %></td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= user.email %></td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
           <div class="flex items-center">
@@ -74,7 +74,7 @@
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center">
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mr-2">
-            #<%= (i + 1) + ((cur_page - 1)*Kaminari.config.default_per_page) %>
+            #<%= (i + 1) + ((@pagy.page - 1) * @pagy.items) %>
           </span>
           <div class="flex items-center">
             <div class="flex-shrink-0 h-8 w-8">
@@ -148,8 +148,8 @@
 <div class="mt-6">
   <div class="flex items-center justify-between">
     <p class="text-sm text-gray-700">
-      Showing <%= page_entries_info @users, entry_name: 'user' %>
+      Showing <%= pagy_info(@pagy) %>
     </p>
-    <%= paginate @users, remote: true %>
+    <%== pagy_nav(@pagy) %>
   </div>
 </div>

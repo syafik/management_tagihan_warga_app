@@ -461,6 +461,8 @@ GEM
       ffi (~> 1.12)
       logger
     ruby2_keywords (0.0.5)
+    sass-rails (6.0.0)
+      sassc-rails (~> 2.1, >= 2.1.1)
     sassc (2.4.0)
       ffi (~> 1.9)
     sassc-rails (2.1.2)
@@ -521,9 +523,9 @@ GEM
     tilt (2.6.1)
     timeout (0.4.3)
     trailblazer-option (0.1.2)
-    turbo-rails (2.0.12)
-      actionpack (>= 6.0.0)
-      railties (>= 6.0.0)
+    turbo-rails (2.0.16)
+      actionpack (>= 7.1.0)
+      railties (>= 7.1.0)
     typhoeus (1.4.1)
       ethon (>= 0.9.0)
     tzinfo (2.0.6)
@@ -598,7 +600,7 @@ DEPENDENCIES
   rspec-rails!
   rspec-support!
   rubocop
-  sassc-rails
+  sass-rails
   sib-api-v3-sdk
   simplecov
   solid_queue

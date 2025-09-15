@@ -13,7 +13,7 @@ This is a Ruby on Rails 7.0 application for managing resident billing/contributi
 - **PDF Generation**: PDFKit with wkhtmltopdf-binary
 - **File Upload**: Paperclip
 - **Background Jobs**: Delayed Job
-- **Pagination**: Kaminari
+- **Pagination**: Pagy
 - **Search**: Ransack
 - **External Integration**: Google Drive API for spreadsheet management
 - **Email**: SendInBlue API

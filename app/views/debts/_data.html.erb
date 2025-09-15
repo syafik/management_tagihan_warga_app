@@ -12,10 +12,10 @@
     </tr>
     </thead>
     <tbody>
-    <% cur_page = @debts.current_page %>
+    <% cur_page = @pagy.page %>
     <% @debts.each_with_index do |debt, i| %>
       <tr>
-        <td><%= (i + 1) + ((cur_page - 1)*Kaminari.config.default_per_page) %> </td>
+        <td><%= (i + 1) + ((@pagy.page - 1) * @pagy.items) %> </td>
         <td><%= debt.user.name.upcase %></td>
         <td><%= debt.description %></td>
         <td><%= number_to_currency(debt.value, unit: "Rp. ", separator: ",", delimiter: ".") %></td>
@@ -32,6 +32,6 @@
   </table>
 </div>
 <div class="d-flex mt-4 flex-wrap">
-  <p class="text-muted"><%= page_entries_info @debts, entry_name: 'item' %></p>
-  <%= paginate @debts, remote: true %>
+  <p class="text-muted">Showing <%= pagy_info(@pagy) %></p>
+  <%== pagy_nav(@pagy) %>
 </div>

@@ -6,7 +6,7 @@ class AppSettingsController < ApplicationController
   def index
     @q = AppSetting.ransack(params[:q])
     @q.sorts = 'id asc' if @q.sorts.empty?
-    @app_settings = @q.result.page(params[:page])
+    @pagy, @app_settings = pagy(@q.result, items: 20)
 
     respond_to do |format|
       format.html

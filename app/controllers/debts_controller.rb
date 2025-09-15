@@ -8,7 +8,7 @@ class DebtsController < ApplicationController
   def index
     @q = Debt.ransack(params[:q])
     @q.sorts = 'id asc' if @q.sorts.empty?
-    @debts = @q.result.page(params[:page])
+    @pagy, @debts = pagy(@q.result, items: 20)
 
     respond_to do |format|
       format.html

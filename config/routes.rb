@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
-  
+  mount RailsAdmin::Engine => '/admin', as: 'rails_admin' # Temporarily disabled
+
   # Admin-only access to Solid Queue Dashboard
   authenticate :user, ->(u) { u.is_admin? } do
-    mount SolidQueueDashboard::Engine, at: "/solid-queue"
+    mount SolidQueueDashboard::Engine, at: '/solid-queue'
   end
 
   # NOTE: Solid Queue doesn't have a built-in web interface

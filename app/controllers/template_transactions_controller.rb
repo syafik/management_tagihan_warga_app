@@ -1,7 +1,7 @@
 class TemplateTransactionsController < ApplicationController
   before_action :find_template_transaction, only: [ :show, :edit, :update, :destroy ]
   def index
-    @template_transactions = TemplateTransaction.page(params[:page])
+    @pagy, @template_transactions = pagy(TemplateTransaction.all, items: 20)
   end
 
   def new

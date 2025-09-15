@@ -8,7 +8,7 @@ class NotificationsController < ApplicationController
   def index
     @q = Notification.ransack(params[:q])
     @q.sorts = 'id asc' if @q.sorts.empty?
-    @notifications = @q.result.page(params[:page])
+    @pagy, @notifications = pagy(@q.result, items: 20)
 
     respond_to do |format|
       format.html

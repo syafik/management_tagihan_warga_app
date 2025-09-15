@@ -11,7 +11,7 @@ class UsersController < ApplicationController
   def index
     @q = User.ransack(params[:q])
     @q.sorts = 'id asc' if @q.sorts.empty?
-    @users = @q.result.includes(:addresses, :primary_address).page(params[:page])
+    @pagy, @users = pagy(@q.result.includes(:addresses, :primary_address), items: 20)
 
     respond_to do |format|
       format.html
