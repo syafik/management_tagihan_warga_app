@@ -1,6 +1,15 @@
 RailsAdmin.config do |config|
   config.asset_source = :sprockets
   
+  # Disable problematic CSS compilation in production
+  if Rails.env.production?
+    config.included_models = []
+    config.excluded_models = []
+    
+    # Configure basic theming without SASS issues
+    config.main_app_name = ['Puri Ayana', 'Management']
+  end
+  
   # Main navigation
   config.main_app_name = ['Management Tagihan Warga', 'Admin']
 

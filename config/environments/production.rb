@@ -29,6 +29,10 @@ Rails.application.configure do
 
   # Allow fallback to assets pipeline for mounted engines like delayed_job_web
   config.assets.compile = true
+  
+  # Disable SASS compilation to avoid CSS custom property errors
+  config.sass.style = :compressed
+  config.sass.line_comments = false
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
