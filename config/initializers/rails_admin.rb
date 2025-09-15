@@ -1,5 +1,10 @@
 RailsAdmin.config do |config|
-  config.asset_source = :sprockets
+  # Try to bypass asset compilation issues
+  config.asset_source = :webpacker if defined?(Webpacker)
+  config.asset_source = :vite if defined?(ViteRuby)
+  config.asset_source = :sprockets unless defined?(Webpacker) || defined?(ViteRuby)
+  
+  config.main_app_name = ['Management Tagihan Warga', 'Admin']
 
   # Authorize with Devise
   config.authenticate_with do

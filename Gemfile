@@ -44,7 +44,7 @@ gem 'wkhtmltopdf-binary'
 gem 'swagger-docs'
 gem 'rails_admin' # Temporarily disabled due to SASS compilation issues
 gem 'cancancan'
-gem 'sass-rails'
+gem 'sassc-rails' # For Rails Admin compatibility
 gem 'coffee-rails'
 gem "solid_queue_dashboard", "~> 0.2.0"
 gem 'chartkick'

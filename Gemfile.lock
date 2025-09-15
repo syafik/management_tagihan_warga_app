@@ -461,8 +461,6 @@ GEM
       ffi (~> 1.12)
       logger
     ruby2_keywords (0.0.5)
-    sass-rails (6.0.0)
-      sassc-rails (~> 2.1, >= 2.1.1)
     sassc (2.4.0)
       ffi (~> 1.9)
     sassc-rails (2.1.2)
@@ -600,7 +598,7 @@ DEPENDENCIES
   rspec-rails!
   rspec-support!
   rubocop
-  sass-rails
+  sassc-rails
   sib-api-v3-sdk
   simplecov
   solid_queue
