@@ -3,11 +3,15 @@
 Rails.application.routes.draw do
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   mount Ckeditor::Engine => '/ckeditor'
-
-  # Delayed Job Web Interface - Admin Only
+  
+  # Admin-only access to Solid Queue Dashboard
   authenticate :user, ->(u) { u.is_admin? } do
-    mount DelayedJobWeb, at: '/jobs'
+    mount SolidQueueDashboard::Engine, at: "/solid-queue"
   end
+
+  # NOTE: Solid Queue doesn't have a built-in web interface
+  # Use `bin/jobs` command to start workers
+  # Use Rails console or logs to monitor jobs
   get '/api' => redirect('/swagger/dist/index.html?url=/apidocs/api-docs.json')
   devise_for :users, skip: :registrations, controllers: {
     sessions: 'users/sessions',

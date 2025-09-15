@@ -4,5 +4,4 @@
 Rails.application.config.assets.version = "1.0"
 
 # Minimal asset pipeline configuration for gem compatibility (CKEditor, etc.)
-# Add all CSS and JS files to ensure mounted engines work
-Rails.application.config.assets.precompile += %w( *.css *.js )
+Rails.application.config.assets.precompile += %w[]

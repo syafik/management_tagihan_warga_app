@@ -1,9 +1,11 @@
 development:
-  adapter: async
+  adapter: postgresql
+  url: <%= ENV.fetch("DATABASE_URL") { "postgresql://localhost/puriayana_development" } %>
 
 test:
-  adapter: async
+  adapter: test
 
 production:
-  adapter: async
+  adapter: postgresql
+  url: <%= ENV.fetch("DATABASE_URL", "postgresql://localhost/puriayana_production") %>
   channel_prefix: puriayana_production

@@ -20,6 +20,6 @@ module SwitchupAdministrator
     # config.eager_load_paths << Rails.root.join("extras")
     
     # ActiveJob configuration
-    config.active_job.queue_adapter = :delayed_job
+    config.active_job.queue_adapter = :solid_queue
   end
 end

@@ -3,7 +3,7 @@
 source "https://rubygems.org"
 ruby "3.2.1"
 
-gem "rails", "~> 7.0.0"
+gem "rails", "8.0.2"
 
 # Use postgresql as the database for Active Record
 gem 'pg'
@@ -15,7 +15,7 @@ gem 'vite_rails'
 # Asset pipeline for compatibility with gems like CKEditor
 gem 'sprockets-rails'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder'
+gem 'jbuilder', '~> 2.14'
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 3.0'
 # Use ActiveModel has_secure_password
@@ -27,15 +27,14 @@ gem 'dotenv-rails'
 gem 'activerecord-import'
 gem 'brakeman'
 gem 'ckeditor', github: 'galetahub/ckeditor'
-gem 'daemons'
-gem 'delayed_job_active_record'
-gem 'delayed_job_web'
+gem 'solid_queue'
 gem 'devise'
-gem 'devise_token_auth'
+gem 'devise_token_auth', '~> 1.2.3'
 # if you haven't added it, already
 gem 'google_drive'
 gem 'pagy'
-gem 'paperclip'
+# gem 'paperclip' # Not Rails 8 compatible, use image_processing instead
+gem 'image_processing'
 gem 'pdfkit'
 gem 'ransack'
 gem 'rubocop'
@@ -48,6 +47,8 @@ gem 'rails_admin'
 gem 'cancancan'
 gem 'sassc-rails'
 gem 'coffee-rails'
+gem "solid_queue_dashboard", "~> 0.2.0"
+gem 'chartkick'
 
 group :development, :test do
   # Call 'byebug' to stop execution and get a debugger console
@@ -67,7 +68,7 @@ end
 
 group :development do
   # Access an IRB console by using <%= console %> anywhere in the code.
-  gem 'listen', '~> 3.0.5'
+  gem 'listen', '~> 3.9'
   gem 'web-console'
   # Spring speeds up development by keeping your application running in the background.
   # Read more: https://github.com/rails/spring

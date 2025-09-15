@@ -2,7 +2,8 @@
 
 # Be sure to restart your server when you modify this file.
 
-Rails.application.configure do
-  config.session_store = :cookie_store
-  config.session_options = { key: '_puriayana_session' }
-end
+# Rails 8 session store configuration
+Rails.application.config.session_store :cookie_store, 
+  key: '_puriayana_session',
+  httponly: true,
+  secure: Rails.env.production?
