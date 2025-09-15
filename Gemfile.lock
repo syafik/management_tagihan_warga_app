@@ -176,6 +176,9 @@ GEM
     connection_pool (2.5.4)
     crass (1.0.6)
     csv (3.3.5)
+    dartsass-rails (0.5.1)
+      railties (>= 6.0.0)
+      sass-embedded (~> 1.63)
     database_cleaner (2.0.2)
       database_cleaner-active_record (>= 2, < 3)
     database_cleaner-active_record (2.1.0)
@@ -257,6 +260,15 @@ GEM
       google-apis-core (>= 0.11.0, < 2.a)
     google-apis-sheets_v4 (0.26.0)
       google-apis-core (>= 0.11.0, < 2.a)
+    google-protobuf (4.32.1-arm64-darwin)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.32.1-x86_64-darwin)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.32.1-x86_64-linux-gnu)
+      bigdecimal
+      rake (>= 13)
     google_drive (3.0.7)
       google-apis-drive_v3 (>= 0.5.0, < 1.0.0)
       google-apis-sheets_v4 (>= 0.4.0, < 1.0.0)
@@ -461,8 +473,12 @@ GEM
       ffi (~> 1.12)
       logger
     ruby2_keywords (0.0.5)
-    sass-rails (6.0.0)
-      sassc-rails (~> 2.1, >= 2.1.1)
+    sass-embedded (1.92.1-arm64-darwin)
+      google-protobuf (~> 4.31)
+    sass-embedded (1.92.1-x86_64-darwin)
+      google-protobuf (~> 4.31)
+    sass-embedded (1.92.1-x86_64-linux-gnu)
+      google-protobuf (~> 4.31)
     sassc (2.4.0)
       ffi (~> 1.9)
     sassc-rails (2.1.2)
@@ -572,6 +588,7 @@ DEPENDENCIES
   capistrano3-puma
   chartkick
   coffee-rails
+  dartsass-rails
   database_cleaner
   devise
   devise_token_auth (~> 1.2.3)
@@ -597,7 +614,6 @@ DEPENDENCIES
   rspec-rails!
   rspec-support!
   rubocop
-  sass-rails
   sib-api-v3-sdk
   simplecov
   solid_queue

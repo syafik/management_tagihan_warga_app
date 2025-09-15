@@ -44,7 +44,7 @@ gem 'wkhtmltopdf-binary'
 gem 'swagger-docs'
 gem 'administrate' # Modern admin interface that works with Tailwind
 gem 'cancancan'
-gem 'sass-rails' # Back to sass-rails now that Rails Admin is removed
+gem 'dartsass-rails' # Use Dart SASS for better CSS custom properties support
 gem 'coffee-rails'
 gem "solid_queue_dashboard", "~> 0.2.0"
 gem 'chartkick'
