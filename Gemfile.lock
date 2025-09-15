@@ -1,11 +1,4 @@
 GIT
-  remote: https://github.com/galetahub/ckeditor.git
-  revision: 8200ccdbf789669d154b800aab329db8f46aabdc
-  specs:
-    ckeditor (5.1.1)
-      orm_adapter (~> 0.5.0)
-
-GIT
   remote: https://github.com/rspec/rspec-core.git
   revision: 5c8d1799f54d231bf97d9a0e558ffa3938a05932
   branch: main
@@ -578,7 +571,6 @@ DEPENDENCIES
   capistrano-rbenv
   capistrano3-puma
   chartkick
-  ckeditor!
   coffee-rails
   database_cleaner
   devise

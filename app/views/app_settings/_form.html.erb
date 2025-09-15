@@ -3,7 +3,7 @@
   
   <div class="form-group">
     <%= f.label :home_page_text %>
-    <%= f.cktext_area :home_page_text, class: 'form-control ckeditor', input_html: { ckeditor: { toolbar: 'mini' } } %>
+    <%= f.text_area :home_page_text, class: 'form-control', rows: 10, placeholder: 'Enter home page text...' %>
   </div>
 
   <%= f.submit 'Submit', class: 'btn btn-primary mr-2' %>

@@ -3,5 +3,5 @@
 # Version of your assets, change this if you want to expire all your assets.
 Rails.application.config.assets.version = "1.0"
 
-# Minimal asset pipeline configuration for gem compatibility (CKEditor, etc.)
+# Minimal asset pipeline configuration for gem compatibility
 Rails.application.config.assets.precompile += %w[]
