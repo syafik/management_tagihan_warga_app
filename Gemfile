@@ -8,7 +8,7 @@ gem "rails", "8.0.2"
 # Use postgresql as the database for Active Record
 gem 'pg'
 # Use Puma as the app server
-gem 'puma'
+gem 'puma', '~> 6.0'
 # Use Vite as the asset bundler
 gem 'vite_rails'
 
@@ -42,9 +42,9 @@ gem "typhoeus"
 gem 'httparty'
 gem 'wkhtmltopdf-binary'
 gem 'swagger-docs'
-gem 'rails_admin' # Temporarily disabled due to SASS compilation issues
+gem 'administrate' # Modern admin interface that works with Tailwind
 gem 'cancancan'
-gem 'sassc-rails' # For Rails Admin compatibility
+gem 'sass-rails' # Back to sass-rails now that Rails Admin is removed
 gem 'coffee-rails'
 gem "solid_queue_dashboard", "~> 0.2.0"
 gem 'chartkick'

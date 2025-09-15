@@ -1,7 +1,28 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  mount RailsAdmin::Engine => '/admin', as: 'rails_admin' # Temporarily disabled
+  namespace :admin do
+      resources :addresses
+      resources :address_contributions
+      resources :app_settings
+      resources :cash_flows
+      resources :cash_infos
+      resources :cash_transactions
+      resources :contributions
+      resources :debts
+      resources :installments
+      resources :notifications
+      resources :template_transactions
+      resources :total_contributions
+      resources :users
+      resources :user_addresses
+      resources :user_contributions
+      resources :user_debts
+      resources :user_notifications
+
+      root to: "addresses#index"
+    end
+  # Rails Admin removed, replaced with Administrate
 
   # Admin-only access to Solid Queue Dashboard
   authenticate :user, ->(u) { u.is_admin? } do
