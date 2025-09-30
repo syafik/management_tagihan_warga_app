@@ -6,7 +6,7 @@
 set -e
 
 # Prompt for VPS connection details
-read -p "Enter VPS IP address: " VPS_IP
+read -p "Enter VPS IP address(103.160.62.145): " VPS_IP
 if [ -z "$VPS_IP" ]; then
     echo "Error: VPS IP address is required"
     exit 1
@@ -73,7 +73,7 @@ echo "$SUDO_PASSWORD" | ssh $VPS_USER@$VPS_IP 'sudo -S systemctl restart puma.se
 
 # Check and restart solid_queue if it exists
 log "Checking solid_queue service..."
-echo "$SUDO_PASSWORD" | ssh $VPS_USER@$VPS_IP 'if systemctl is-active --quiet solid_queue.service 2>/dev/null; then echo "Restarting solid_queue..."; sudo -S systemctl restart solid_queue.service; else echo "solid_queue service not found or inactive"; fi'
+ssh $VPS_USER@$VPS_IP 'if systemctl is-active --quiet solid_queue.service 2>/dev/null; then echo "Restarting solid_queue..."; echo "'"$SUDO_PASSWORD"'" | sudo -S systemctl restart solid_queue.service; else echo "solid_queue service not found or inactive"; fi'
 
 # Clear password from memory
 unset SUDO_PASSWORD

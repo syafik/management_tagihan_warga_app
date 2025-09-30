@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Admin - PuriAyana App!</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <!-- Load Administrate CSS via asset pipeline -->
+  <%= stylesheet_link_tag "administrate/application", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "admin", "data-turbo-track": "reload" %>
+
+  <!-- Vite assets for additional styling -->
+  <%= vite_client_tag %>
+  <%= vite_stylesheet_tag 'application' %>
+
+  <link rel="shortcut icon" href="<%= asset_path('img_305218.png') %>" />
+</head>
+<body>
+  <div id="page-wrapper">
+    <!-- Header -->
+    <header class="header" role="banner">
+      <div class="header__content">
+        <%= link_to "Admin Dashboard", admin_root_path, class: "header__logo" %>
+        <nav class="header__nav" role="navigation">
+          <% if user_signed_in? %>
+            <%= link_to "Back to App", root_path, class: "header__nav-item" %>
+            <%= link_to "Logout", destroy_user_session_path, method: :delete, class: "header__nav-item" %>
+          <% end %>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+      <!-- Sidebar Navigation -->
+      <nav class="sidebar" role="navigation">
+        <div class="sidebar__content">
+          <h3 class="sidebar__title">Administration</h3>
+
+          <div class="sidebar__section">
+            <h4 class="sidebar__section-title">Core Data</h4>
+            <ul class="sidebar__menu">
+              <li><%= link_to "Addresses", admin_addresses_path, class: "sidebar__link" %></li>
+              <li><%= link_to "Users", admin_users_path, class: "sidebar__link" %></li>
+              <li><%= link_to "User Addresses", admin_user_addresses_path, class: "sidebar__link" %></li>
+            </ul>
+          </div>
+
+          <div class="sidebar__section">
+            <h4 class="sidebar__section-title">Contributions</h4>
+            <ul class="sidebar__menu">
+              <li><%= link_to "Contributions", admin_contributions_path, class: "sidebar__link" %></li>
+              <li><%= link_to "User Contributions", admin_user_contributions_path, class: "sidebar__link" %></li>
+              <li><%= link_to "Address Contributions", admin_address_contributions_path, class: "sidebar__link" %></li>
+              <li><%= link_to "Total Contributions", admin_total_contributions_path, class: "sidebar__link" %></li>
+            </ul>
+          </div>
+
+          <div class="sidebar__section">
+            <h4 class="sidebar__section-title">Financial</h4>
+            <ul class="sidebar__menu">
+              <li><%= link_to "Cash Transactions", admin_cash_transactions_path, class: "sidebar__link" %></li>
+              <li><%= link_to "Cash Flows", admin_cash_flows_path, class: "sidebar__link" %></li>
+              <li><%= link_to "Cash Info", admin_cash_infos_path, class: "sidebar__link" %></li>
+              <li><%= link_to "Template Transactions", admin_template_transactions_path, class: "sidebar__link" %></li>
+            </ul>
+          </div>
+
+          <div class="sidebar__section">
+            <h4 class="sidebar__section-title">Debt Management</h4>
+            <ul class="sidebar__menu">
+              <li><%= link_to "Debts", admin_debts_path, class: "sidebar__link" %></li>
+              <li><%= link_to "User Debts", admin_user_debts_path, class: "sidebar__link" %></li>
+              <li><%= link_to "Installments", admin_installments_path, class: "sidebar__link" %></li>
+            </ul>
+          </div>
+
+          <div class="sidebar__section">
+            <h4 class="sidebar__section-title">Communication</h4>
+            <ul class="sidebar__menu">
+              <li><%= link_to "Notifications", admin_notifications_path, class: "sidebar__link" %></li>
+              <li><%= link_to "User Notifications", admin_user_notifications_path, class: "sidebar__link" %></li>
+            </ul>
+          </div>
+
+          <div class="sidebar__section">
+            <h4 class="sidebar__section-title">Settings</h4>
+            <ul class="sidebar__menu">
+              <li><%= link_to "App Settings", admin_app_settings_path, class: "sidebar__link" %></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main content -->
+      <main class="main-content" role="main">
+        <%= render partial: 'shared/flash_message' if !flash.empty? %>
+        <%= yield %>
+      </main>
+    </div>
+  </div>
+
+  <%= vite_javascript_tag 'application' %>
+
+  <!-- Admin-specific JavaScript for confirmations -->
+  <script>
+    // Handle confirmation dialogs for delete actions
+    document.addEventListener('DOMContentLoaded', function() {
+      // Enhanced confirmation handler for both Turbo and standard requests
+      function handleConfirmation(event) {
+        const element = event.target.closest('[data-method="delete"], [data-turbo-method="delete"]');
+        if (element) {
+          const confirmMessage = element.dataset.confirm ||
+                                element.dataset.turboConfirm ||
+                                'Are you sure you want to delete this item? This action cannot be undone.';
+
+          if (!confirm(confirmMessage)) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+          }
+        }
+      }
+
+      // Handle Turbo requests
+      document.addEventListener('turbo:before-fetch-request', handleConfirmation);
+
+      // Handle standard form submissions and clicks
+      document.addEventListener('click', handleConfirmation);
+      document.addEventListener('submit', handleConfirmation);
+
+      // Add confirmation to all delete buttons that don't already have it
+      document.addEventListener('click', function(event) {
+        const deleteButton = event.target.closest('a[data-method="delete"], button[data-method="delete"], a[data-turbo-method="delete"], button[data-turbo-method="delete"]');
+        if (deleteButton && !deleteButton.dataset.confirm && !deleteButton.dataset.turboConfirm) {
+          const resourceName = deleteButton.textContent.toLowerCase().includes('delete') ? 'item' : deleteButton.textContent.toLowerCase();
+          const confirmMessage = `Are you sure you want to delete this ${resourceName}? This action cannot be undone.`;
+
+          if (!confirm(confirmMessage)) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,3 +1,4 @@
 vite: bin/vite dev
 web: bundle exec rails server
-jobs: bundle exec rake jobs:work 
+jobs: bin/jobs
+css: bin/rails dartsass:watch

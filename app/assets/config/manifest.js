@@ -3,3 +3,4 @@
 //= link chartkick.js
 //= link Chart.bundle.js
 //= link_tree ../builds
+//= link admin.css

@@ -1,11 +1,11 @@
-# Disable Administrate's CSS to avoid SassC compilation errors
+# Re-enable Administrate's CSS now that we have proper layout
 if defined?(Administrate)
-  # Override the asset loading to skip problematic CSS
+  # Enable the asset loading for administrate CSS
   module Administrate
     class Engine < ::Rails::Engine
       initializer "administrate.assets.precompile" do |app|
-        # Skip adding administrate CSS to avoid SassC compilation errors
-        # app.config.assets.precompile += %w( administrate/application.css )
+        # Add administrate CSS to precompiled assets
+        app.config.assets.precompile += %w( administrate/application.css administrate/application.js )
       end
     end
   end

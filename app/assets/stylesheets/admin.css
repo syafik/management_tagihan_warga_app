@@ -1,0 +1,416 @@
+/* Admin-specific CSS overrides for Administrate */
+
+/* Layout */
+#page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content-wrapper {
+  display: flex;
+  flex: 1;
+}
+
+/* Header styling */
+.header {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header__logo {
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #1f2937;
+}
+
+.header__logo:hover {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header__nav-item {
+  padding: 0.5rem 1rem;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  color: #374151;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.header__nav-item:hover {
+  background: #e5e7eb;
+  text-decoration: none;
+  color: #1f2937;
+}
+
+/* Pagination styling fixes */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 2rem 0;
+  font-size: 0.875rem;
+}
+
+.pagination a,
+.pagination span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0.5rem;
+  text-decoration: none;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  color: #374151;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.pagination a:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  text-decoration: none;
+}
+
+.pagination .current {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+  font-weight: 600;
+}
+
+.pagination .disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Table improvements */
+.table {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.table th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: #6b7280;
+}
+
+.table tr:hover {
+  background: #f9fafb;
+}
+
+/* Action buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  margin-right: 0.5rem;
+}
+
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+  text-decoration: none;
+  color: #fff;
+}
+
+.btn-secondary {
+  background: #6b7280;
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background: #4b5563;
+  text-decoration: none;
+  color: #fff;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+  text-decoration: none;
+  color: #fff;
+}
+
+/* Form improvements */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Flash messages */
+.flash {
+  padding: 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.flash--notice {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.flash--alert,
+.flash--error {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+  width: 280px;
+  background: #f8fafc;
+  border-right: 1px solid #e2e8f0;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.sidebar__content {
+  padding: 1.5rem 1rem;
+}
+
+.sidebar__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 2rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.sidebar__section {
+  margin-bottom: 2rem;
+}
+
+.sidebar__section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4a5568;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 1rem 0;
+  padding: 0 0.75rem;
+}
+
+.sidebar__menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar__menu li {
+  margin: 0;
+}
+
+.sidebar__link {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: #2d3748;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.sidebar__link:hover {
+  background: #e2e8f0;
+  color: #2b6cb0;
+  text-decoration: none;
+  transform: translateX(2px);
+}
+
+.sidebar__link.active,
+.sidebar__link:active {
+  background: #3182ce;
+  color: #fff;
+}
+
+/* Main content adjustment for sidebar */
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  background: #fff;
+  overflow-x: auto;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .content-wrapper {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    order: 2;
+  }
+
+  .main-content {
+    order: 1;
+    padding: 1rem;
+  }
+}
+
+/* Table actions */
+.table-actions {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.table-actions .btn {
+  margin-right: 0;
+}
+
+/* Main content actions */
+.main-content__actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.main-content__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.main-content__page-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+/* Attribute list styling */
+.attribute-list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.attribute-list__item {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+.attribute-list__term {
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+}
+
+.attribute-list__details {
+  color: #6b7280;
+  margin: 0;
+  word-break: break-word;
+}
+
+@media (max-width: 768px) {
+  .attribute-list__item {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .main-content__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .table-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

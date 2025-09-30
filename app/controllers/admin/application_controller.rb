@@ -7,6 +7,7 @@
 module Admin
   class ApplicationController < Administrate::ApplicationController
     before_action :authenticate_admin
+    layout 'admin'
 
     def authenticate_admin
       authenticate_user!
