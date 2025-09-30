@@ -23,4 +23,18 @@ if Rails::VERSION::MAJOR >= 8
       end
     end
   end
+
+  # Fix for with_connection method that was removed in Rails 8
+  # See: https://github.com/rails/rails/pull/48629
+  module ActiveRecord
+    module ConnectionAdapters
+      class AbstractAdapter
+        unless method_defined?(:with_connection)
+          def with_connection
+            yield self
+          end
+        end
+      end
+    end
+  end
 end
