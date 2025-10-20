@@ -1,0 +1,251 @@
+<div class="max-w-7xl mx-auto" data-controller="security-dashboard" data-security-dashboard-year-value="<%= @year_selected %>">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Dashboard Sekurity</h1>
+    <p class="mt-1 text-sm text-gray-600">Kelola pembayaran iuran warga untuk blok yang Anda tanggung jawab</p>
+  </div>
+
+  <!-- Block Tabs -->
+  <% if @accessible_blocks.any? %>
+    <div class="mb-6">
+      <div class="border-b border-gray-200">
+        <nav class="flex -mb-px space-x-4 overflow-x-auto" aria-label="Block tabs">
+          <% @accessible_blocks.each do |block| %>
+            <%= link_to security_dashboard_index_path(block: block, search: @search_term),
+                        class: "px-4 py-3 text-sm font-medium rounded-t-lg transition-colors whitespace-nowrap #{@selected_block == block ? 'bg-indigo-50 text-indigo-700 border-b-2 border-indigo-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}" do %>
+              <div class="flex items-center gap-2">
+                <span class="text-lg font-bold">Blok <%= block %></span>
+                <%
+                  block_addresses = @addresses_with_unpaid.select { |data| data[:address].block_letter == block }
+                  total_unpaid_in_block = block_addresses.sum { |data| data[:unpaid_months] }
+                %>
+                <% if total_unpaid_in_block > 0 %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    <%= total_unpaid_in_block %>
+                  </span>
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
+        </nav>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Search Bar -->
+  <div class="mb-6 bg-white rounded-lg shadow p-4">
+    <%= form_with url: security_dashboard_index_path, method: :get, class: "flex gap-3" do |f| %>
+      <div class="flex-1">
+        <%= f.text_field :search,
+                        value: @search_term,
+                        placeholder: "Cari alamat atau nama kepala keluarga...",
+                        class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
+                        data: {
+                          security_dashboard_target: "searchInput",
+                          action: "input->security-dashboard#search"
+                        } %>
+      </div>
+      <%= f.hidden_field :year, value: @year_selected %>
+      <%= f.hidden_field :block, value: @selected_block %>
+      <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+        Cari
+      </button>
+    <% end %>
+
+    <% if @search_term.present? %>
+      <div class="mt-3">
+        <%= link_to "Reset Pencarian", security_dashboard_index_path(year: @year_selected, block: @selected_block),
+                    class: "text-sm text-indigo-600 hover:text-indigo-800" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Addresses Grid -->
+  <% if @addresses_with_unpaid.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <% @addresses_with_unpaid.each do |data| %>
+        <% address = data[:address] %>
+        <% unpaid_months = data[:unpaid_months] %>
+        <% arrears = data[:arrears] %>
+        <% arrears_amount = data[:arrears_amount] %>
+        <% total_unpaid_amount = data[:total_unpaid_amount] %>
+        <%
+          # Determine card background based on payment status
+          card_bg = unpaid_months == 0 && arrears == 0 ? 'bg-green-50 border-2 border-green-200' : 'bg-white'
+        %>
+        <%= link_to payment_security_dashboard_index_path(address_id: address.id),
+                    class: "block #{card_bg} rounded-lg shadow hover:shadow-lg transition-shadow" do %>
+          <div class="p-5">
+            <!-- Address Header -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <h3 class="text-lg font-semibold text-gray-900"><%= address.block_address&.upcase %></h3>
+                <p class="text-sm text-gray-500 mt-1">
+                  <span class="font-medium">KK:</span> <%= address.head_of_family&.name&.upcase || 'Tidak ada' %>
+                </p>
+              </div>
+              <% if unpaid_months == 0 && arrears == 0 %>
+                <div class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-1 rounded flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                  </svg>
+                  Lunas
+                </div>
+              <% else %>
+                <div class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-1 rounded">
+                  <%= unpaid_months + (arrears > 0 ? 1 : 0) %> tunggakan
+                </div>
+              <% end %>
+            </div>
+
+            <!-- Total Unpaid Amount -->
+            <div class="mb-3 p-3 <%= total_unpaid_amount == 0 ? 'bg-white' : 'bg-red-50' %> rounded-lg border <%= total_unpaid_amount == 0 ? 'border-green-200' : 'border-red-200' %>">
+              <div class="text-xs <%= total_unpaid_amount == 0 ? 'text-green-600' : 'text-red-600' %> font-medium mb-1">
+                Total Harus Dibayar s/d <%= UserContribution::MONTHNAMES.invert[@current_month] %> <%= @current_year %>
+              </div>
+              <div class="text-xl font-bold <%= total_unpaid_amount == 0 ? 'text-green-700' : 'text-red-700' %>">
+                Rp <%= number_with_delimiter(total_unpaid_amount, delimiter: '.') %>
+              </div>
+              <% if total_unpaid_amount > 0 %>
+                <div class="text-xs text-gray-600 mt-1">
+                  <% if arrears > 0 %>
+                    Tunggakan lama: <%= arrears %> bln × Rp <%= number_with_delimiter(address.current_contribution_rate, delimiter: '.') %> = Rp <%= number_with_delimiter(arrears_amount, delimiter: '.') %>
+                    <% if unpaid_months > 0 %>
+                      <br>Tahun ini: <%= unpaid_months %> bln × Rp <%= number_with_delimiter(address.current_contribution_rate, delimiter: '.') %>
+                    <% end %>
+                  <% else %>
+                    <%= unpaid_months %> bulan × Rp <%= number_with_delimiter(address.current_contribution_rate, delimiter: '.') %>
+                  <% end %>
+                </div>
+              <% else %>
+                <div class="text-xs text-green-600 mt-1">
+                  Semua pembayaran sudah lunas
+                </div>
+              <% end %>
+            </div>
+
+            <!-- Action Button -->
+            <div class="w-full mt-2 px-4 py-2 <%= unpaid_months == 0 && arrears == 0 ? 'bg-green-600 hover:bg-green-700' : 'bg-indigo-600 hover:bg-indigo-700' %> text-white text-sm font-medium rounded-lg transition-colors text-center">
+              <%= unpaid_months == 0 && arrears == 0 ? 'Bayar Bulan Depan' : 'Lihat Detail & Bayar →' %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Results Info -->
+    <div class="mt-4 text-sm text-gray-600">
+      Menampilkan <%= @addresses_with_unpaid.count %> alamat di Blok <%= @selected_block %>
+      <% if @search_term.present? %>
+        untuk pencarian "<span class="font-medium"><%= @search_term %></span>"
+      <% end %>
+    </div>
+  <% else %>
+    <!-- Empty State -->
+    <div class="bg-white rounded-lg shadow p-12 text-center">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+      </svg>
+      <h3 class="mt-4 text-lg font-medium text-gray-900">
+        <% if @search_term.present? %>
+          Tidak ada hasil
+        <% else %>
+          Tidak ada alamat
+        <% end %>
+      </h3>
+      <p class="mt-2 text-sm text-gray-500">
+        <% if @search_term.present? %>
+          Coba kata kunci pencarian lain.
+        <% else %>
+          Tidak ada alamat di blok <%= @selected_block %>.
+        <% end %>
+      </p>
+    </div>
+  <% end %>
+
+  <!-- Payment Modal -->
+  <div data-security-dashboard-target="paymentModal"
+       class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 overflow-y-auto z-50">
+    <div class="flex min-h-screen items-center justify-center p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <h2 class="text-xl font-semibold text-gray-900" data-modal-title>Pembayaran Iuran</h2>
+          <button type="button"
+                  class="text-gray-400 hover:text-gray-500"
+                  data-action="click->security-dashboard#closeModal">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="px-6 py-4">
+          <!-- Address Info -->
+          <div class="mb-6 p-4 bg-gray-50 rounded-lg" data-security-dashboard-target="addressInfo">
+            <!-- Filled by JS -->
+          </div>
+
+          <!-- Payment Type Selection -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Metode Pembayaran</label>
+            <select data-security-dashboard-target="paymentTypeSelect"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+              <option value="1">Cash</option>
+              <option value="2">Transfer</option>
+            </select>
+          </div>
+
+          <!-- Future Months Toggle -->
+          <div class="mb-6">
+            <label class="flex items-center cursor-pointer">
+              <input type="checkbox"
+                     data-security-dashboard-target="futureToggle"
+                     data-action="change->security-dashboard#toggleFutureMonths"
+                     class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+              <span class="ml-2 text-sm text-gray-700">
+                Tampilkan bulan-bulan mendatang (untuk bayar di muka)
+              </span>
+            </label>
+          </div>
+
+          <!-- Months Grid -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-3">Pilih Bulan Pembayaran</label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"
+                 data-security-dashboard-target="monthsGrid">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+
+          <!-- Total Amount -->
+          <div class="bg-indigo-50 rounded-lg p-4 mb-4">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-gray-700">Total Pembayaran:</span>
+              <span class="text-2xl font-bold text-indigo-900">
+                Rp <span data-security-dashboard-target="totalAmount">0</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex gap-3 justify-end">
+          <button type="button"
+                  class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+                  data-action="click->security-dashboard#closeModal">
+            Batal
+          </button>
+          <button type="button"
+                  class="px-6 py-2 bg-indigo-600 text-white rounded-lg transition-colors opacity-50 cursor-not-allowed"
+                  data-security-dashboard-target="submitButton"
+                  data-action="click->security-dashboard#submitPayment"
+                  disabled>
+            Simpan Pembayaran
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

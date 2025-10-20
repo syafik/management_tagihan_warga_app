@@ -21,19 +21,28 @@
       <% end %>
     </div>
 
-    <!-- Iuran / Data Iuran -->
+    <!-- Iuran / Data Iuran / Security Dashboard -->
     <div class="flex flex-col items-center">
-      <%= link_to user_contributions_path, class: "flex flex-col items-center p-2 text-xs #{request.path.start_with?('/user_contributions') ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors" do %>
-        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-        </svg>
-        <span class="text-xs">
-          <%= current_user.is_warga? ? 'Iuran Ku' : 'Data Iuran' %>
-        </span>
+      <% if current_user.is_security? %>
+        <%= link_to security_dashboard_index_path, class: "flex flex-col items-center p-2 text-xs #{request.path.start_with?('/security_dashboard') && !request.path.include?('total_setoran') && !request.path.include?('expense') ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors" do %>
+          <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+          <span class="text-xs">Terima</span>
+        <% end %>
+      <% else %>
+        <%= link_to user_contributions_path, class: "flex flex-col items-center p-2 text-xs #{request.path.start_with?('/user_contributions') ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors" do %>
+          <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+          </svg>
+          <span class="text-xs">
+            <%= current_user.is_warga? ? 'Iuran Ku' : 'Data Iuran' %>
+          </span>
+        <% end %>
       <% end %>
     </div>
 
-    <!-- Transaksi -->
+    <!-- Transaksi / Rekap / Pengeluaran -->
     <div class="flex flex-col items-center">
       <% if current_user.is_warga? %>
         <%= link_to show_report_cash_transactions_path('warga', Date.current.year, Date.current.month), class: "flex flex-col items-center p-2 text-xs #{request.path.include?('show_report') ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors" do %>
@@ -41,6 +50,13 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
           </svg>
           <span class="text-xs">Keuangan</span>
+        <% end %>
+      <% elsif current_user.is_security? %>
+        <%= link_to rekap_pembayaran_security_dashboard_index_path, class: "flex flex-col items-center p-2 text-xs #{request.path.include?('rekap_pembayaran') ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors" do %>
+          <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+          </svg>
+          <span class="text-xs">Rekap</span>
         <% end %>
       <% else %>
         <%= link_to cash_transactions_path, class: "flex flex-col items-center p-2 text-xs #{request.path.start_with?('/cash_transactions') ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors" do %>
@@ -52,13 +68,22 @@
       <% end %>
     </div>
 
-    <!-- Profile / More Menu -->
+    <!-- Pengeluaran (Security only if allowed) / Profile (Others) -->
     <div class="flex flex-col items-center">
-      <%= link_to user_path(current_user), class: "flex flex-col items-center p-2 text-xs #{request.path.start_with?('/users') ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors", data: { turbo: false } do %>
-        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-        </svg>
-        <span class="text-xs">Profile</span>
+      <% if current_user.is_security? && current_user.allow_manage_expense %>
+        <%= link_to new_expense_security_dashboard_index_path, class: "flex flex-col items-center p-2 text-xs #{request.path.include?('new_expense') ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors" do %>
+          <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"/>
+          </svg>
+          <span class="text-xs">Pengeluaran</span>
+        <% end %>
+      <% else %>
+        <%= link_to user_path(current_user), class: "flex flex-col items-center p-2 text-xs #{request.path.start_with?('/users') ? 'text-indigo-600' : 'text-gray-600'} hover:text-indigo-600 transition-colors", data: { turbo: false } do %>
+          <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          <span class="text-xs">Profile</span>
+        <% end %>
       <% end %>
     </div>
   </div>

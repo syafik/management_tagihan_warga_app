@@ -87,8 +87,34 @@
           </svg>
           Iuran Ku
         <% end %>
+      <% elsif current_user.is_security? %>
+        <!-- Security Dashboard -->
+        <%= link_to security_dashboard_index_path, class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
+          <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+          Terima Pembayaran
+        <% end %>
+
+        <!-- Rekap Pembayaran for Security -->
+        <%= link_to rekap_pembayaran_security_dashboard_index_path, class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
+          <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+          </svg>
+          Rekap Pembayaran
+        <% end %>
+
+        <!-- Catat Pengeluaran for Security (only if allowed) -->
+        <% if current_user.allow_manage_expense %>
+          <%= link_to new_expense_security_dashboard_index_path, class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
+            <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
+            </svg>
+            Catat Pengeluaran
+          <% end %>
+        <% end %>
       <% else %>
-        <!-- Data Iuran Warga for Admin/Security -->
+        <!-- Data Iuran Warga for Admin -->
         <%= link_to user_contributions_path, class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
           <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
@@ -104,7 +130,7 @@
           </svg>
           Laporan Keuangan
         <% end %>
-      <% else %>
+      <% elsif !current_user.is_security? %>
         <%= link_to cash_transactions_path, class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
           <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
