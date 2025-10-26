@@ -148,6 +148,32 @@ class User < ApplicationRecord
     primary_address&.id
   end
 
+  # Virtual attribute for handling multiple addresses from form
+  def address_ids=(ids)
+    return if ids.blank? || ids.reject(&:blank?).empty?
+
+    # Get valid address IDs
+    valid_ids = ids.reject(&:blank?).map(&:to_i)
+    return if valid_ids.empty?
+
+    # Remove addresses that are not in the new list
+    user_addresses.where.not(address_id: valid_ids).destroy_all
+
+    # Add new addresses
+    valid_ids.each_with_index do |address_id, index|
+      user_address = user_addresses.find_or_initialize_by(address_id: address_id)
+      # Set first address as primary if no primary exists
+      if index == 0 && !user_addresses.exists?(primary: true)
+        user_address.primary = true
+      end
+      user_address.save if user_address.new_record? || user_address.changed?
+    end
+  end
+
+  def address_ids
+    addresses.pluck(:id)
+  end
+
   # WhatsApp Login Code Methods
   def generate_login_code!
     self.login_code = SecureRandom.random_number(100_000..999_999).to_s

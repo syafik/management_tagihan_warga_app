@@ -1,3 +1,157 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Select2 Tailwind Customization */
+@layer components {
+  .select2-container--default .select2-selection--single,
+  .select2-container--default .select2-selection--multiple {
+    @apply border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500;
+    min-height: 38px;
+  }
+
+  .select2-container--default.select2-container--focus .select2-selection--single,
+  .select2-container--default.select2-container--focus .select2-selection--multiple {
+    @apply border-indigo-500 ring-1 ring-indigo-500;
+  }
+
+  .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    @apply bg-indigo-100 border-indigo-300 text-indigo-800 rounded-full px-3 py-1 text-sm font-medium;
+  }
+
+  .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    @apply text-indigo-600 hover:text-indigo-800 mr-1;
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+
+  .select2-dropdown {
+    @apply border-gray-300 rounded-md shadow-lg;
+  }
+
+  .select2-search--dropdown .select2-search__field {
+    @apply border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm;
+  }
+
+  .select2-results__option {
+    @apply px-4 py-3 text-sm;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+  }
+
+  .select2-results__option:hover {
+    @apply bg-indigo-50;
+  }
+
+  .select2-results__option--highlighted {
+    @apply bg-indigo-50;
+  }
+
+  .select2-results__option--highlighted svg {
+    @apply text-indigo-600;
+  }
+
+  .select2-results__option[aria-selected=true] {
+    @apply bg-indigo-50;
+  }
+
+  /* Ensure proper alignment for custom formatted options */
+  .select2-results__option > div {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  /* Animate checkmark */
+  .select2-results__option svg {
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* "Dipilih" badge animation */
+  .select2-results__option span[class*="bg-indigo"] {
+    animation: fadeInScale 0.2s ease-in-out;
+  }
+
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Mobile-specific styles */
+  @media (max-width: 768px) {
+    /* Larger touch targets on mobile */
+    .select2-container--mobile .select2-selection--multiple {
+      min-height: 44px;
+      padding: 4px 8px;
+    }
+
+    .select2-container--mobile .select2-selection--multiple .select2-selection__choice {
+      @apply text-base px-4 py-2;
+      margin: 4px 4px 4px 0;
+    }
+
+    .select2-container--mobile .select2-selection--multiple .select2-selection__choice__remove {
+      font-size: 1.5rem;
+      padding: 0 8px;
+    }
+
+    /* Fullscreen dropdown on mobile for better UX */
+    .select2-dropdown--mobile {
+      @apply fixed inset-x-0;
+      top: 50% !important;
+      transform: translateY(-50%);
+      max-height: 80vh;
+      margin: 0;
+      border-radius: 1rem;
+      z-index: 9999;
+    }
+
+    /* Mobile search field */
+    .select2-dropdown--mobile .select2-search--dropdown {
+      padding: 12px;
+    }
+
+    .select2-dropdown--mobile .select2-search--dropdown .select2-search__field {
+      @apply text-base;
+      height: 44px;
+      padding: 8px 12px;
+    }
+
+    /* Mobile options with larger touch targets */
+    .select2-dropdown--mobile .select2-results__option {
+      @apply px-6 py-4 text-base;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Larger checkmark icons on mobile */
+    .select2-dropdown--mobile .select2-results__option svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    /* Larger selected badge on mobile */
+    .select2-dropdown--mobile .select2-results__option span[class*="bg-indigo"] {
+      @apply text-sm px-3 py-1;
+    }
+
+    /* Add backdrop for mobile dropdown */
+    .select2-container--open + .select2-backdrop {
+      @apply fixed inset-0 bg-black bg-opacity-50;
+      z-index: 9998;
+    }
+  }
+
+  /* Better scrolling on mobile */
+  .select2-results__options {
+    @apply overflow-y-auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

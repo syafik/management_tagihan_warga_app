@@ -12,10 +12,9 @@
     </tr>
     </thead>
     <tbody class="bg-white divide-y divide-gray-200">
-    <% cur_page = @users.current_page %>
     <% @users.each_with_index do |user, i| %>
       <tr class="hover:bg-gray-50">
-        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= (i + 1) + ((@pagy.page - 1) * @pagy.items) %></td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= (i + 1) + ((@pagy.page - 1) * @pagy.vars[:items]) %></td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= user.email %></td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
           <div class="flex items-center">
@@ -32,11 +31,15 @@
             </div>
           </div>
         </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-          <% if user.address&.block_address.present? %>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-              <%= user.address.block_address.upcase %>
-            </span>
+        <td class="px-6 py-4 text-sm text-gray-900">
+          <% if user.addresses.any? %>
+            <div class="flex flex-wrap gap-1">
+              <% user.addresses.each do |address| %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <%= address.block_address.upcase %>
+                </span>
+              <% end %>
+            </div>
           <% else %>
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
               Tidak ada
@@ -68,13 +71,12 @@
 
 <!-- Mobile card view -->
 <div class="md:hidden space-y-4">
-  <% cur_page = @users.current_page %>
   <% @users.each_with_index do |user, i| %>
     <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center">
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mr-2">
-            #<%= (i + 1) + ((@pagy.page - 1) * @pagy.items) %>
+            #<%= (i + 1) + ((@pagy.page - 1) * @pagy.vars[:items]) %>
           </span>
           <div class="flex items-center">
             <div class="flex-shrink-0 h-8 w-8">
@@ -113,10 +115,14 @@
           <div>
             <dt class="text-xs font-medium text-gray-500">Blok</dt>
             <dd>
-              <% if user.address&.block_address.present? %>
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  <%= user.address.block_address.upcase %>
-                </span>
+              <% if user.addresses.any? %>
+                <div class="flex flex-wrap gap-1">
+                  <% user.addresses.each do |address| %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      <%= address.block_address.upcase %>
+                    </span>
+                  <% end %>
+                </div>
               <% else %>
                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
                   Tidak ada
@@ -146,10 +152,5 @@
 </div>
 
 <div class="mt-6">
-  <div class="flex items-center justify-between">
-    <p class="text-sm text-gray-700">
-      Showing <%= pagy_info(@pagy) %>
-    </p>
-    <%== pagy_nav(@pagy) %>
-  </div>
+  <%== pagy_tailwind_nav(@pagy) %>
 </div>

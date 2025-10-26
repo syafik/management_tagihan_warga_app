@@ -15,15 +15,43 @@
           </div>
         </div>
 
+        <!-- Arrears Alert (if any) -->
+        <% if address.arrears.present? && address.arrears > 0 %>
+          <div class="bg-red-50 border-l-4 border-red-500 px-6 py-4">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+              </div>
+              <div class="ml-4 flex-1">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-medium text-red-800">
+                      Tunggakan Lama: <%= address.arrears %> bulan
+                    </p>
+                    <p class="text-sm text-red-700 mt-1">
+                      Total: Rp <%= number_with_delimiter(address.arrears * 175000, delimiter: '.') %>
+                    </p>
+                  </div>
+                  <div class="text-xs text-red-600">
+                    @ Rp 175.000/bulan
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
         <!-- Year Navigation -->
         <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
           <div class="flex items-center justify-between">
             <h4 class="text-sm font-medium text-gray-700">Status Pembayaran Iuran <%= @year_selected %></h4>
             <div class="flex items-center space-x-4">
               <% if @year_selected > AppSetting.starting_year %>
-                <%= form_tag(search_user_contributions_path, method: :post, local: false, class: 'inline', data: { turbo: false }) do %>
+                <%= form_tag(search_user_contributions_path, method: :post, class: 'inline') do %>
                   <%= hidden_field_tag :year_eq, @year_selected - 1 %>
-                  <%= hidden_field_tag :address_filter, params[:address_filter] if params[:address_filter].present? %>
+                  <%= hidden_field_tag :address_filter, @address_filter if @address_filter.present? %>
                   <%= button_tag type: 'submit', class: 'inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50' do %>
                     <svg class="-ml-1 mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -39,12 +67,12 @@
                   <%= @year_selected - 1 %>
                 </div>
               <% end %>
-              
+
               <span class="px-4 py-1 text-lg font-semibold text-indigo-600"><%= @year_selected %></span>
-              
-              <%= form_tag(search_user_contributions_path, method: :post, local: false, class: 'inline', data: { turbo: false }) do %>
+
+              <%= form_tag(search_user_contributions_path, method: :post, class: 'inline') do %>
                 <%= hidden_field_tag :year_eq, @year_selected + 1 %>
-                <%= hidden_field_tag :address_filter, params[:address_filter] if params[:address_filter].present? %>
+                <%= hidden_field_tag :address_filter, @address_filter if @address_filter.present? %>
                 <%= button_tag type: 'submit', class: 'inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50' do %>
                   <%= @year_selected + 1 %>
                   <svg class="-mr-1 ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

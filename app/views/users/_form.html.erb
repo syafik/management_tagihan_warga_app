@@ -44,20 +44,28 @@
 
     <% unless current_user.is_warga? && current_user == user %>
       <div data-user-form-target="addressBox" class="<%= user.is_security? ? "hidden": ""%>">
-        <%= f.label :address_id, "Blok Rumah", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= f.select :address_id, 
-                    Address.select('id, block_address').collect {|p| [ p.block_address.try(:upcase), p.id ] }, 
-                    {include_blank: "Pilih blok rumah"}, 
+        <%= f.label :address_ids, "Blok Rumah", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.select :address_ids,
+                    Address.select('id, block_address').order(:block_address).collect {|p| [ p.block_address.try(:upcase), p.id ] },
+                    { selected: user.address_ids },
                     {
+                      multiple: true,
                       data: { "user-form-target": "addressSelect" },
-                      class: "select-field-js w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      class: "select-field-js w-full"
                     } %>
+        <p class="mt-1 text-sm text-gray-500">
+          <svg class="inline-block w-4 h-4 mr-1 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+          </svg>
+          <span class="hidden sm:inline">Cari dan pilih blok rumah dengan dropdown. Bisa pilih lebih dari satu.</span>
+          <span class="sm:hidden">Tap untuk pilih blok. Bisa pilih lebih dari satu. Tap item yang dipilih untuk menghapus.</span>
+        </p>
       </div>
-      
+
       <div data-user-form-target="picBox" class="<%= user.is_security? ? "": "hidden"%>">
         <%= f.label :pic_blok, "PIC Blok", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= f.text_field :pic_blok, 
-                        class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", 
+        <%= f.text_field :pic_blok,
+                        class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
                         placeholder: "PIC retribution" %>
       </div>
     <% end %>

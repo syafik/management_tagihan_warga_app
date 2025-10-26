@@ -20,16 +20,16 @@
       </div>
       
       <div class="mb-6">
-        <%= form_with url: search_users_path, method: :get, class: 'flex flex-col sm:flex-row gap-3', local: false, data: { turbo: false } do |form| %>
-          <%= form.text_field 'q[name_or_email_cont]', 
+        <%= form_with url: users_path, method: :get, class: 'flex flex-col sm:flex-row gap-3' do |form| %>
+          <%= form.text_field 'q[name_or_email_cont]',
                               value: params.dig(:q, :name_or_email_cont),
-                              placeholder: 'Cari berdasarkan nama atau email...', 
+                              placeholder: 'Cari berdasarkan nama atau email...',
                               class: 'flex-1 min-w-0 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' %>
           <div class="flex gap-2">
-            <%= form.submit "Cari", 
+            <%= form.submit "Cari",
                             class: 'flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
             <% if params[:q].present? %>
-              <%= link_to "Reset", users_path, 
+              <%= link_to "Reset", users_path,
                           class: 'flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
             <% end %>
           </div>

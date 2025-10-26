@@ -9,36 +9,38 @@ class UserContributionsController < ApplicationController
     @year_selected = (params[:year_eq] || Date.current.year).to_i
     @block_selected = params[:block_eq]
     @search_term = params[:search_address]
-    
+    @address_filter = params[:address_filter]
+
     # Debug logging
-    Rails.logger.debug "Index - Year: #{@year_selected}, Block: #{@block_selected}, Search: #{@search_term}"
+    Rails.logger.debug "Index - Year: #{@year_selected}, Block: #{@block_selected}, Search: #{@search_term}, Address Filter: #{@address_filter}"
     Rails.logger.debug "Params: #{params.inspect}"
     Rails.logger.debug "Current user role: #{current_user.role}"
-    
+
     # Start with addresses based on user role
     if current_user.is_warga?
       # For Warga users, only show addresses they are affiliated with
       addresses = current_user.addresses
-      
+
       # If address filter is specified, filter to specific address
-      if params[:address_filter].present?
-        addresses = addresses.where(id: params[:address_filter])
-        Rails.logger.debug "Warga user - filtering to specific address: #{params[:address_filter]}"
+      if @address_filter.present?
+        addresses = addresses.where(id: @address_filter)
+        Rails.logger.debug "Warga user - filtering to specific address: #{@address_filter}"
       else
         # Default: show only first address (primary or first available)
         first_address = current_user.primary_address || addresses.order(:block_address).first
         addresses = addresses.where(id: first_address&.id) if first_address
+        @address_filter = first_address&.id
         Rails.logger.debug "Warga user - showing default first address: #{first_address&.block_address}"
       end
-      
+
       Rails.logger.debug "Warga user - showing #{addresses.count} address(es)"
     else
       # For Admin/Security users, show all addresses
       addresses = Address.all
-      
+
       # Default to Block A if no parameters provided and user is not Warga
       @block_selected = 'A' if @block_selected.blank? && @search_term.blank?
-      
+
       # Filter by search term first (has priority)
       if @search_term.present?
         addresses = addresses.where("UPPER(block_address) LIKE UPPER(?)", "%#{@search_term}%")
@@ -123,17 +125,15 @@ class UserContributionsController < ApplicationController
 
     @addresses = addresses
 
-    respond_to do |format|
-      format.html { render 'index' }
-      format.turbo_stream do
-        partial_name = current_user.is_warga? ? 'warga_view' : 'data'
-        render turbo_stream: [
-          turbo_stream.replace('content-data', partial: partial_name),
-          turbo_stream.update('year-selected', @year_selected.to_s)
-        ]
-      end
-      format.js { render 'index' }
-    end
+    # Build redirect params
+    redirect_params = {
+      year_eq: @year_selected
+    }
+    redirect_params[:block_eq] = @block_selected if @block_selected.present?
+    redirect_params[:search_address] = @search_term if @search_term.present?
+    redirect_params[:address_filter] = params[:address_filter] if params[:address_filter].present?
+
+    redirect_to user_contributions_path(redirect_params)
   end
 
   def import_data

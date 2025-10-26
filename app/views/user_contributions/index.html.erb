@@ -55,7 +55,7 @@
       
       <% unless current_user.is_warga? %>
         <div class="mb-6">
-          <%= form_tag(search_user_contributions_path, method: :post, local: false, class: 'flex flex-col lg:flex-row gap-3', data: { turbo: false }) do |f| %>
+          <%= form_tag(search_user_contributions_path, method: :post, class: 'flex flex-col lg:flex-row gap-3') do |f| %>
             <div class="flex flex-col sm:flex-row gap-3 flex-1">
               <div class="flex-1 min-w-0">
                 <%= label_tag :tahun, "Tahun", class: 'block text-sm font-medium text-gray-700 mb-1' %>
@@ -82,22 +82,17 @@
         <!-- Address filter for Warga users -->
         <% if current_user.addresses.count > 1 %>
           <div class="mb-6">
-            <%= form_tag(search_user_contributions_path, method: :post, local: false, class: 'flex flex-row gap-3', data: { turbo: false }) do |f| %>
+            <%= form_tag(search_user_contributions_path, method: :post, class: 'flex flex-row gap-3') do |f| %>
               <%= hidden_field_tag :year_eq, @year_selected %>
               <div class="flex-1 max-w-xs">
                 <%= label_tag :address_filter, "Pilih Alamat", class: 'block text-sm font-medium text-gray-700 mb-1' %>
-                <% 
-                  # Get current address for default selection
-                  current_address_id = params[:address_filter].presence || 
-                                      (current_user.primary_address&.id || current_user.addresses.order(:block_address).first&.id)
-                %>
-                <%= select_tag :address_filter, 
+                <%= select_tag :address_filter,
                     options_for_select(
-                      current_user.addresses.order(:block_address).map { |addr| 
-                        ["#{addr.block_address&.upcase} - #{addr.head_of_family&.name&.upcase}", addr.id] 
-                      }, 
-                      current_address_id
-                    ), 
+                      current_user.addresses.order(:block_address).map { |addr|
+                        ["#{addr.block_address&.upcase} - #{addr.head_of_family&.name&.upcase}", addr.id]
+                      },
+                      @address_filter
+                    ),
                     class: 'w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm' %>
               </div>
               <div class="flex items-end">
