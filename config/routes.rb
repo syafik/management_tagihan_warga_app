@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  get "arrears/index"
   namespace :admin do
       resources :addresses
       resources :address_contributions

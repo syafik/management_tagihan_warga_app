@@ -175,7 +175,8 @@ class UsersController < ApplicationController
     else
       # Admin users can edit all fields
       params.fetch(:user, {}).permit(:email, :name, :phone_number, :password, :contribution, :block_address, :role,
-                                     :pic_blok, :avatar, :address_id, address_ids: [])
+                                     :pic_blok, :avatar, :address_id, :allow_manage_transfer, :allow_manage_expense,
+                                     address_ids: [])
     end
   end
 end

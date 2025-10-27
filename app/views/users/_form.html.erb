@@ -68,6 +68,20 @@
                         class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
                         placeholder: "PIC retribution" %>
       </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex items-center">
+          <%= f.check_box :allow_manage_transfer,
+                          class: "h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" %>
+          <%= f.label :allow_manage_transfer, "Izinkan Kelola Transfer", class: "ml-2 text-sm font-medium text-gray-700" %>
+        </div>
+
+        <div class="flex items-center">
+          <%= f.check_box :allow_manage_expense,
+                          class: "h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" %>
+          <%= f.label :allow_manage_expense, "Izinkan Kelola Pengeluaran", class: "ml-2 text-sm font-medium text-gray-700" %>
+        </div>
+      </div>
     <% end %>
 
     <div>

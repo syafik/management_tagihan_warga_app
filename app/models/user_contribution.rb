@@ -7,6 +7,7 @@ class UserContribution < ApplicationRecord
   validates :contribution, :pay_at, :receiver_id, :payment_type, :blok, presence: true
 
   before_save :set_blok_group
+  after_create :send_payment_notification
 
   MONTHNAMES =
     {
@@ -35,7 +36,7 @@ class UserContribution < ApplicationRecord
         tagihan = ws[row, 4].strip
         next unless row >= 3
 
-        address = Address.where(block_address: block_address).first
+        address = Address.where(block_address:).first
         next unless address
 
         1.upto(execute_month - tagihan.to_i) do |_i|
@@ -63,9 +64,8 @@ class UserContribution < ApplicationRecord
   end
 
   def tgl_bayar
-    pay_at.blank? ? "-" : pay_at.strftime('%d %B %Y')
+    pay_at.blank? ? '-' : pay_at.strftime('%d %B %Y')
   end
-
 
   private
 
@@ -73,4 +73,12 @@ class UserContribution < ApplicationRecord
     blok = address.block_address.gsub(/[^A-Za-z]/, '').upcase
   end
 
+  def send_payment_notification
+    # Queue the notification job to run in background
+    SendPaymentNotificationJob.perform_later(id)
+    Rails.logger.info "Queued payment notification job for UserContribution ##{id}"
+  rescue StandardError => e
+    # Log error but don't fail the payment creation
+    Rails.logger.error "Failed to queue payment notification: #{e.message}"
+  end
 end
