@@ -1,6 +1,9 @@
 // Import Tailwind CSS
 import './application.css'
 
+// Import Choices.js CSS
+import 'choices.js/public/assets/styles/choices.min.css'
+
 // Import Chart.js globally
 import Chart from 'chart.js/auto'
 

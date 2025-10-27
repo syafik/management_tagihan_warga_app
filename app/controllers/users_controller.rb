@@ -54,7 +54,7 @@ class UsersController < ApplicationController
         format.html { redirect_to @user, notice: 'User was successfully created.' }
         format.json { render :show, status: :created, location: @user }
       else
-        format.html { render :new }
+        format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @user.errors, status: :unprocessable_entity }
       end
     end
@@ -174,9 +174,18 @@ class UsersController < ApplicationController
       params.fetch(:user, {}).permit(:email, :name, :phone_number, :avatar)
     else
       # Admin users can edit all fields
-      params.fetch(:user, {}).permit(:email, :name, :phone_number, :password, :contribution, :block_address, :role,
+      permitted_params = params.fetch(:user, {}).permit(:email, :name, :phone_number, :password, :contribution, :block_address, :role,
                                      :pic_blok, :avatar, :address_id, :allow_manage_transfer, :allow_manage_expense,
                                      address_ids: [])
+
+      # Filter out empty strings from address_ids array
+      if permitted_params[:address_ids].present?
+        Rails.logger.debug "Before filter: #{permitted_params[:address_ids].inspect}"
+        permitted_params[:address_ids] = permitted_params[:address_ids].reject(&:blank?)
+        Rails.logger.debug "After filter: #{permitted_params[:address_ids].inspect}"
+      end
+
+      permitted_params
     end
   end
 end

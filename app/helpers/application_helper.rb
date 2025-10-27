@@ -74,19 +74,24 @@ module ApplicationHelper
     html.html_safe
   end
   def errors_for(object)
-    if object.errors.any?
-      content_tag(:div, class: 'card-body border-danger') do
-        concat(content_tag(:div, class: 'card-header bg-danger text-white') do
-          concat "#{pluralize(object.errors.count,
-                              'error')} prohibited this #{object.class.name.downcase} from being saved:"
-        end)
-        concat(content_tag(:div, class: 'card-body') do
-          concat(content_tag(:ul, class: 'mb-0') do
-            object.errors.full_messages.each do |msg|
-              concat content_tag(:li, msg)
+    return unless object
+    return unless object.errors.any?
+
+    content_tag(:div, class: 'bg-red-50 border border-red-200 rounded-lg p-4 mb-6', role: 'alert') do
+      content_tag(:div, class: 'flex items-start') do
+        content_tag(:div, class: 'flex-shrink-0') do
+          raw '<svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>'
+        end +
+        content_tag(:div, class: 'ml-3 flex-1') do
+          content_tag(:h3, class: 'text-sm font-medium text-red-800') do
+            "#{pluralize(object.errors.count, 'kesalahan')} ditemukan:"
+          end +
+          content_tag(:div, class: 'mt-2 text-sm text-red-700') do
+            content_tag(:ul, class: 'list-disc list-inside space-y-1') do
+              raw object.errors.full_messages.map { |msg| content_tag(:li, msg) }.join
             end
-          end)
-        end)
+          end
+        end
       end
     end
   end

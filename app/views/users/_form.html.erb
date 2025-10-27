@@ -1,6 +1,28 @@
 <div data-controller="user-form">
   <%= form_for(user, html: { class: "space-y-6" }) do |f| %>
-    <%= errors_for(user) %>
+    <% if user.errors.any? %>
+      <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">
+              <%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:
+            </h3>
+            <div class="mt-2 text-sm text-red-700">
+              <ul class="list-disc pl-5 space-y-1">
+                <% user.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
     
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <div>
@@ -47,11 +69,10 @@
         <%= f.label :address_ids, "Blok Rumah", class: "block text-sm font-medium text-gray-700 mb-2" %>
         <%= f.select :address_ids,
                     Address.select('id, block_address').order(:block_address).collect {|p| [ p.block_address.try(:upcase), p.id ] },
-                    { selected: user.address_ids },
+                    {},
                     {
                       multiple: true,
-                      data: { "user-form-target": "addressSelect" },
-                      class: "select-field-js w-full"
+                      data: { "user-form-target": "addressSelect" }
                     } %>
         <p class="mt-1 text-sm text-gray-500">
           <svg class="inline-block w-4 h-4 mr-1 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
