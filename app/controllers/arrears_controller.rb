@@ -1,6 +1,6 @@
 class ArrearsController < ApplicationController
   def index
-    # Get threshold from settings (default: 3 months)
+    # Get threshold from settings (default: 2 months)
     @threshold = Setting.arrears_threshold_months
 
     # Calculate cutoff date (1 month before current month)
@@ -15,11 +15,11 @@ class ArrearsController < ApplicationController
     # Example: Jan 2025 to Sep 2025 = 9 months
     months_should_pay = ((cutoff_date.year - start_date.year) * 12) + (cutoff_date.month - start_date.month) + 1
 
-    # Get all addresses that are NOT free and have residents
+    # Get all addresses that are NOT free
     # Skip addresses with free flag = true
+    # Include addresses even if they don't have residents
     addresses = Address.includes(:user_contributions, :head_of_family, :residents)
                        .where(free: [false, nil])
-                       .where.not(id: Address.left_joins(:residents).where(users: { id: nil }).select(:id))
 
     # Calculate arrears for each address
     @arrears_data = addresses.map do |address|

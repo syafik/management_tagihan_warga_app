@@ -306,22 +306,6 @@ class UserContributionsController < ApplicationController
     @year_selected = (params[:year] || [Date.current.year, AppSetting.starting_year].max).to_i
     @month_info = generate_month_info(@year_selected)
     @selected_address_id = params[:address_id]
-    
-    respond_to do |format|
-      format.html
-      format.turbo_stream do
-        render turbo_stream: [
-          turbo_stream.replace('month-selection-content', 
-            partial: 'month_selection', 
-            locals: { 
-              year_selected: @year_selected, 
-              month_info: @month_info,
-              selected_address_id: @selected_address_id
-            }
-          )
-        ]
-      end
-    end
   end
 
   # GET /user_contributions/1/edit

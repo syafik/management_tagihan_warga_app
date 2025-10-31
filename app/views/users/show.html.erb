@@ -78,20 +78,6 @@
             </div>
 
             <div>
-              <dt class="text-sm font-medium text-gray-500 mb-1">Iuran Bulanan</dt>
-              <dd class="text-sm text-gray-900 bg-gray-50 rounded px-3 py-2">
-                <%= @user.address&.contribution.present? ? number_to_currency(@user.address.contribution, unit: "Rp.", separator: ",", delimiter: ".") : "-" %>
-              </dd>
-            </div>
-
-            <div>
-              <dt class="text-sm font-medium text-gray-500 mb-1">Tunggakan</dt>
-              <dd class="text-sm text-gray-900 bg-gray-50 rounded px-3 py-2">
-                <%= @user.address&.arrears.present? ? @user.address.arrears : "-" %>
-              </dd>
-            </div>
-
-            <div>
               <dt class="text-sm font-medium text-gray-500 mb-1">PIC Blok</dt>
               <dd class="text-sm text-gray-900 bg-gray-50 rounded px-3 py-2">
                 <%= @user.pic_blok.present? ? @user.pic_blok : "-" %>

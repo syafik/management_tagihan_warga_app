@@ -17,6 +17,6 @@ class Setting < ApplicationRecord
 
   # Get arrears threshold in months
   def self.arrears_threshold_months
-    get('arrears_threshold_months', '3').to_i
+    get('arrears_threshold_months', '2').to_i
   end
 end

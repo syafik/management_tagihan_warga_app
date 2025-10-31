@@ -26,11 +26,13 @@
     
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <div>
-        <%= f.label :email, class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= f.email_field :email, 
-                          autofocus: true, 
-                          class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", 
-                          placeholder: "Alamat email" %>
+        <%= f.label :email, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+          Email <span class="text-xs text-gray-500">(Opsional)</span>
+        <% end %>
+        <%= f.email_field :email,
+                          autofocus: true,
+                          class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+                          placeholder: "Alamat email (opsional)" %>
       </div>
 
       <div>
@@ -113,10 +115,15 @@
 
     <% if user.new_record? %>
       <div>
-        <%= f.label :password, class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= f.password_field :password, 
-                           class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", 
-                           placeholder: "Password" %>
+        <%= f.label :password, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+          Password <span class="text-xs text-gray-500">(Opsional - akan di-generate otomatis jika kosong)</span>
+        <% end %>
+        <%= f.password_field :password,
+                           class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm",
+                           placeholder: "Kosongkan untuk generate otomatis" %>
+        <p class="mt-1 text-xs text-gray-500">
+          Password harus minimal 8 karakter dengan kombinasi huruf dan angka
+        </p>
       </div>
     <% end %>
 

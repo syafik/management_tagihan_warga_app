@@ -25,7 +25,7 @@
           </div>
           <div class="ml-5 w-0 flex-1">
             <dl>
-              <dt class="text-sm font-medium text-gray-500 truncate">Total Warga</dt>
+              <dt class="text-sm font-medium text-gray-500 truncate">Total Users Aplikasi</dt>
               <dd class="text-lg font-medium text-gray-900"><%= @total_residents %></dd>
             </dl>
           </div>
@@ -116,8 +116,8 @@
                 <dd class="text-2xl font-bold text-white">
                   <%= @current_cash_balance < 0 ? '-' : '' %>Rp <%= number_with_delimiter(@current_cash_balance.abs, delimiter: '.') %>
                 </dd>
-                <p class="text-xs <%= @current_cash_balance >= 0 ? 'text-green-100' : 'text-red-100' %>">
-                  Saldo awal: Rp <%= number_with_delimiter(@starting_balance, delimiter: '.') %>
+                <p class="text-sm <%= @current_cash_balance >= 0 ? 'text-green-100' : 'text-red-100' %>">
+                  <span class="font-semibold">Saldo awal:</span> <span class="font-bold">Rp <%= number_with_delimiter(@starting_balance, delimiter: '.') %></span>
                   <% if @current_cash_balance < 0 %>
                     <span class="block mt-1 font-semibold">⚠️ Saldo Negatif</span>
                   <% end %>

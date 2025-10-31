@@ -7,6 +7,10 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable, :timeoutable
   include DeviseTokenAuth::Concerns::User
 
+  # Override Devise's email validation to make it optional
+  validates :email, uniqueness: { allow_blank: true, case_sensitive: false }
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP, allow_blank: true }
+
   validates :name, :phone_number, presence: true
   validate :password_complexity
   validate :phone_number_format_validation
@@ -17,6 +21,10 @@ class User < ApplicationRecord
   has_one :primary_address_relation, -> { where(primary: true) }, class_name: 'UserAddress'
   has_one :primary_address, through: :primary_address_relation, source: :address
   before_validation :set_uid
+  before_validation :normalize_phone_number
+  before_validation :set_dummy_email_if_blank
+  before_validation :set_random_password_if_blank, on: :create
+  after_create :sync_address_ids
 
   has_one_attached :avatar
   has_many :debts
@@ -26,6 +34,32 @@ class User < ApplicationRecord
 
   def set_uid
     self.uid = self.class.generate_uid if uid.blank?
+  end
+
+  def set_dummy_email_if_blank
+    # Generate dummy email if email is blank
+    # Use phone number as base to ensure uniqueness
+    if email.blank? && phone_number.present?
+      # Remove + and non-numeric characters from phone number
+      clean_phone = phone_number.gsub(/[^\d]/, '')
+      self.email = "user#{clean_phone}@dummy.local"
+    end
+  end
+
+  def set_random_password_if_blank
+    # Generate random password if password is blank on creation
+    # Password format: 8 characters with at least 1 letter and 1 number
+    if password.blank?
+      # Generate random password: 6 letters + 2 numbers
+      letters = ('a'..'z').to_a.sample(6).join
+      numbers = ('0'..'9').to_a.sample(2).join
+      random_password = (letters + numbers).chars.shuffle.join
+
+      self.password = random_password
+      self.password_confirmation = random_password
+
+      Rails.logger.info "Generated random password for user with phone: #{phone_number}"
+    end
   end
 
   def self.generate_uid
@@ -64,10 +98,49 @@ class User < ApplicationRecord
     errors.add :password, 'harus 8-128 karakter dan mempunyai minmal 1 number and 1 huruf.'
   end
 
-  def phone_number_format_validation
-    return if phone_number.blank? || phone_number =~ /\+?([ -]?\d+)+|\(\d+\)([ -]\d+)/
+  def normalize_phone_number
+    return if phone_number.blank?
 
-    errors.add :phone_number, 'harus diisi dengan format yang benar.'
+    # Remove all characters except + and digits
+    cleaned = phone_number.gsub(/[^\d+]/, '')
+
+    # Convert Indonesian format to international format
+    if cleaned.match?(/^0\d+/)
+      # 081234567890 -> +6281234567890
+      self.phone_number = "+62#{cleaned[1..-1]}"
+    elsif cleaned.match?(/^8\d+/)
+      # 81234567890 -> +6281234567890
+      self.phone_number = "+62#{cleaned}"
+    elsif cleaned.match?(/^62\d+/)
+      # 6281234567890 -> +6281234567890
+      self.phone_number = "+#{cleaned}"
+    elsif cleaned.start_with?('+')
+      # Already has +, just use it
+      self.phone_number = cleaned
+    else
+      # Unknown format, assume it needs +62
+      self.phone_number = "+62#{cleaned}"
+    end
+  end
+
+  def phone_number_format_validation
+    return if phone_number.blank?
+
+    # Only allow + and digits
+    unless phone_number.match?(/^\+\d+$/)
+      errors.add :phone_number, 'hanya boleh berisi + dan angka (contoh: +6281234567890)'
+      return
+    end
+
+    # Must start with +62 for Indonesian numbers
+    unless phone_number.start_with?('+62')
+      errors.add :phone_number, 'harus diawali dengan +62 untuk nomor Indonesia'
+    end
+
+    # Minimum length check (e.g., +62812345678 = 13 characters minimum)
+    if phone_number.length < 13
+      errors.add :phone_number, 'terlalu pendek (minimal 10-11 digit setelah +62)'
+    end
   end
 
   def is_admin?
@@ -150,11 +223,23 @@ class User < ApplicationRecord
 
   # Virtual attribute for handling multiple addresses from form
   def address_ids=(ids)
-    return if ids.blank? || ids.reject(&:blank?).empty?
+    # Store the IDs to be synced after create
+    @pending_address_ids = ids
 
-    # Get valid address IDs
-    valid_ids = ids.reject(&:blank?).map(&:to_i)
-    return if valid_ids.empty?
+    # Return early if no IDs provided or all blank
+    return if ids.blank?
+
+    # Only sync if user is already persisted (for updates)
+    return unless persisted?
+
+    # Get valid address IDs, removing blank values
+    valid_ids = ids.is_a?(Array) ? ids.reject(&:blank?).map(&:to_i) : [ids.to_i]
+
+    # If no valid IDs, clear all addresses
+    if valid_ids.empty?
+      user_addresses.destroy_all
+      return
+    end
 
     # Remove addresses that are not in the new list
     user_addresses.where.not(address_id: valid_ids).destroy_all
@@ -290,6 +375,37 @@ class User < ApplicationRecord
 
   def blok_name
     address.try(:block_address)
+  end
+
+  # Override Devise methods to make email optional
+  def email_required?
+    false
+  end
+
+  def email_changed?
+    false
+  end
+
+  def will_save_change_to_email?
+    false
+  end
+
+  # Sync address_ids after user is created
+  def sync_address_ids
+    return if @pending_address_ids.blank?
+
+    # Get valid address IDs, removing blank values
+    valid_ids = @pending_address_ids.is_a?(Array) ? @pending_address_ids.reject(&:blank?).map(&:to_i) : [@pending_address_ids.to_i]
+    return if valid_ids.empty?
+
+    # Add addresses
+    valid_ids.each_with_index do |address_id, index|
+      user_address = user_addresses.create(address_id: address_id)
+      # Set first address as primary
+      user_address.update(primary: true) if index == 0
+    end
+
+    @pending_address_ids = nil
   end
 
   class << self
