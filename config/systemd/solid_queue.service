@@ -6,18 +6,18 @@ Requires=postgresql.service
 [Service]
 Type=simple
 User=syafik
-WorkingDirectory=/var/www/management_tagihan_warga_app/current
+WorkingDirectory=/var/www/puriayana-app
 Environment=RAILS_ENV=production
 Environment=RAILS_LOG_TO_STDOUT=true
 
 # Use rbenv to ensure correct Ruby version
-ExecStart=/bin/bash -lc 'cd /var/www/management_tagihan_warga_app/current && bundle exec rake solid_queue:start'
+ExecStart=/bin/bash -lc 'cd /var/www/puriayana-app && bundle exec rake solid_queue:start'
 
 # Restart policy
 Restart=always
 RestartSec=10
-StandardOutput=append:/var/www/management_tagihan_warga_app/shared/log/solid_queue.log
-StandardError=append:/var/www/management_tagihan_warga_app/shared/log/solid_queue_error.log
+StandardOutput=append:/var/www/puriayana-app/log/solid_queue.log
+StandardError=append:/var/www/puriayana-app/log/solid_queue_error.log
 
 # Security settings
 NoNewPrivileges=true
