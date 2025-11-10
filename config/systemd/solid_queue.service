@@ -1,0 +1,27 @@
+[Unit]
+Description=Solid Queue Worker for Management Tagihan Warga
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=deploy
+WorkingDirectory=/var/www/management_tagihan_warga_app/current
+Environment=RAILS_ENV=production
+Environment=RAILS_LOG_TO_STDOUT=true
+
+# Use rbenv to ensure correct Ruby version
+ExecStart=/bin/bash -lc 'cd /var/www/management_tagihan_warga_app/current && bundle exec rake solid_queue:start'
+
+# Restart policy
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/www/management_tagihan_warga_app/shared/log/solid_queue.log
+StandardError=append:/var/www/management_tagihan_warga_app/shared/log/solid_queue_error.log
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
