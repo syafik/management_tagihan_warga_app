@@ -317,11 +317,17 @@ class UserContributionsController < ApplicationController
     success = false
     total_contribution_amount = 0
     address = Address.find_by(id: params[:user_contribution][:address_id])
+
+    if address.nil?
+      flash[:error] = "Alamat tidak ditemukan"
+      redirect_to new_user_contribution_path and return
+    end
+
     user_contributions_created = []
 
     UserContribution.transaction do
       params[:user_contribution_month].each do |value|
-        month, month_text, year = value.split(",")
+        month, month_text, year = value.strip.split(",")
 
         # Get the expected contribution for this specific address, month, and year
         expected_contribution = address.expected_contribution_for(month.to_i, year.to_i)

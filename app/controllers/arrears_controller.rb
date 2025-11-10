@@ -36,16 +36,16 @@ class ArrearsController < ApplicationController
       arrears_months = months_should_pay - total_paid_2025 + initial_arrears
 
       {
-        address: address,
-        arrears_months: arrears_months,
-        months_should_pay: months_should_pay,
-        total_paid_2025: total_paid_2025,
-        initial_arrears: initial_arrears,
+        address:,
+        arrears_months:,
+        months_should_pay:,
+        total_paid_2025:,
+        initial_arrears:,
         head_of_family: address.head_of_family,
         residents: address.residents
       }
     end.select { |data| data[:arrears_months] >= @threshold }
-       .sort_by { |data| -data[:arrears_months] }
+                             .sort_by { |data| -data[:arrears_months] }
 
     @total_arrears_count = @arrears_data.size
     @cutoff_date = cutoff_date

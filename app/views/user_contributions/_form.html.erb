@@ -98,12 +98,15 @@
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <span class="text-gray-500 sm:text-sm">Rp</span>
         </div>
-        <%= form.number_field :contribution, 
-            class: 'block w-full pl-10 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm', 
+        <%= text_field_tag 'contribution_display', '',
+            class: 'block w-full pl-10 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-gray-50',
             placeholder: '0',
-            step: 1000,
+            readonly: true,
+            data: { user_contribution_form_target: 'contributionDisplay' } %>
+        <%= form.hidden_field :contribution,
             data: { user_contribution_form_target: 'contributionField' } %>
       </div>
+      <p class="mt-1 text-xs text-gray-500">Jumlah iuran otomatis terisi dari bulan yang dipilih</p>
     </div>
 
     <!-- Payment Date -->

@@ -7,7 +7,8 @@ export default class extends Controller {
     "searchResults",
     "selectedAddress",
     "selectedAddressText",
-    "contributionField", 
+    "contributionField",
+    "contributionDisplay",
     "monthsGrid",
     "monthCheckbox",
     "monthSelectionContent"
@@ -234,11 +235,12 @@ export default class extends Controller {
   updateContributionInfo(firstMonth) {
     if (!firstMonth) return
 
-    this.currentContributionRateValue = firstMonth.contribution_rate
-    
+    // Convert to number to ensure proper calculation
+    this.currentContributionRateValue = parseFloat(firstMonth.contribution_rate)
+
     console.log('Updated contribution rate for address:', this.currentContributionRateValue)
-    
-    // Clear and reset the contribution field 
+
+    // Clear and reset the contribution field
     if (this.hasContributionFieldTarget) {
       this.contributionFieldTarget.value = ''
       // Trigger total calculation after contribution rate is updated
@@ -251,15 +253,15 @@ export default class extends Controller {
   updateMonthsWithPaymentStatus(months) {
     // Clear previous monthly rates
     this.monthlyRates.clear()
-    
+
     months.forEach(monthData => {
       const monthId = `month_${monthData.month}_${monthData.year}`
       const monthContainer = document.getElementById(monthId)?.parentElement
-      
-      // Store the monthly rate for later calculation
+
+      // Store the monthly rate for later calculation (convert to number)
       const monthKey = `${monthData.month}_${monthData.year}`
-      this.monthlyRates.set(monthKey, monthData.contribution_rate)
-      
+      this.monthlyRates.set(monthKey, parseFloat(monthData.contribution_rate))
+
       if (monthContainer) {
         const label = monthContainer.querySelector('.month-label')
         const contributionDisplay = monthContainer.querySelector('.contribution-display')
@@ -267,10 +269,10 @@ export default class extends Controller {
         const paidIndicator = monthContainer.querySelector('.paid-indicator')
         const unpaidIndicator = monthContainer.querySelector('.unpaid-indicator')
         const checkbox = monthContainer.querySelector('.month-checkbox')
-        
+
         // Update contribution amount display
         if (contributionDisplay && monthData.contribution_rate > 0) {
-          contributionDisplay.textContent = `Rp ${monthData.formatted_rate}`
+          contributionDisplay.textContent = `Rp ${this.formatCurrency(monthData.contribution_rate)}`
           contributionDisplay.classList.remove('hidden')
         }
         
@@ -327,22 +329,22 @@ export default class extends Controller {
   }
 
   updateTotalContribution() {
-    const checkedBoxes = this.monthCheckboxTargets.filter(checkbox => 
+    const checkedBoxes = this.monthCheckboxTargets.filter(checkbox =>
       checkbox.checked && !checkbox.disabled
     )
-    
+
     let totalAmount = 0
     let monthsDetails = []
-    
+
     // Calculate total based on each month's specific contribution rate
     checkedBoxes.forEach(checkbox => {
       const month = parseInt(checkbox.dataset.month)
       const year = parseInt(checkbox.dataset.year)
       const monthKey = `${month}_${year}`
-      
+
       // Get the specific contribution rate for this month/year
       const monthlyRate = this.monthlyRates.get(monthKey) || this.currentContributionRateValue
-      
+
       totalAmount += monthlyRate
       monthsDetails.push({
         month: month,
@@ -350,16 +352,22 @@ export default class extends Controller {
         rate: monthlyRate
       })
     })
-    
-    // Update the contribution field
+
+    // Update both the hidden field (for form submission) and display field (for user)
     if (this.hasContributionFieldTarget) {
       if (checkedBoxes.length > 0 && totalAmount > 0) {
         this.contributionFieldTarget.value = totalAmount
+        if (this.hasContributionDisplayTarget) {
+          this.contributionDisplayTarget.value = this.formatCurrency(totalAmount)
+        }
       } else {
         this.contributionFieldTarget.value = ''
+        if (this.hasContributionDisplayTarget) {
+          this.contributionDisplayTarget.value = ''
+        }
       }
     }
-    
+
     console.log('Total contribution calculated:', {
       selectedMonths: checkedBoxes.length,
       monthsDetails: monthsDetails,
@@ -368,33 +376,46 @@ export default class extends Controller {
   }
 
   resetForm() {
-    // Clear contribution field
+    // Clear contribution fields
     if (this.hasContributionFieldTarget) {
       this.contributionFieldTarget.value = ''
     }
-    
+    if (this.hasContributionDisplayTarget) {
+      this.contributionDisplayTarget.value = ''
+    }
+
     // Reset all month displays
     this.monthCheckboxTargets.forEach(checkbox => {
       const monthContainer = checkbox.parentElement
       const label = monthContainer.querySelector('.month-label')
       const contributionDisplay = monthContainer.querySelector('.contribution-display')
       const paymentStatus = monthContainer.querySelector('.payment-status')
-      
+
       // Reset styles
       label?.classList.remove('bg-green-50', 'border-green-200', 'text-green-800', 'bg-red-50', 'border-red-200')
       label?.classList.add('border-gray-200', 'hover:bg-gray-50')
-      
+
       // Hide displays
       contributionDisplay?.classList.add('hidden')
       paymentStatus?.classList.add('hidden')
-      
+
       // Enable and uncheck checkbox
       checkbox.disabled = false
       checkbox.checked = false
     })
-    
+
     this.currentContributionRateValue = 0
     this.monthlyRates.clear() // Clear monthly rates
+  }
+
+  formatCurrency(amount) {
+    if (!amount || amount === 0) return '0'
+
+    // Convert to integer to remove any decimal places
+    const intAmount = parseInt(amount)
+
+    // Format with Indonesian locale (using period as thousands separator)
+    return intAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
   }
 
 }
