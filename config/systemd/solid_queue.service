@@ -11,7 +11,7 @@ Environment=RAILS_ENV=production
 Environment=RAILS_LOG_TO_STDOUT=true
 
 # Use rbenv to ensure correct Ruby version
-ExecStart=/bin/bash -lc 'cd /var/www/puriayana-app && bundle exec rake solid_queue:start'
+ExecStart=/bin/bash -c 'cd /var/www/puriayana-app && /home/syafik/.rbenv/shims/bundle exec rake solid_queue:start'
 
 # Restart policy
 Restart=always
