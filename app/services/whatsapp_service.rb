@@ -72,7 +72,7 @@ class WhatsappService
   def handle_response(response)
     # Debug logging
     Rails.logger.info "WhatsApp API Response: #{response.code} - #{response.body}"
-    
+
     case response.code
     when 200, 201
       {

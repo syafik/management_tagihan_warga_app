@@ -15,7 +15,7 @@ class SendPaymentReminderNotificationJob < ApplicationJob
 
     whatsapp_service = WhatsappService.new
     message = build_reminder_message(address, head_of_family, year, month)
-    result = whatsapp_service.send_login_code(head_of_family.phone_number, message)
+    result = whatsapp_service.send_message(head_of_family.phone_number, message)
 
     Rails.logger.info message
 
