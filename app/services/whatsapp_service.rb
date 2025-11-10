@@ -17,7 +17,10 @@ class WhatsappService
 
   def send_login_code(phone_number, login_code)
     message = build_login_message(login_code)
+    send_message(phone_number, message)
+  end
 
+  def send_message(phone_number, message)
     body = {
       "user_code": @user_code,
       "device_id": @device_id,

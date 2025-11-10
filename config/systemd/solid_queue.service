@@ -9,7 +9,6 @@ User=syafik
 WorkingDirectory=/var/www/puriayana-app
 Environment=RAILS_ENV=production
 Environment=RAILS_LOG_TO_STDOUT=true
-Environment=SECRET_KEY_BASE=7fd59d794fa1e49c82f7e9a7bf2517c44148e8157aa2b42c5aa914b0b173d0b18309430a1524bc232eaae98c6cad0f585751f2d1b34b51de9ed10860d677d1fc
 
 # Use rbenv to ensure correct Ruby version
 ExecStart=/bin/bash -c 'cd /var/www/puriayana-app && /home/syafik/.rbenv/shims/bundle exec rake solid_queue:start'
