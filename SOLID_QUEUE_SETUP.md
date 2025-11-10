@@ -12,14 +12,32 @@ Setelah deploy pertama kali, jalankan command ini **sekali saja** di production 
 # SSH ke production server
 ssh your_user@your_server
 
-# Jalankan Capistrano task untuk install service
-bundle exec cap production solid_queue:install
+# Copy service file ke systemd
+cd /var/www/puriayana-app
+sudo cp config/systemd/solid_queue.service /etc/systemd/system/
+
+# Edit service file untuk menambahkan credentials (PENTING!)
+sudo nano /etc/systemd/system/solid_queue.service
 ```
 
-Task ini akan:
-- Copy file `config/systemd/solid_queue.service` ke `/etc/systemd/system/`
-- Enable service untuk auto-start saat server reboot
-- Reload systemd daemon
+**Tambahkan baris ini** setelah `Environment=RAILS_LOG_TO_STDOUT=true`:
+
+```ini
+Environment=RAILS_MASTER_KEY=your_production_key_here
+```
+
+**Note**: Dapatkan production key dari file `config/credentials/production.key` di local repository.
+
+Simpan file (Ctrl+O, Enter, Ctrl+X), lalu:
+
+```bash
+# Enable dan start service
+sudo systemctl daemon-reload
+sudo systemctl enable solid_queue
+sudo systemctl start solid_queue
+```
+
+**⚠️ PENTING**: File service di server mengandung credentials. Jangan pernah commit credentials ke git repository!
 
 ### 2. Verifikasi Service Berjalan
 
