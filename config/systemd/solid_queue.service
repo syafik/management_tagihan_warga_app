@@ -5,7 +5,7 @@ Requires=postgresql.service
 
 [Service]
 Type=simple
-User=deploy
+User=syafik
 WorkingDirectory=/var/www/management_tagihan_warga_app/current
 Environment=RAILS_ENV=production
 Environment=RAILS_LOG_TO_STDOUT=true
