@@ -71,9 +71,15 @@ echo
 log "Restarting puma service..."
 echo "$SUDO_PASSWORD" | ssh $VPS_USER@$VPS_IP 'sudo -S systemctl restart puma.service'
 
-# Check and restart solid_queue if it exists
-log "Checking solid_queue service..."
-ssh $VPS_USER@$VPS_IP 'if systemctl is-active --quiet solid_queue.service 2>/dev/null; then echo "Restarting solid_queue..."; echo "'"$SUDO_PASSWORD"'" | sudo -S systemctl restart solid_queue.service; else echo "solid_queue service not found or inactive"; fi'
+# Reload systemd daemon and restart solid_queue
+log "Reloading systemd daemon..."
+echo "$SUDO_PASSWORD" | ssh $VPS_USER@$VPS_IP 'sudo -S systemctl daemon-reload'
+
+log "Restarting solid_queue service..."
+echo "$SUDO_PASSWORD" | ssh $VPS_USER@$VPS_IP 'sudo -S systemctl restart solid_queue.service'
+
+log "Checking solid_queue status..."
+ssh $VPS_USER@$VPS_IP 'systemctl is-active solid_queue.service && echo "✅ Solid Queue is running" || echo "⚠️  Solid Queue failed to start"'
 
 # Clear password from memory
 unset SUDO_PASSWORD
