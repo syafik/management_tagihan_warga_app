@@ -3,16 +3,17 @@ class ArrearsController < ApplicationController
     # Get threshold from settings (default: 2 months)
     @threshold = Setting.arrears_threshold_months
 
-    # Calculate cutoff date (1 month before current month)
+    # Calculate cutoff date (last month, not current month)
     # If current month is October 2025, cutoff is September 2025
+    # But we still check payments made up until today
     current_date = Date.current
     cutoff_date = current_date - 1.month
 
     # Starting from January 2025
     start_date = Date.new(2025, 1, 1)
 
-    # Calculate how many months from Jan 2025 to cutoff date
-    # Example: Jan 2025 to Sep 2025 = 9 months
+    # Calculate how many months from Jan 2025 to cutoff date (last month)
+    # Example: Jan 2025 to Sep 2025 = 9 months should be paid
     months_should_pay = ((cutoff_date.year - start_date.year) * 12) + (cutoff_date.month - start_date.month) + 1
 
     # Get all addresses that are NOT free
@@ -23,9 +24,10 @@ class ArrearsController < ApplicationController
 
     # Calculate arrears for each address
     @arrears_data = addresses.map do |address|
-      # Count payments made in 2025 only (from Jan 2025 to cutoff date)
+      # Count payments made in 2025 only (from Jan 2025 up until today)
+      # This ensures payments made today are counted immediately
       total_paid_2025 = address.user_contributions
-                               .where('pay_at >= ? AND pay_at <= ?', start_date, cutoff_date.end_of_month)
+                               .where('pay_at >= ? AND pay_at <= ?', start_date, current_date)
                                .count
 
       # Get initial arrears from database (tunggakan dari sebelum 2025)
