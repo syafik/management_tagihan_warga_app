@@ -1,81 +1,82 @@
-<!-- Warga View - Box Layout -->
-<div class="space-y-8">
+<!-- Warga View - Mobile-First Modern Layout -->
+<div class="space-y-4">
   <% if @addresses.any? %>
     <% @addresses.each do |address| %>
-      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-        <!-- Address Header -->
-        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <!-- Address Header - Compact Mobile Design -->
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-3">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-white">
-              <%= address.block_address&.upcase %>
-            </h3>
-            <div class="text-sm text-indigo-100">
-              <%= address.head_of_family&.name&.upcase %>
+            <div class="flex items-center space-x-3">
+              <div class="bg-white bg-opacity-20 rounded-xl p-2 backdrop-blur-sm">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-white">
+                  <%= address.block_address&.upcase %>
+                </h3>
+                <p class="text-xs text-indigo-100 mt-0.5">
+                  <%= address.head_of_family&.name&.upcase %>
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Arrears Alert (if any) -->
+        <!-- Arrears Alert - Compact Mobile -->
         <% if address.arrears.present? && address.arrears > 0 %>
-          <div class="bg-red-50 border-l-4 border-red-500 px-6 py-4">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <svg class="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                </svg>
-              </div>
-              <div class="ml-4 flex-1">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="text-sm font-medium text-red-800">
-                      Tunggakan Lama: <%= address.arrears %> bulan
-                    </p>
-                    <p class="text-sm text-red-700 mt-1">
-                      Total: Rp <%= number_with_delimiter(address.arrears * 175000, delimiter: '.') %>
-                    </p>
-                  </div>
-                  <div class="text-xs text-red-600">
-                    @ Rp 175.000/bulan
-                  </div>
+          <div class="mx-4 mt-3 bg-red-50 border border-red-200 rounded-xl p-3">
+            <div class="flex items-start space-x-3">
+              <div class="flex-shrink-0 mt-0.5">
+                <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                  <svg class="h-4 w-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                  </svg>
                 </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold text-red-800">Tunggakan Lama</p>
+                <p class="text-sm font-bold text-red-900 mt-0.5">
+                  <%= address.arrears %> bulan • Rp <%= number_with_delimiter(address.arrears * 175000, delimiter: '.') %>
+                </p>
               </div>
             </div>
           </div>
         <% end %>
 
-        <!-- Year Navigation -->
-        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
-          <div class="flex items-center justify-between">
-            <h4 class="text-sm font-medium text-gray-700">Status Pembayaran Iuran <%= @year_selected %></h4>
-            <div class="flex items-center space-x-4">
+        <!-- Year Navigation - Mobile Friendly -->
+        <div class="px-4 py-3 bg-gray-50">
+          <div class="flex flex-col space-y-2">
+            <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tahun</h4>
+            <div class="flex items-center justify-between">
               <% if @year_selected > AppSetting.starting_year %>
                 <%= form_tag(search_user_contributions_path, method: :post, class: 'inline') do %>
                   <%= hidden_field_tag :year_eq, @year_selected - 1 %>
                   <%= hidden_field_tag :address_filter, @address_filter if @address_filter.present? %>
-                  <%= button_tag type: 'submit', class: 'inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50' do %>
-                    <svg class="-ml-1 mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <%= button_tag type: 'submit', class: 'p-2 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 active:bg-gray-200 transition-colors' do %>
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                     </svg>
-                    <%= @year_selected - 1 %>
                   <% end %>
                 <% end %>
               <% else %>
-                <div class="inline-flex items-center px-3 py-1 text-sm font-medium text-gray-400 cursor-not-allowed">
-                  <svg class="-ml-1 mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="p-2 rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                   </svg>
-                  <%= @year_selected - 1 %>
                 </div>
               <% end %>
 
-              <span class="px-4 py-1 text-lg font-semibold text-indigo-600"><%= @year_selected %></span>
+              <div class="flex-1 text-center">
+                <span class="text-2xl font-bold text-indigo-600"><%= @year_selected %></span>
+              </div>
 
               <%= form_tag(search_user_contributions_path, method: :post, class: 'inline') do %>
                 <%= hidden_field_tag :year_eq, @year_selected + 1 %>
                 <%= hidden_field_tag :address_filter, @address_filter if @address_filter.present? %>
-                <%= button_tag type: 'submit', class: 'inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50' do %>
-                  <%= @year_selected + 1 %>
-                  <svg class="-mr-1 ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <%= button_tag type: 'submit', class: 'p-2 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 active:bg-gray-200 transition-colors' do %>
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                   </svg>
                 <% end %>
@@ -84,9 +85,9 @@
           </div>
         </div>
 
-        <!-- Monthly Status Grid -->
-        <div class="p-6">
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <!-- Monthly Status Grid - Mobile Optimized -->
+        <div class="p-4">
+          <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
             <% 
               current_date = Date.current
               UserContribution::MONTHNAMES.each do |month_name, month_num| 
@@ -108,91 +109,57 @@
               
               <div class="relative group">
                 <% if contribution %>
-                  <!-- PAID -->
-                  <div class="flex flex-col items-center justify-between p-4 rounded-lg border-2 transition-all duration-200 h-[140px] border-green-200 bg-green-50 hover:bg-green-100">
+                  <!-- PAID - Compact Mobile -->
+                  <div class="flex flex-col items-center justify-center p-2 rounded-xl border transition-all duration-200 min-h-[80px] border-green-300 bg-green-50 active:scale-95">
                 <% elsif is_future %>
-                  <!-- FUTURE MONTH -->
-                  <div class="flex flex-col items-center justify-between p-4 rounded-lg border-2 transition-all duration-200 h-[140px] border-gray-200 bg-gray-50 hover:bg-gray-100">
+                  <!-- FUTURE MONTH - Compact Mobile -->
+                  <div class="flex flex-col items-center justify-center p-2 rounded-xl border transition-all duration-200 min-h-[80px] border-gray-200 bg-gray-50">
                 <% else %>
-                  <!-- UNPAID AND DUE -->
-                  <div class="flex flex-col items-center justify-between p-4 rounded-lg border-2 transition-all duration-200 h-[140px] border-red-200 bg-red-50 hover:bg-red-100">
+                  <!-- UNPAID AND DUE - Compact Mobile -->
+                  <div class="flex flex-col items-center justify-center p-2 rounded-xl border transition-all duration-200 min-h-[80px] border-red-300 bg-red-50 active:scale-95">
                 <% end %>
-                
-                  <!-- Top Section: Month Name -->
-                  <div class="text-center">
-                    <div class="text-sm font-medium text-gray-700"><%= month_name %></div>
-                  </div>
-                  
-                  <!-- Middle Section: Status Icon -->
-                  <div class="flex-1 flex items-center justify-center">
-                    <% if contribution %>
-                      <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                    <% elsif is_future %>
-                      <div class="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                      </div>
-                    <% else %>
-                      <div class="w-10 h-10 bg-red-400 rounded-full flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                    <% end %>
-                  </div>
-                  
-                  <!-- Bottom Section: Status Text and Amount -->
-                  <div class="text-center">
-                    <% if contribution %>
-                      <div class="text-xs font-bold text-green-700 mb-1">LUNAS</div>
-                      <div class="text-xs text-green-600">
-                        Rp <%= number_with_delimiter(contribution.contribution, delimiter: '.') %>
-                      </div>
-                      <% if contribution.pay_at %>
-                        <div class="text-xs text-gray-500 mt-1">
-                          <%= contribution.pay_at.strftime('%d/%m/%Y') %>
-                        </div>
-                      <% end %>
-                    <% elsif is_future %>
-                      <div class="text-xs text-gray-600">
-                        Rp <%= number_with_delimiter(expected_amount, delimiter: '.') %>
-                      </div>
-                    <% else %>
-                      <div class="text-xs font-bold text-red-700 mb-1">BELUM LUNAS</div>
-                      <div class="text-xs text-red-600">
-                        Rp <%= number_with_delimiter(expected_amount, delimiter: '.') %>
-                      </div>
-                    <% end %>
-                  </div>
-                  
-                  <!-- Payment Type Badge -->
+
+                  <!-- Month Name - Compact -->
+                  <div class="text-xs font-semibold text-gray-700 mb-1.5"><%= month_name %></div>
+
+                  <!-- Status Icon - Smaller -->
+                  <% if contribution %>
+                    <div class="w-7 h-7 bg-green-500 rounded-full flex items-center justify-center mb-1.5">
+                      <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                      </svg>
+                    </div>
+                    <div class="text-xs font-bold text-green-700">LUNAS</div>
+                  <% elsif is_future %>
+                    <div class="w-7 h-7 bg-gray-300 rounded-full flex items-center justify-center mb-1.5">
+                      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                    </div>
+                    <div class="text-xs text-gray-500">Belum Tempo</div>
+                  <% else %>
+                    <div class="w-7 h-7 bg-red-500 rounded-full flex items-center justify-center mb-1.5">
+                      <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                      </svg>
+                    </div>
+                    <div class="text-xs font-bold text-red-700">TUNGGAK</div>
+                  <% end %>
+
+                  <!-- Payment Type Badge - Smaller -->
                   <% if contribution && contribution.payment_type %>
-                    <div class="absolute top-2 right-2">
-                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <%= contribution.payment_type == 1 ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800' %>">
-                        <%= contribution.payment_type == 1 ? 'Cash' : 'Transfer' %>
-                      </span>
+                    <div class="absolute top-1 right-1">
+                      <div class="w-1.5 h-1.5 rounded-full <%= contribution.payment_type == 1 ? 'bg-blue-500' : 'bg-purple-500' %>"></div>
                     </div>
                   <% end %>
                 </div>
                 
-                <!-- Hover Tooltip -->
+                <!-- Tooltip - Hidden on mobile, visible on desktop hover -->
                 <% if contribution %>
-                  <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-xs text-white bg-gray-800 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
-                    <div class="font-medium">Detail Pembayaran</div>
-                    <div>Jumlah: Rp <%= number_with_delimiter(contribution.contribution, delimiter: '.') %></div>
+                  <div class="hidden sm:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1.5 text-xs text-white bg-gray-900 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                    <div class="font-medium text-xs">Rp <%= number_with_delimiter(contribution.contribution, delimiter: '.') %></div>
                     <% if contribution.pay_at %>
-                      <div>Tanggal: <%= contribution.pay_at.strftime('%d %B %Y') %></div>
-                    <% end %>
-                    <% if contribution.receiver %>
-                      <div>Penerima: <%= contribution.receiver.name %></div>
-                    <% end %>
-                    <% if contribution.payment_type %>
-                      <div>Jenis: <%= contribution.payment_type == 1 ? 'Cash' : 'Transfer' %></div>
+                      <div class="text-xs opacity-80"><%= contribution.pay_at.strftime('%d/%m/%Y') %></div>
                     <% end %>
                   </div>
                 <% end %>
@@ -201,10 +168,10 @@
           </div>
         </div>
 
-        <!-- Summary Statistics -->
-        <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-            <% 
+        <!-- Summary Statistics - Mobile Optimized -->
+        <div class="bg-gradient-to-br from-gray-50 to-gray-100 px-4 py-4">
+          <div class="grid grid-cols-2 gap-3">
+            <%
               # Calculate due months (only previous months are due, current month is not due yet)
               current_date = Date.current
               if @year_selected == current_date.year
@@ -217,48 +184,67 @@
                 # For future years, no months are due yet
                 due_months = 0
               end
-              
+
               total_paid = address.user_contributions.where(year: @year_selected).count
               total_amount_paid = address.user_contributions.where(year: @year_selected).sum(:contribution)
               completion_percentage = due_months > 0 ? (total_paid.to_f / due_months * 100).round(1) : 0
               unpaid_due = [due_months - total_paid, 0].max
             %>
-            <div>
-              <div class="text-2xl font-bold text-indigo-600"><%= total_paid %></div>
-              <div class="text-sm text-gray-500">Bulan Terbayar</div>
+            <div class="bg-white rounded-xl p-3 shadow-sm">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-xl font-bold text-indigo-600"><%= total_paid %></div>
+                  <div class="text-xs text-gray-500 truncate">Terbayar</div>
+                </div>
+              </div>
             </div>
-            <div>
-              <div class="text-2xl font-bold text-green-600">Rp <%= number_with_delimiter(total_amount_paid, delimiter: '.') %></div>
-              <div class="text-sm text-gray-500">Total Dibayar</div>
-            </div>
-            <div>
-              <div class="text-2xl font-bold text-purple-600"><%= completion_percentage %>%</div>
-              <div class="text-sm text-gray-500">Tingkat Kepatuhan</div>
-            </div>
-            <div>
-              <div class="text-2xl font-bold text-orange-600"><%= unpaid_due %></div>
-              <div class="text-sm text-gray-500">
-                <% if @year_selected == current_date.year %>
-                  Belum Terbayar
-                <% elsif @year_selected < current_date.year %>
-                  Tunggakan
-                <% else %>
-                  Belum Jatuh Tempo
-                <% end %>
+            <div class="bg-white rounded-xl p-3 shadow-sm">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-xl font-bold text-orange-600"><%= unpaid_due %></div>
+                  <div class="text-xs text-gray-500 truncate">
+                    <% if @year_selected == current_date.year %>
+                      Belum Bayar
+                    <% elsif @year_selected < current_date.year %>
+                      Tunggakan
+                    <% else %>
+                      Belum Tempo
+                    <% end %>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          
+
+          <!-- Total Amount Card -->
+          <div class="mt-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-xs text-green-100 font-medium mb-1">Total Dibayar</div>
+                <div class="text-2xl font-bold text-white">Rp <%= number_with_delimiter(total_amount_paid, delimiter: '.') %></div>
+              </div>
+              <div class="text-right">
+                <div class="text-xs text-green-100 mb-1">Kepatuhan</div>
+                <div class="text-2xl font-bold text-white"><%= completion_percentage %>%</div>
+              </div>
+            </div>
+          </div>
+
           <!-- Additional info for current year -->
-          <% if @year_selected == current_date.year %>
-            <div class="mt-4 text-center">
-              <div class="text-xs text-gray-600">
-                <% if due_months > 0 %>
-                  Status dihitung sampai bulan <%= Date.new(@year_selected, current_date.month - 1, 1).strftime('%B') %> <%= @year_selected %>
-                  • Bulan <%= Date.new(@year_selected, current_date.month, 1).strftime('%B') %> dan seterusnya belum jatuh tempo
-                <% else %>
-                  Bulan <%= Date.new(@year_selected, current_date.month, 1).strftime('%B') %> <%= @year_selected %> dan seterusnya belum jatuh tempo
-                <% end %>
+          <% if @year_selected == current_date.year && due_months > 0 %>
+            <div class="mt-3 text-center">
+              <div class="text-xs text-gray-500">
+                Data sampai <%= Date.new(@year_selected, current_date.month - 1, 1).strftime('%B %Y') %>
               </div>
             </div>
           <% end %>

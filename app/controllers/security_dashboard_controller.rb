@@ -259,6 +259,71 @@ class SecurityDashboardController < ApplicationController
     end
   end
 
+  def confirm_payment
+    @address = Address.find_by(id: params[:address_id])
+
+    unless @address && can_access_address?(@address)
+      redirect_to security_dashboard_index_path, alert: 'Akses ditolak'
+      return
+    end
+
+    @payment_type = params[:payment_type]&.to_i || 1
+    @pay_arrears = params[:pay_arrears] == '1'
+    @unpaid_months = params[:unpaid_months] || []
+    @future_months = params[:future_months] || []
+
+    if !@pay_arrears && @unpaid_months.empty? && @future_months.empty?
+      redirect_to payment_security_dashboard_index_path(address_id: @address.id),
+                  alert: 'Pilih minimal 1 item pembayaran'
+      return
+    end
+
+    # Calculate total and prepare display data
+    @total_amount = 0
+    @selected_items = []
+
+    # Process arrears
+    if @pay_arrears && @address.arrears.to_i > 0
+      arrears_amount = @address.arrears * @address.current_contribution_rate
+      @total_amount += arrears_amount
+      @selected_items << {
+        category: 'Tunggakan Lama',
+        description: "#{@address.arrears} bulan tunggakan",
+        amount: arrears_amount
+      }
+    end
+
+    # Process unpaid months
+    @unpaid_months.each do |month_year|
+      month, year = month_year.split(',').map(&:to_i)
+      expected_contribution = @address.expected_contribution_for(month, year)
+      month_text = UserContribution::MONTHNAMES.invert[month]
+
+      @selected_items << {
+        category: 'Belum Bayar',
+        description: "#{month_text} #{year}",
+        amount: expected_contribution
+      }
+      @total_amount += expected_contribution
+    end
+
+    # Process future months
+    @future_months.each do |month_year|
+      month, year = month_year.split(',').map(&:to_i)
+      expected_contribution = @address.expected_contribution_for(month, year)
+      month_text = UserContribution::MONTHNAMES.invert[month]
+
+      @selected_items << {
+        category: 'Bayar Bulan Lain',
+        description: "#{month_text} #{year}",
+        amount: expected_contribution
+      }
+      @total_amount += expected_contribution
+    end
+
+    @current_date = Date.current.strftime('%d %B %Y')
+  end
+
   def create_payment
     address = Address.find_by(id: params[:address_id])
 

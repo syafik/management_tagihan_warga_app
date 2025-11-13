@@ -1,76 +1,275 @@
-<div class="max-w-4xl mx-auto" data-controller="security-payment">
-  <!-- Header -->
-  <div class="mb-6">
-    <%= link_to security_dashboard_index_path, class: "inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4" do %>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-4" data-controller="payment-wizard">
+  <!-- Header - Mobile Optimized -->
+  <div class="mb-4">
+    <%= link_to security_dashboard_index_path, class: "inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-3" do %>
       <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
       </svg>
-      Kembali ke Dashboard
+      Kembali
     <% end %>
 
-    <h1 class="text-2xl font-bold text-gray-900">Pembayaran Iuran</h1>
-    <div class="mt-2">
-      <div class="text-lg font-semibold text-gray-900"><%= @address.block_address&.upcase %></div>
-      <div class="text-sm text-gray-600">Kepala Keluarga: <%= @address.head_of_family&.name&.upcase || 'Tidak ada' %></div>
-    </div>
-  </div>
-
-  <!-- Summary Card -->
-  <div class="mb-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div>
-        <div class="text-indigo-100 text-sm">Tunggakan Lama</div>
-        <div class="text-2xl font-bold">Rp <%= number_with_delimiter(@total_arrears, delimiter: '.') %></div>
-      </div>
-      <div>
-        <div class="text-indigo-100 text-sm">Belum Bayar Tahun Ini</div>
-        <div class="text-2xl font-bold">Rp <%= number_with_delimiter(@total_unpaid, delimiter: '.') %></div>
-      </div>
-      <div class="bg-white/20 rounded-lg p-3">
-        <div class="text-indigo-100 text-sm">Total yang Harus Dibayar</div>
-        <div class="text-3xl font-bold">Rp <%= number_with_delimiter(@grand_total, delimiter: '.') %></div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+      <h1 class="text-lg sm:text-xl font-bold text-gray-900">Pembayaran Iuran</h1>
+      <div class="mt-2 flex items-center gap-2">
+        <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="text-base font-bold text-gray-900"><%= @address.block_address&.upcase %></div>
+          <div class="text-xs text-gray-600"><%= @address.head_of_family&.name&.upcase || 'Tidak ada KK' %></div>
+        </div>
       </div>
     </div>
   </div>
 
-  <%= form_with url: create_payment_security_dashboard_index_path, method: :post, data: { security_payment_target: "form" } do |f| %>
+  <!-- Floating Summary Card -->
+  <div class="sticky top-4 z-10 mb-4">
+    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg p-4 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-xs text-indigo-100">Total Dipilih</div>
+          <div class="text-2xl sm:text-3xl font-bold" data-payment-wizard-target="totalAmount">Rp 0</div>
+          <div class="text-xs text-indigo-100 mt-1" data-payment-wizard-target="itemCount">0 item</div>
+        </div>
+        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/>
+            <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%= form_with url: confirm_payment_security_dashboard_index_path, method: :post, data: { payment_wizard_target: "form", turbo: false } do |f| %>
     <%= f.hidden_field :address_id, value: @address.id %>
+    <%= f.hidden_field :payment_type, value: 1, data: { payment_wizard_target: "paymentTypeField" } %>
 
-    <!-- Payment Type -->
-    <% if current_user.allow_manage_transfer %>
-      <div class="mb-6 bg-white rounded-lg shadow p-6" data-controller="payment-type">
-        <label class="block text-sm font-medium text-gray-700 mb-3">Metode Pembayaran</label>
-        <div class="grid grid-cols-2 gap-3">
-          <label class="relative flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-                 data-payment-type-target="cashLabel">
-            <%= f.radio_button :payment_type, 1,
-                checked: true,
-                class: "sr-only",
-                data: {
-                  payment_type_target: "radio",
-                  action: "change->payment-type#updateSelection"
-                } %>
+    <!-- STEP 1: Selection -->
+    <div class="space-y-3" data-payment-wizard-target="step1">
+      <!-- Section: Tunggakan Lama (Collapsible) -->
+      <% if @arrears_months > 0 %>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden" data-controller="collapsible">
+          <!-- Collapsible Header -->
+          <button type="button"
+                  class="w-full bg-gradient-to-r from-red-500 to-rose-600 px-4 py-3 flex items-center justify-between hover:from-red-600 hover:to-rose-700 active:from-red-700 active:to-rose-800 transition-all"
+                  data-action="click->collapsible#toggle">
             <div class="flex items-center">
-              <svg class="w-6 h-6 mr-3" data-payment-type-target="cashIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+              <svg class="w-5 h-5 mr-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
               </svg>
-              <span class="font-medium text-gray-900">Cash</span>
+              <div class="text-left">
+                <h2 class="text-base font-bold text-white">Tunggakan Lama</h2>
+                <p class="text-xs text-red-100">Dari tahun sebelumnya - Klik untuk expand</p>
+              </div>
+            </div>
+            <svg class="w-6 h-6 text-white transform transition-transform duration-200"
+                 data-collapsible-target="icon"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          <!-- Collapsible Content (Hidden by default) -->
+          <div class="hidden" data-collapsible-target="content">
+            <div class="p-4">
+              <label class="flex items-start p-4 border-2 border-red-200 rounded-xl bg-gradient-to-br from-red-50 to-rose-50 cursor-pointer hover:border-red-400 active:scale-[0.98] transition-all">
+                <%= check_box_tag 'pay_arrears', '1', false,
+                    class: "w-6 h-6 text-red-600 border-gray-300 rounded-lg focus:ring-red-500 mt-1 flex-shrink-0",
+                    data: {
+                      payment_wizard_target: "arrearsCheckbox",
+                      amount: @arrears_amount,
+                      action: "change->payment-wizard#updateTotal"
+                    } %>
+                <div class="ml-3 flex-1 min-w-0">
+                  <div class="font-semibold text-gray-900">Bayar Semua Tunggakan Lama</div>
+                  <div class="text-sm text-gray-600 mt-1">
+                    <%= @arrears_months %> bulan × Rp <%= number_with_delimiter(@address.current_contribution_rate, delimiter: '.') %>
+                  </div>
+                  <div class="mt-2 pt-2 border-t border-red-200">
+                    <div class="text-lg font-bold text-red-700">
+                      Rp <%= number_with_delimiter(@arrears_amount, delimiter: '.') %>
+                    </div>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Section: Belum Bayar -->
+      <% if @unpaid_months.any? %>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="bg-gradient-to-r from-orange-500 to-amber-600 px-4 py-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-base font-bold text-white flex items-center">
+                  <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                  </svg>
+                  Belum Bayar
+                </h2>
+                <p class="text-xs text-orange-100 mt-1">Bulan yang sudah jatuh tempo</p>
+              </div>
+              <button type="button"
+                      class="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-semibold text-white backdrop-blur-sm transition-colors"
+                      data-action="click->payment-wizard#selectAllUnpaid">
+                Pilih Semua
+              </button>
+            </div>
+          </div>
+          <div class="p-4">
+            <div class="space-y-3">
+              <% @unpaid_months.group_by { |m| m[:year] }.sort.reverse.each do |year, months| %>
+                <div>
+                  <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 px-1">
+                    Tahun <%= year %>
+                  </div>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <% months.each do |month_data| %>
+                      <%
+                        month = month_data[:month]
+                        contribution_rate = @address.expected_contribution_for(month, year)
+                      %>
+                      <label class="month-card block p-3 border-2 border-orange-200 rounded-xl bg-gradient-to-br from-orange-50 to-amber-50 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all"
+                             data-payment-wizard-target="monthCard">
+                        <%= check_box_tag "unpaid_months[]", "#{month},#{year}", false,
+                            class: "hidden month-checkbox",
+                            data: {
+                              payment_wizard_target: "unpaidCheckbox",
+                              amount: contribution_rate,
+                              action: "change->payment-wizard#updateTotal change->payment-wizard#toggleCard"
+                            } %>
+                        <div class="text-center">
+                          <div class="font-bold text-gray-900 text-sm"><%= UserContribution::MONTHNAMES.invert[month] %></div>
+                          <div class="text-xs text-orange-700 font-semibold mt-1">
+                            Rp <%= number_with_delimiter(contribution_rate, delimiter: '.') %>
+                          </div>
+                          <div class="checkmark-circle mt-2 w-6 h-6 mx-auto rounded-full border-2 border-orange-300 flex items-center justify-center transition-all">
+                            <svg class="checkmark-icon w-4 h-4 text-white opacity-0 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
+                              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                          </div>
+                        </div>
+                      </label>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Section: Bayar Bulan Lain (Collapsible) -->
+      <% if @future_months.any? %>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden" data-controller="collapsible">
+          <!-- Collapsible Header -->
+          <button type="button"
+                  class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-3 flex items-center justify-between hover:from-blue-600 hover:to-indigo-700 active:from-blue-700 active:to-indigo-800 transition-all"
+                  data-action="click->collapsible#toggle">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 mr-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+              </svg>
+              <div class="text-left">
+                <h2 class="text-base font-bold text-white">Bayar Bulan Lain</h2>
+                <p class="text-xs text-blue-100">Opsional - Klik untuk expand</p>
+              </div>
+            </div>
+            <svg class="w-6 h-6 text-white transform transition-transform duration-200"
+                 data-collapsible-target="icon"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          <!-- Collapsible Content (Hidden by default) -->
+          <div class="hidden" data-collapsible-target="content">
+            <div class="p-4">
+              <div class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-xs text-blue-800">
+                  <strong>💡 Info:</strong> Bayar bulan-bulan lain untuk kemudahan pembayaran.
+                </p>
+              </div>
+
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Pilih Bulan</span>
+                <button type="button"
+                        class="px-3 py-1 bg-blue-100 hover:bg-blue-200 rounded-lg text-xs font-semibold text-blue-700 transition-colors"
+                        data-action="click->payment-wizard#selectAllFuture">
+                  Pilih Semua
+                </button>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <% @future_months.each do |month_data| %>
+                  <label class="month-card block p-3 border-2 border-blue-200 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all"
+                         data-payment-wizard-target="monthCard">
+                    <%= check_box_tag "future_months[]", "#{month_data[:month]},#{month_data[:year]}", false,
+                        class: "hidden month-checkbox",
+                        data: {
+                          payment_wizard_target: "futureCheckbox",
+                          amount: month_data[:contribution_rate],
+                          action: "change->payment-wizard#updateTotal change->payment-wizard#toggleCard"
+                        } %>
+                    <div class="text-center">
+                      <div class="font-bold text-gray-900 text-sm"><%= month_data[:month_text] %></div>
+                      <div class="text-xs text-blue-700 font-semibold mt-1">
+                        Rp <%= number_with_delimiter(month_data[:contribution_rate], delimiter: '.') %>
+                      </div>
+                      <div class="checkmark-circle mt-2 w-6 h-6 mx-auto rounded-full border-2 border-blue-300 flex items-center justify-center transition-all">
+                        <svg class="checkmark-icon w-4 h-4 text-white opacity-0 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </label>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Payment Method Selection (if applicable) -->
+    <% if current_user.allow_manage_transfer %>
+      <div class="mb-4 bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <label class="block text-sm font-semibold text-gray-700 mb-3">Metode Pembayaran</label>
+        <div class="grid grid-cols-2 gap-2">
+          <label class="payment-method-card relative block p-3 border-2 border-green-200 rounded-xl cursor-pointer hover:shadow-md transition-all bg-green-50"
+                 data-payment-wizard-target="paymentCard">
+            <%= f.radio_button :payment_type, 1, checked: true, class: "hidden payment-radio",
+                data: { action: "change->payment-wizard#togglePaymentMethod" } %>
+            <div class="flex flex-col items-center text-center">
+              <div class="payment-icon w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mb-2 transition-colors">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+              </div>
+              <span class="font-semibold text-sm text-gray-900">Cash</span>
             </div>
           </label>
 
-          <label class="relative flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-                 data-payment-type-target="transferLabel">
-            <%= f.radio_button :payment_type, 2,
-                class: "sr-only",
-                data: {
-                  payment_type_target: "radio",
-                  action: "change->payment-type#updateSelection"
-                } %>
-            <div class="flex items-center">
-              <svg class="w-6 h-6 mr-3" data-payment-type-target="transferIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-              </svg>
-              <span class="font-medium text-gray-900">Transfer</span>
+          <label class="payment-method-card relative block p-3 border-2 border-gray-200 rounded-xl cursor-pointer hover:shadow-md transition-all"
+                 data-payment-wizard-target="paymentCard">
+            <%= f.radio_button :payment_type, 2, class: "hidden payment-radio",
+                data: { action: "change->payment-wizard#togglePaymentMethod" } %>
+            <div class="flex flex-col items-center text-center">
+              <div class="payment-icon w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-2 transition-colors">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                </svg>
+              </div>
+              <span class="font-semibold text-sm text-gray-900">Transfer</span>
             </div>
           </label>
         </div>
@@ -79,174 +278,31 @@
       <%= f.hidden_field :payment_type, value: 1 %>
     <% end %>
 
-    <!-- Section 1: Tunggakan Lama (Arrears) -->
-    <% if @arrears_months > 0 %>
-      <div class="mb-6 bg-white rounded-lg shadow overflow-hidden">
-        <div class="bg-red-50 border-b-2 border-red-200 px-6 py-4">
-          <h2 class="text-lg font-semibold text-red-900 flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-            </svg>
-            Tunggakan Lama (dari Tahun Sebelumnya)
-          </h2>
-        </div>
-        <div class="p-6">
-          <label class="flex items-center justify-between p-4 border-2 border-red-200 rounded-lg bg-red-50 cursor-pointer hover:bg-red-100 transition-colors">
-            <div class="flex items-center">
-              <%= check_box_tag 'pay_arrears', '1', false,
-                  class: "w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500",
-                  data: {
-                    security_payment_target: "arrearsCheckbox",
-                    amount: @arrears_amount,
-                    action: "change->security-payment#updateTotal"
-                  } %>
-              <div class="ml-4">
-                <div class="font-medium text-gray-900">Bayar Semua Tunggakan Lama</div>
-                <div class="text-sm text-gray-600"><%= @arrears_months %> bulan × Rp <%= number_with_delimiter(@address.current_contribution_rate, delimiter: '.') %></div>
-              </div>
-            </div>
-            <div class="text-xl font-bold text-red-700">
-              Rp <%= number_with_delimiter(@arrears_amount, delimiter: '.') %>
-            </div>
-          </label>
-        </div>
-      </div>
-    <% end %>
-
-    <!-- Section 2: Belum Bayar (Unpaid Months) -->
-    <% if @unpaid_months.any? %>
-      <div class="mb-6 bg-white rounded-lg shadow overflow-hidden">
-        <div class="bg-orange-50 border-b-2 border-orange-200 px-6 py-4 flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-orange-900 flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-            </svg>
-            Belum Bayar - Bulan Jatuh Tempo
-          </h2>
-          <button type="button"
-                  class="text-sm text-orange-700 hover:text-orange-900 font-medium"
-                  data-action="click->security-payment#selectAllUnpaid">
-            Pilih Semua
-          </button>
-        </div>
-        <div class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            <% @unpaid_months.group_by { |m| m[:year] }.sort.each do |year, months| %>
-              <div class="col-span-full">
-                <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-4 first:mt-0">
-                  Tahun <%= year %>
-                </div>
-              </div>
-              <% months.each do |month_data| %>
-                <%
-                  month = month_data[:month]
-                  contribution_rate = @address.expected_contribution_for(month, year)
-                %>
-                <label class="flex items-start p-3 border-2 border-orange-200 rounded-lg bg-orange-50 cursor-pointer hover:bg-orange-100 transition-colors">
-                  <%= check_box_tag "unpaid_months[]", "#{month},#{year}", false,
-                      class: "w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500 mt-0.5",
-                      data: {
-                        security_payment_target: "unpaidCheckbox",
-                        amount: contribution_rate,
-                        action: "change->security-payment#updateTotal"
-                      } %>
-                  <div class="ml-3 flex-1">
-                    <div class="font-medium text-gray-900"><%= UserContribution::MONTHNAMES.invert[month] %> <%= year %></div>
-                    <div class="text-sm font-semibold text-orange-700">Rp <%= number_with_delimiter(contribution_rate, delimiter: '.') %></div>
-                  </div>
-                </label>
-              <% end %>
-            <% end %>
-          </div>
-        </div>
-      </div>
-    <% end %>
-
-    <!-- Section 3: Bulan Mendatang (Future Months) -->
-    <% if @future_months.any? %>
-      <div class="mb-6 bg-white rounded-lg shadow overflow-hidden">
-        <div class="bg-blue-50 border-b-2 border-blue-200 px-6 py-4 flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-blue-900 flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
-            </svg>
-            Bayar Di Muka (Opsional)
-          </h2>
-          <button type="button"
-                  class="text-sm text-blue-700 hover:text-blue-900 font-medium"
-                  data-action="click->security-payment#selectAllFuture">
-            Pilih Semua
-          </button>
-        </div>
-        <div class="p-6">
-          <div class="mb-4 p-4 bg-blue-100 border border-blue-300 rounded-lg">
-            <p class="text-sm text-blue-800">
-              <strong>💡 Info:</strong> Warga dapat membayar hingga 6 bulan ke depan untuk kemudahan pembayaran.
-            </p>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            <% @future_months.each do |month_data| %>
-              <label class="flex items-start p-3 border-2 border-blue-200 rounded-lg bg-blue-50 cursor-pointer hover:bg-blue-100 transition-colors">
-                <%= check_box_tag "future_months[]", "#{month_data[:month]},#{month_data[:year]}", false,
-                    class: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mt-0.5",
-                    data: {
-                      security_payment_target: "futureCheckbox",
-                      amount: month_data[:contribution_rate],
-                      action: "change->security-payment#updateTotal"
-                    } %>
-                <div class="ml-3 flex-1">
-                  <div class="font-medium text-gray-900"><%= month_data[:month_text] %> <%= month_data[:year] %></div>
-                  <div class="text-sm font-semibold text-blue-700">Rp <%= number_with_delimiter(month_data[:contribution_rate], delimiter: '.') %></div>
-                </div>
-              </label>
-            <% end %>
-          </div>
-        </div>
-      </div>
-    <% end %>
-
-    <!-- Total & Actions -->
-    <div class="sticky bottom-0 bg-white border-t-4 border-indigo-600 rounded-t-lg shadow-xl p-6">
-      <div class="flex items-center justify-between mb-6">
+    <!-- Total & Actions - Mobile Optimized -->
+    <div class="sticky bottom-0 bg-white border-t-4 border-indigo-600 rounded-t-lg shadow-xl p-4 sm:p-6">
+      <!-- Total Amount -->
+      <div class="mb-4 flex items-center justify-between">
         <div>
-          <div class="text-sm text-gray-600">Total Pembayaran</div>
-          <div class="text-4xl font-bold text-indigo-600" data-security-payment-target="totalAmount">
+          <div class="text-xs sm:text-sm text-gray-600">Total Pembayaran</div>
+          <div class="text-2xl sm:text-4xl font-bold text-indigo-600" data-payment-wizard-target="totalAmountBottom">
             Rp 0
           </div>
-          <div class="text-sm text-gray-500 mt-1" data-security-payment-target="selectedInfo">
-            Pilih item pembayaran
-          </div>
         </div>
-        <div class="flex gap-3">
-          <%= link_to "Batal", security_dashboard_index_path,
-              class: "px-6 py-3 border-2 border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition-colors" %>
-          <%= f.submit "Proses Pembayaran",
-              class: "px-8 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
-              data: { security_payment_target: "submitButton" },
-              disabled: true %>
+        <div class="text-right">
+          <div class="text-xs sm:text-sm text-gray-500" data-payment-wizard-target="itemCountBottom">
+            0 item
+          </div>
         </div>
       </div>
 
-      <!-- Quick Action Buttons -->
-      <div class="flex gap-3 pt-4 border-t border-gray-200">
-        <% if @grand_total > 0 %>
-          <button type="button"
-                  class="flex-1 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
-                  data-action="click->security-payment#payAllArrears">
-            💰 Bayar Semua Tunggakan
-          </button>
-        <% end %>
-        <button type="button"
-                class="flex-1 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
-                data-action="click->security-payment#payAll">
-          ✅ Pilih Semua
-        </button>
-        <button type="button"
-                class="flex-1 px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors"
-                data-action="click->security-payment#clearAll">
-          🔄 Reset Pilihan
-        </button>
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+        <%= link_to "Batal", security_dashboard_index_path,
+            class: "w-full sm:flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 text-sm sm:text-base font-medium rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors text-center" %>
+        <%= f.submit "Lanjutkan",
+            class: "w-full sm:flex-1 px-4 py-3 bg-indigo-600 text-white text-sm sm:text-base font-medium rounded-lg hover:bg-indigo-700 active:bg-indigo-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+            data: { payment_wizard_target: "submitButton" },
+            disabled: true %>
       </div>
     </div>
   <% end %>

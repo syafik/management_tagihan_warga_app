@@ -167,6 +167,7 @@ Rails.application.routes.draw do
   resources :security_dashboard, only: [:index] do
     collection do
       get :address_detail
+      post :confirm_payment
       post :create_payment
       get 'payment/:address_id', to: 'security_dashboard#payment_page', as: :payment
       get :rekap_pembayaran

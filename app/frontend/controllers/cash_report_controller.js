@@ -17,14 +17,16 @@ export default class extends Controller {
 
   navigateMonth(event) {
     event.preventDefault()
-    const direction = event.target.dataset.direction
-    
+    // Use currentTarget to always get the button element, not child elements like SVG
+    const button = event.currentTarget
+    const direction = button.dataset.direction
+
     if (direction === 'prev') {
       this.goToPreviousMonth()
     } else if (direction === 'next') {
       this.goToNextMonth()
     }
-    
+
     this.updateMonthDisplay()
     this.redirectToReport()
   }

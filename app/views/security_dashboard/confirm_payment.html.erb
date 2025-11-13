@@ -1,0 +1,157 @@
+<div class="max-w-2xl mx-auto px-4 sm:px-6 py-4">
+  <!-- Header -->
+  <div class="mb-4 text-center">
+    <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mb-3">
+      <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Konfirmasi Pembayaran</h1>
+    <p class="text-sm text-gray-600">Pastikan data pembayaran sudah benar sebelum memproses</p>
+  </div>
+
+  <!-- Payment Method - Most Prominent -->
+  <div class="mb-4">
+    <div class="bg-gradient-to-r <%= @payment_type == 1 ? 'from-green-500 to-emerald-600' : 'from-blue-500 to-indigo-600' %> rounded-2xl shadow-lg p-6 text-white">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center">
+          <div class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mr-4">
+            <% if @payment_type == 1 %>
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+            <% else %>
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+              </svg>
+            <% end %>
+          </div>
+          <div>
+            <div class="text-xs uppercase tracking-wider opacity-80">Metode Pembayaran</div>
+            <div class="text-2xl sm:text-3xl font-bold"><%= @payment_type == 1 ? 'CASH' : 'TRANSFER' %></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-white/20 pt-4 mt-4">
+        <div class="text-xs uppercase tracking-wider opacity-80 mb-1">Total Pembayaran</div>
+        <div class="text-3xl sm:text-4xl font-bold">
+          Rp <%= number_with_delimiter(@total_amount, delimiter: '.') %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Details Card -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-4 overflow-hidden">
+    <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-4 py-3">
+      <h2 class="text-base font-bold text-white">Detail Pembayaran</h2>
+    </div>
+
+    <div class="p-4 space-y-3">
+      <!-- Blok Address -->
+      <div class="flex items-start py-2 border-b border-gray-100">
+        <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+          <svg class="w-5 h-5 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <div class="text-xs text-gray-500 mb-1">Blok Rumah</div>
+          <div class="text-base font-bold text-gray-900"><%= @address.block_address&.upcase %></div>
+        </div>
+      </div>
+
+      <!-- Nama -->
+      <div class="flex items-start py-2 border-b border-gray-100">
+        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+          <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <div class="text-xs text-gray-500 mb-1">Nama Pembayar</div>
+          <div class="text-base font-bold text-gray-900"><%= @address.head_of_family&.name&.upcase || 'Tidak ada KK' %></div>
+        </div>
+      </div>
+
+      <!-- Penerima -->
+      <div class="flex items-start py-2 border-b border-gray-100">
+        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+          <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <div class="text-xs text-gray-500 mb-1">Penerima Pembayaran</div>
+          <div class="text-base font-bold text-gray-900"><%= current_user.name&.upcase %></div>
+        </div>
+      </div>
+
+      <!-- Tanggal -->
+      <div class="flex items-start py-2">
+        <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+          <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <div class="text-xs text-gray-500 mb-1">Tanggal Pembayaran</div>
+          <div class="text-base font-bold text-gray-900"><%= @current_date %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Items List -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-4 overflow-hidden">
+    <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-4 py-3">
+      <h2 class="text-base font-bold text-white">Item Pembayaran</h2>
+    </div>
+
+    <div class="divide-y divide-gray-100">
+      <% @selected_items.group_by { |item| item[:category] }.each do |category, items| %>
+        <div class="p-4">
+          <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3"><%= category %></div>
+          <div class="space-y-2">
+            <% items.each do |item| %>
+              <div class="flex items-center justify-between py-2">
+                <div class="flex-1">
+                  <div class="text-sm font-medium text-gray-900"><%= item[:description] %></div>
+                </div>
+                <div class="text-sm font-bold text-gray-900 ml-4">
+                  Rp <%= number_with_delimiter(item[:amount], delimiter: '.') %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Form to submit -->
+  <%= form_with url: create_payment_security_dashboard_index_path, method: :post do |f| %>
+    <%= f.hidden_field :address_id, value: @address.id %>
+    <%= f.hidden_field :payment_type, value: @payment_type %>
+    <%= f.hidden_field :pay_arrears, value: @pay_arrears ? '1' : '0' %>
+
+    <% @unpaid_months.each do |month_year| %>
+      <%= hidden_field_tag 'unpaid_months[]', month_year %>
+    <% end %>
+
+    <% @future_months.each do |month_year| %>
+      <%= hidden_field_tag 'future_months[]', month_year %>
+    <% end %>
+
+    <!-- Action Buttons -->
+    <div class="sticky bottom-0 bg-white border-t-4 border-indigo-600 rounded-t-xl shadow-xl p-4">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <%= link_to "Kembali", payment_security_dashboard_index_path(address_id: @address.id),
+            class: "w-full sm:flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 text-sm sm:text-base font-medium rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors text-center" %>
+        <%= f.submit "Proses Pembayaran",
+            class: "w-full sm:flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm sm:text-base font-bold rounded-lg hover:from-indigo-700 hover:to-purple-700 active:from-indigo-800 active:to-purple-800 transition-all shadow-lg" %>
+      </div>
+    </div>
+  <% end %>
+</div>
