@@ -1,5 +1,22 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+# == Schema Information
+#
+# Table name: installments
+#
+#  id               :bigint           not null, primary key
+#  description      :text
+#  paid_off         :boolean          default(FALSE)
+#  transaction_type :integer
+#  value            :float
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  parent_id        :integer
+#
+# Indexes
+#
+#  index_installments_on_parent_id  (parent_id)
+#
 one:
   description: MyText
   value: 1.5

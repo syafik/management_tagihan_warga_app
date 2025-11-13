@@ -1,6 +1,32 @@
 # frozen_string_literal: true
 
 # Address-specific contribution rates for special cases
+# == Schema Information
+#
+# Table name: address_contributions
+#
+#  id              :bigint           not null, primary key
+#  active          :boolean          default(TRUE)
+#  amount          :decimal(10, 2)   not null
+#  effective_from  :date             not null
+#  effective_until :date
+#  reason          :text
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  address_id      :bigint           not null
+#
+# Indexes
+#
+#  index_address_contributions_on_active                         (active)
+#  index_address_contributions_on_address_id                     (address_id)
+#  index_address_contributions_on_address_id_and_effective_from  (address_id,effective_from)
+#  index_address_contributions_on_effective_from                 (effective_from)
+#  index_address_contributions_on_period                         (address_id,effective_from,effective_until) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (address_id => addresses.id)
+#
 class AddressContribution < ApplicationRecord
   belongs_to :address
 

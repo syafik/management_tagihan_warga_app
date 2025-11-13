@@ -1,5 +1,38 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: users
+#
+#  id                     :bigint           not null, primary key
+#  allow_manage_expense   :boolean          default(TRUE)
+#  allow_manage_transfer  :boolean          default(TRUE)
+#  allow_password_change  :boolean          default(FALSE), not null
+#  device_token           :string
+#  device_type            :string
+#  email                  :string           default(""), not null
+#  encrypted_password     :string           default(""), not null
+#  login_code             :string
+#  login_code_expires_at  :datetime
+#  name                   :string           not null
+#  phone_number           :string
+#  pic_blok               :string
+#  provider               :string           default("email"), not null
+#  remember_created_at    :datetime
+#  reset_password_sent_at :datetime
+#  reset_password_token   :string
+#  role                   :integer          default(1), not null
+#  tokens                 :json
+#  uid                    :string           default(""), not null
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#
+# Indexes
+#
+#  index_users_on_email                 (email) UNIQUE
+#  index_users_on_reset_password_token  (reset_password_token) UNIQUE
+#  index_users_on_uid_and_provider      (uid,provider) UNIQUE
+#
 require 'test_helper'
 
 class UserTest < ActiveSupport::TestCase

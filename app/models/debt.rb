@@ -2,6 +2,19 @@
 
 # storing debt data
 
+# == Schema Information
+#
+# Table name: debts
+#
+#  id          :bigint           not null, primary key
+#  debt_date   :date
+#  debt_type   :integer
+#  description :text
+#  value       :float
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  user_id     :integer
+#
 class Debt < ApplicationRecord
   belongs_to :user
 

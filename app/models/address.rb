@@ -2,6 +2,20 @@
 
 # storing address
 
+# == Schema Information
+#
+# Table name: addresses
+#
+#  id            :bigint           not null, primary key
+#  arrears       :integer          default(0)
+#  block         :string
+#  block_address :string
+#  block_number  :string
+#  empty         :boolean          default(FALSE)
+#  free          :boolean          default(FALSE)
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#
 class Address < ApplicationRecord
   # New many-to-many relationship with users
   has_many :user_addresses, dependent: :destroy

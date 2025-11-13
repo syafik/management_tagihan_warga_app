@@ -4,7 +4,7 @@
     <% @addresses.each do |address| %>
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <!-- Address Header - Compact Mobile Design -->
-        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-3">
+        <div class="bg-gradient-to-r <%= address.free? ? 'from-green-500 to-emerald-600' : 'from-indigo-500 to-purple-600' %> px-4 py-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
               <div class="bg-white bg-opacity-20 rounded-xl p-2 backdrop-blur-sm">
@@ -16,15 +16,45 @@
                 <h3 class="text-base font-bold text-white">
                   <%= address.block_address&.upcase %>
                 </h3>
-                <p class="text-xs text-indigo-100 mt-0.5">
+                <p class="text-xs <%= address.free? ? 'text-green-100' : 'text-indigo-100' %> mt-0.5">
                   <%= address.head_of_family&.name&.upcase %>
                 </p>
+                <% if address.free? %>
+                  <div class="mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-white bg-opacity-20">
+                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    BEBAS IURAN
+                  </div>
+                <% end %>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Arrears Alert - Compact Mobile -->
+        <% if address.free? %>
+          <!-- Free Address Message -->
+          <div class="p-6">
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6">
+              <div class="text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-full mb-4">
+                  <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Bebas Iuran Bulanan</h3>
+                <p class="text-sm text-gray-600 mb-4">
+                  Blok <span class="font-bold"><%= address.block_address&.upcase %></span> tidak dikenakan iuran bulanan.
+                </p>
+                <div class="bg-white rounded-xl p-4 border border-green-200">
+                  <p class="text-xs text-gray-500 mb-1">Status</p>
+                  <p class="text-base font-bold text-green-700">✓ Tidak Ada Kewajiban Pembayaran</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <!-- Arrears Alert - Compact Mobile -->
         <% if address.arrears.present? && address.arrears > 0 %>
           <div class="mx-4 mt-3 bg-red-50 border border-red-200 rounded-xl p-3">
             <div class="flex items-start space-x-3">
@@ -249,6 +279,7 @@
             </div>
           <% end %>
         </div>
+        <% end %>
       </div>
     <% end %>
   <% else %>

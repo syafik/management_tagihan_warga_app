@@ -133,6 +133,9 @@ GEM
       selectize-rails (~> 0.6)
     airbrussh (1.5.1)
       sshkit (>= 1.6.1, != 1.7.0)
+    annotaterb (4.20.0)
+      activerecord (>= 6.0.0)
+      activesupport (>= 6.0.0)
     ast (2.4.2)
     base64 (0.3.0)
     bcrypt (3.1.20)
@@ -579,6 +582,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import
   administrate
+  annotaterb
   brakeman
   cancancan
   capistrano

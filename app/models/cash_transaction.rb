@@ -2,6 +2,28 @@
 
 # storing cash transaaction data
 
+# == Schema Information
+#
+# Table name: cash_transactions
+#
+#  id                :bigint           not null, primary key
+#  description       :text
+#  month             :integer
+#  total             :float
+#  transaction_date  :date
+#  transaction_group :integer
+#  transaction_type  :integer
+#  year              :integer
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  pic_id            :integer
+#
+# Indexes
+#
+#  index_cash_transactions_on_month_and_year    (month,year)
+#  index_cash_transactions_on_pic_id            (pic_id)
+#  index_cash_transactions_on_transaction_date  (transaction_date)
+#
 class CashTransaction < ApplicationRecord
   validates :description, :total, :transaction_date, presence: true
 
