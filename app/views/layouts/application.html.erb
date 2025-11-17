@@ -6,12 +6,29 @@
   <title>PuriAyana App!</title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
-  
+
+  <!-- PWA Meta Tags -->
+  <meta name="application-name" content="Puri Ayana">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Puri Ayana">
+  <meta name="description" content="Aplikasi manajemen tagihan dan iuran warga Puri Ayana">
+  <meta name="theme-color" content="#4F46E5">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" href="/pwa-icons/icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/pwa-icons/icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/pwa-icons/icon-192x192.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="/pwa-icons/icon-192x192.png">
+
   <!-- Vite assets -->
   <%= vite_client_tag %>
   <%= vite_stylesheet_tag 'application' %>
   <%= vite_javascript_tag 'application' %>
-  
+
   <link rel="shortcut icon" href="<%= asset_path('img_305218.png') %>" />
 </head>
 <body class="h-full">
@@ -33,9 +50,20 @@
         
         <!-- Footer - always at bottom, hidden on mobile -->
         <footer class="bg-white border-t border-gray-200 mt-auto hidden lg:block">
-          <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 sm:flex sm:items-center sm:justify-between">
-            <span class="text-gray-500 text-xs sm:text-sm block sm:inline">Copyright © 2020 PAD2 Solution. All rights reserved.</span>
-            <span class="text-gray-500 text-xs sm:text-sm mt-2 sm:mt-0 block sm:inline">Hand-crafted & made with <i class="text-red-500">❤</i></span>
+          <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+              <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm">
+                <%= link_to "Kebijakan Privasi", privacy_policy_path, class: "text-gray-600 hover:text-gray-900" %>
+                <span class="text-gray-300">|</span>
+                <%= link_to "Ketentuan Layanan", terms_of_service_path, class: "text-gray-600 hover:text-gray-900" %>
+                <span class="text-gray-300">|</span>
+                <%= link_to "Kontak Support", support_contact_path, class: "text-gray-600 hover:text-gray-900" %>
+              </div>
+              <div class="flex flex-col sm:items-end space-y-1">
+                <span class="text-gray-500 text-xs sm:text-sm">Copyright © 2020 PAD2 Solution. All rights reserved.</span>
+                <span class="text-gray-500 text-xs sm:text-sm">Hand-crafted & made with <i class="text-red-500">❤</i></span>
+              </div>
+            </div>
           </div>
         </footer>
       </main>

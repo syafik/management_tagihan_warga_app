@@ -36,4 +36,7 @@ registerControllers(application)
 // Start Turbo
 Turbo.start()
 
+// Import PWA functionality
+import '../../javascript/pwa.js'
+
 console.log('Vite ⚡️ Rails with Tailwind CSS, Stimulus & Turbo loaded!')

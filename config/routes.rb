@@ -76,6 +76,11 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   root to: 'home#index'
 
+  # Static pages
+  get '/privacy-policy', to: 'pages#privacy_policy', as: :privacy_policy
+  get '/terms-of-service', to: 'pages#terms_of_service', as: :terms_of_service
+  get '/support', to: 'pages#support_contact', as: :support_contact
+
   # Admin routes
   get 'backup_database', to: 'admin#backup_database', as: :backup_database
 

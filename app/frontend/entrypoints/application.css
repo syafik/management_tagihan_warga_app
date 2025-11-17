@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* PWA Styles */
+@import '../../assets/stylesheets/pwa.css';
+
 /* Select2 Tailwind Customization */
 @layer components {
   .select2-container--default .select2-selection--single,

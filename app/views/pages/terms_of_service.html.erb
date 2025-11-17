@@ -1,0 +1,244 @@
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <div class="bg-white rounded-lg shadow-lg p-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Ketentuan Layanan</h1>
+
+    <p class="text-sm text-gray-600 mb-8">
+      <strong>Terakhir diperbarui:</strong> <%= Time.current.strftime("%d %B %Y") %>
+    </p>
+
+    <div class="prose prose-lg max-w-none">
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">1. Penerimaan Ketentuan</h2>
+        <p class="text-gray-700 mb-4">
+          Dengan mengakses dan menggunakan <strong>Puri Ayana Management System</strong>, Anda menyetujui untuk terikat dengan Ketentuan Layanan ini.
+          Jika Anda tidak setuju dengan ketentuan ini, mohon untuk tidak menggunakan layanan kami.
+        </p>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">2. Definisi</h2>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li><strong>"Layanan"</strong> merujuk pada website dan sistem manajemen Puri Ayana</li>
+          <li><strong>"Warga"</strong> adalah penghuni yang terdaftar di perumahan Puri Ayana</li>
+          <li><strong>"Pengurus"</strong> adalah RT/RW dan admin yang mengelola sistem</li>
+          <li><strong>"Iuran"</strong> adalah kontribusi bulanan warga untuk operasional perumahan</li>
+          <li><strong>"User"</strong> adalah semua pengguna sistem (Warga, Security, Admin)</li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">3. Kelayakan Pengguna</h2>
+        <p class="text-gray-700 mb-4">Untuk menggunakan layanan ini, Anda harus:</p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Merupakan warga resmi Perumahan Puri Ayana</li>
+          <li>Berusia minimal 17 tahun atau memiliki izin dari kepala keluarga</li>
+          <li>Memberikan informasi yang akurat dan lengkap saat registrasi</li>
+          <li>Menjaga kerahasiaan akun dan password Anda</li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">4. Akun Pengguna</h2>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">4.1 Registrasi</h3>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Akun dibuat oleh pengurus berdasarkan data warga yang valid</li>
+          <li>Setiap rumah/unit memiliki 1 akun utama (kepala keluarga)</li>
+          <li>Password awal akan diberikan oleh pengurus</li>
+          <li>Warga wajib mengganti password setelah login pertama kali</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">4.2 Keamanan Akun</h3>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Anda bertanggung jawab penuh atas keamanan akun Anda</li>
+          <li>Jangan membagikan password kepada orang lain</li>
+          <li>Segera laporkan jika akun Anda dicurigai diretas</li>
+          <li>Kami tidak bertanggung jawab atas kerugian akibat kelalaian Anda</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">4.3 Penonaktifan Akun</h3>
+        <p class="text-gray-700 mb-4">Akun dapat dinonaktifkan jika:</p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Warga pindah dari perumahan</li>
+          <li>Terjadi penyalahgunaan sistem</li>
+          <li>Atas permintaan warga sendiri</li>
+          <li>Tunggakan iuran melebihi 6 bulan (sesuai keputusan rapat warga)</li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">5. Kewajiban Pembayaran Iuran</h2>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">5.1 Iuran Bulanan</h3>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Setiap unit wajib membayar iuran sebesar <strong>Rp 190.000/bulan</strong></li>
+          <li>Iuran jatuh tempo setiap tanggal 10 bulan berjalan</li>
+          <li>Pembayaran dapat dilakukan melalui: Cash (ke security), Transfer Bank, atau QRIS</li>
+          <li>Bukti pembayaran otomatis tersimpan di sistem</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">5.2 Tunggakan</h3>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Tunggakan akan tercatat otomatis jika lewat tanggal 10</li>
+          <li>Sistem akan mengirim pengingat via WhatsApp setiap bulan</li>
+          <li>Tunggakan dapat dibayar sekaligus untuk beberapa bulan</li>
+          <li>Sanksi sesuai keputusan rapat warga untuk tunggakan >6 bulan</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">5.3 Metode Pembayaran</h3>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li><strong>QRIS:</strong> Scan QR Code dengan mobile banking (Gopay, OVO, Dana, dll)</li>
+          <li><strong>Transfer Bank:</strong> Ke rekening pengurus yang tertera di dashboard</li>
+          <li><strong>Cash:</strong> Bayar langsung ke security dengan bukti kwitansi</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">5.4 Konfirmasi Pembayaran</h3>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Pembayaran QRIS otomatis terkonfirmasi dalam 1-5 menit</li>
+          <li>Pembayaran transfer manual perlu konfirmasi (upload bukti di sistem)</li>
+          <li>Pembayaran cash langsung dicatat oleh security</li>
+          <li>Notifikasi WhatsApp akan dikirim setelah pembayaran sukses</li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">6. Penggunaan yang Dilarang</h2>
+        <p class="text-gray-700 mb-4">Anda TIDAK DIPERBOLEHKAN untuk:</p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Menggunakan sistem untuk tujuan ilegal atau penipuan</li>
+          <li>Mengakses akun orang lain tanpa izin</li>
+          <li>Memodifikasi, copy, atau mendistribusikan konten sistem tanpa izin</li>
+          <li>Menggunakan bot, scraper, atau alat otomatis lainnya</li>
+          <li>Mengirim spam atau konten yang tidak pantas</li>
+          <li>Mencoba meretas atau mengganggu sistem</li>
+          <li>Membagikan informasi pribadi warga lain tanpa izin</li>
+          <li>Menyalahgunakan fitur notifikasi atau komunikasi</li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">7. Hak Kekayaan Intelektual</h2>
+        <p class="text-gray-700 mb-4">
+          Semua konten dalam sistem (termasuk logo, desain, kode, dan dokumentasi) adalah milik Pengurus RT/RW Puri Ayana.
+          Anda tidak diperbolehkan untuk:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Menyalin atau menduplikasi sistem untuk digunakan di tempat lain</li>
+          <li>Menggunakan logo atau branding tanpa izin</li>
+          <li>Mengambil data warga untuk kepentingan komersial</li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">8. Privasi dan Data Pribadi</h2>
+        <p class="text-gray-700 mb-4">
+          Penggunaan data pribadi Anda diatur dalam <%= link_to "Kebijakan Privasi", privacy_policy_path, class: "text-indigo-600 hover:text-indigo-800 underline" %> kami.
+          Dengan menggunakan layanan ini, Anda menyetujui pengumpulan dan penggunaan data sesuai kebijakan tersebut.
+        </p>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">9. Batasan Tanggung Jawab</h2>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">9.1 Ketersediaan Layanan</h3>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Kami berusaha menjaga sistem online 24/7, namun tidak menjamin 100% uptime</li>
+          <li>Pemeliharaan sistem dapat dilakukan tanpa pemberitahuan terlebih dahulu</li>
+          <li>Kami tidak bertanggung jawab atas gangguan layanan di luar kendali kami (internet down, server issue, dll)</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">9.2 Akurasi Informasi</h3>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Kami berusaha menjaga akurasi data, namun warga wajib melaporkan jika ada kesalahan</li>
+          <li>Warga bertanggung jawab untuk memverifikasi data iuran dan pembayaran mereka</li>
+          <li>Kami tidak bertanggung jawab atas kesalahan input yang dilakukan oleh user</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">9.3 Transaksi Pembayaran</h3>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Untuk pembayaran QRIS, masalah teknis dengan payment gateway (Tripay) di luar tanggung jawab kami</li>
+          <li>Refund hanya diproses untuk pembayaran duplikat atau kesalahan sistem</li>
+          <li>Warga wajib menyimpan bukti pembayaran untuk keperluan verifikasi</li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">10. Penyelesaian Sengketa</h2>
+        <p class="text-gray-700 mb-4">
+          Jika terjadi perselisihan terkait layanan:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Hubungi pengurus melalui halaman <%= link_to "Kontak Support", support_contact_path, class: "text-indigo-600 hover:text-indigo-800 underline" %></li>
+          <li>Kami akan berusaha menyelesaikan dalam 3-7 hari kerja</li>
+          <li>Jika tidak dapat diselesaikan secara musyawarah, dapat dibawa ke rapat warga</li>
+          <li>Keputusan rapat warga bersifat final dan mengikat</li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">11. Perubahan Ketentuan</h2>
+        <p class="text-gray-700 mb-4">
+          Kami berhak untuk mengubah Ketentuan Layanan ini sewaktu-waktu. Perubahan akan:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Diumumkan melalui notifikasi di dashboard</li>
+          <li>Dikirimkan via WhatsApp untuk perubahan penting</li>
+          <li>Tercantum tanggal "Terakhir diperbarui" di halaman ini</li>
+          <li>Berlaku segera setelah dipublikasikan</li>
+        </ul>
+        <p class="text-gray-700 mb-4">
+          Penggunaan layanan setelah perubahan dianggap sebagai persetujuan Anda terhadap ketentuan baru.
+        </p>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">12. Ketentuan Lain-lain</h2>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">12.1 Penggunaan WhatsApp</h3>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Notifikasi otomatis akan dikirim via WhatsApp untuk pembayaran dan pengingat</li>
+          <li>Anda dapat opt-out dari notifikasi dengan menghubungi pengurus</li>
+          <li>Nomor WhatsApp yang terdaftar harus aktif dan dapat dihubungi</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">12.2 Laporan Keuangan</h3>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Laporan keuangan perumahan dipublikasikan setiap bulan</li>
+          <li>Warga dapat mengakses laporan melalui dashboard</li>
+          <li>Transparansi pengelolaan dana iuran dijamin oleh sistem</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">12.3 Hukum yang Berlaku</h3>
+        <p class="text-gray-700 mb-4">
+          Ketentuan Layanan ini tunduk pada hukum Negara Republik Indonesia.
+        </p>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">13. Kontak</h2>
+        <p class="text-gray-700 mb-4">
+          Untuk pertanyaan atau klarifikasi mengenai Ketentuan Layanan ini:
+        </p>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <p class="text-gray-700"><strong>Pengurus RT/RW Puri Ayana</strong></p>
+          <p class="text-gray-700">Email: <%= link_to "support@puriayana.com", "mailto:support@puriayana.com", class: "text-indigo-600 hover:text-indigo-800" %></p>
+          <p class="text-gray-700">WhatsApp: <a href="https://wa.me/6282234569053" class="text-indigo-600 hover:text-indigo-800">+62 822-3456-9053</a></p>
+          <p class="text-gray-700">Kunjungi: <%= link_to "Kontak Support", support_contact_path, class: "text-indigo-600 hover:text-indigo-800 underline" %></p>
+        </div>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">14. Persetujuan</h2>
+        <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4">
+          <p class="text-gray-800 font-medium">
+            Dengan menggunakan Puri Ayana Management System, Anda mengakui bahwa telah membaca, memahami, dan menyetujui Ketentuan Layanan ini.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <div class="mt-8 pt-6 border-t border-gray-200">
+      <%= link_to "← Kembali ke Halaman Utama", root_path, class: "text-indigo-600 hover:text-indigo-800 font-medium" %>
+    </div>
+  </div>
+</div>

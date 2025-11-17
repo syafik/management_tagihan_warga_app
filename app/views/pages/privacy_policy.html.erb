@@ -1,0 +1,170 @@
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <div class="bg-white rounded-lg shadow-lg p-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Kebijakan Privasi</h1>
+
+    <p class="text-sm text-gray-600 mb-8">
+      <strong>Terakhir diperbarui:</strong> <%= Time.current.strftime("%d %B %Y") %>
+    </p>
+
+    <div class="prose prose-lg max-w-none">
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">1. Pendahuluan</h2>
+        <p class="text-gray-700 mb-4">
+          Selamat datang di <strong>Puri Ayana Management System</strong>. Kami berkomitmen untuk melindungi privasi dan keamanan data pribadi Anda.
+          Kebijakan Privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, menyimpan, dan melindungi informasi Anda saat menggunakan layanan kami.
+        </p>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">2. Informasi yang Kami Kumpulkan</h2>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">2.1 Data Pribadi</h3>
+        <p class="text-gray-700 mb-4">Kami mengumpulkan informasi berikut:</p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Nama lengkap</li>
+          <li>Nomor telepon/WhatsApp</li>
+          <li>Email</li>
+          <li>Alamat rumah (blok dan nomor unit)</li>
+          <li>Nomor Induk Kependudukan (NIK)</li>
+          <li>Foto profil (opsional)</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">2.2 Data Transaksi</h3>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Riwayat pembayaran iuran bulanan</li>
+          <li>Jumlah dan tanggal pembayaran</li>
+          <li>Metode pembayaran (Cash, Transfer, QRIS)</li>
+          <li>Status pembayaran dan tunggakan</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">2.3 Data Teknis</h3>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Alamat IP</li>
+          <li>Jenis browser dan perangkat</li>
+          <li>Waktu akses sistem</li>
+          <li>Log aktivitas untuk keamanan</li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">3. Penggunaan Informasi</h2>
+        <p class="text-gray-700 mb-4">Informasi yang kami kumpulkan digunakan untuk:</p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li><strong>Pengelolaan Iuran:</strong> Mencatat dan memproses pembayaran iuran bulanan warga</li>
+          <li><strong>Notifikasi:</strong> Mengirimkan pengingat pembayaran dan konfirmasi via WhatsApp/Email</li>
+          <li><strong>Laporan Keuangan:</strong> Membuat laporan transparansi keuangan perumahan</li>
+          <li><strong>Komunikasi:</strong> Mengirimkan pengumuman penting terkait perumahan</li>
+          <li><strong>Keamanan:</strong> Mencegah penyalahgunaan sistem dan fraud</li>
+          <li><strong>Peningkatan Layanan:</strong> Menganalisis penggunaan untuk meningkatkan sistem</li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">4. Perlindungan Data</h2>
+        <p class="text-gray-700 mb-4">Kami menerapkan langkah-langkah keamanan berikut:</p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li><strong>Enkripsi:</strong> Data sensitif dienkripsi menggunakan HTTPS/SSL</li>
+          <li><strong>Akses Terbatas:</strong> Hanya pengurus dan petugas berwenang yang dapat mengakses data</li>
+          <li><strong>Role-based Access:</strong> Sistem otorisasi berdasarkan peran (Warga, Security, Admin)</li>
+          <li><strong>Backup Rutin:</strong> Data di-backup secara berkala untuk mencegah kehilangan</li>
+          <li><strong>Password Aman:</strong> Sistem password terenkripsi dengan bcrypt</li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">5. Berbagi Informasi</h2>
+        <p class="text-gray-700 mb-4">
+          Kami <strong>TIDAK</strong> akan menjual, menyewakan, atau membagikan data pribadi Anda kepada pihak ketiga untuk tujuan komersial.
+        </p>
+        <p class="text-gray-700 mb-4">Data Anda hanya dibagikan dalam kondisi berikut:</p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li><strong>Payment Gateway (Tripay):</strong> Untuk memproses pembayaran QRIS</li>
+          <li><strong>WhatsApp API:</strong> Untuk mengirimkan notifikasi pembayaran</li>
+          <li><strong>Google Sheets API:</strong> Untuk sinkronisasi data keuangan (hanya pengurus yang akses)</li>
+          <li><strong>Kewajiban Hukum:</strong> Jika diwajibkan oleh hukum atau permintaan pihak berwenang</li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">6. Hak Pengguna</h2>
+        <p class="text-gray-700 mb-4">Sebagai pengguna, Anda memiliki hak untuk:</p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li><strong>Akses Data:</strong> Melihat data pribadi Anda melalui dashboard</li>
+          <li><strong>Koreksi Data:</strong> Meminta perubahan data yang tidak akurat</li>
+          <li><strong>Download Data:</strong> Mendapatkan salinan data Anda dalam format Excel/PDF</li>
+          <li><strong>Penghapusan Data:</strong> Meminta penghapusan data (setelah tidak lagi menjadi warga)</li>
+          <li><strong>Keberatan:</strong> Menolak penggunaan data untuk tujuan tertentu</li>
+        </ul>
+        <p class="text-gray-700 mb-4">
+          Untuk menggunakan hak-hak di atas, silakan hubungi pengurus RT/RW melalui halaman <%= link_to "Kontak Support", support_contact_path, class: "text-indigo-600 hover:text-indigo-800 underline" %>.
+        </p>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">7. Cookies dan Tracking</h2>
+        <p class="text-gray-700 mb-4">
+          Website kami menggunakan cookies untuk meningkatkan pengalaman pengguna:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li><strong>Session Cookies:</strong> Untuk menjaga sesi login Anda</li>
+          <li><strong>Preference Cookies:</strong> Untuk mengingat preferensi Anda</li>
+          <li><strong>Security Cookies:</strong> Untuk melindungi dari serangan CSRF</li>
+        </ul>
+        <p class="text-gray-700 mb-4">
+          Anda dapat menonaktifkan cookies melalui pengaturan browser, namun beberapa fitur mungkin tidak berfungsi dengan baik.
+        </p>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">8. Retensi Data</h2>
+        <p class="text-gray-700 mb-4">
+          Kami menyimpan data Anda selama:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li><strong>Warga Aktif:</strong> Selama Anda masih menjadi penghuni perumahan</li>
+          <li><strong>Data Keuangan:</strong> Minimal 5 tahun untuk keperluan audit dan pelaporan</li>
+          <li><strong>Warga Pindah:</strong> Data dapat dihapus setelah 1 tahun sejak pindah (kecuali data keuangan)</li>
+        </ul>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">9. Perubahan Kebijakan</h2>
+        <p class="text-gray-700 mb-4">
+          Kami dapat memperbarui Kebijakan Privasi ini sewaktu-waktu. Perubahan akan diumumkan melalui:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>Notifikasi di dashboard</li>
+          <li>Pengumuman via WhatsApp</li>
+          <li>Update tanggal "Terakhir diperbarui" di halaman ini</li>
+        </ul>
+        <p class="text-gray-700 mb-4">
+          Dengan terus menggunakan layanan setelah perubahan, Anda dianggap menyetujui kebijakan yang diperbarui.
+        </p>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">10. Kontak</h2>
+        <p class="text-gray-700 mb-4">
+          Jika Anda memiliki pertanyaan tentang Kebijakan Privasi ini, silakan hubungi:
+        </p>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <p class="text-gray-700"><strong>Pengurus RT/RW Puri Ayana</strong></p>
+          <p class="text-gray-700">Email: <%= link_to "support@puriayana.com", "mailto:support@puriayana.com", class: "text-indigo-600 hover:text-indigo-800" %></p>
+          <p class="text-gray-700">WhatsApp: <a href="https://wa.me/6282234569053" class="text-indigo-600 hover:text-indigo-800">+62 822-3456-9053</a></p>
+          <p class="text-gray-700">Atau kunjungi halaman <%= link_to "Kontak Support", support_contact_path, class: "text-indigo-600 hover:text-indigo-800 underline" %></p>
+        </div>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">11. Persetujuan</h2>
+        <p class="text-gray-700 mb-4">
+          Dengan menggunakan Puri Ayana Management System, Anda menyetujui pengumpulan dan penggunaan informasi sesuai dengan Kebijakan Privasi ini.
+        </p>
+      </section>
+    </div>
+
+    <div class="mt-8 pt-6 border-t border-gray-200">
+      <%= link_to "← Kembali ke Halaman Utama", root_path, class: "text-indigo-600 hover:text-indigo-800 font-medium" %>
+    </div>
+  </div>
+</div>
