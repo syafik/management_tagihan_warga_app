@@ -1,0 +1,234 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
+  <div class="max-w-2xl mx-auto px-4">
+    <% if @payment.paid? %>
+      <!-- Success State -->
+      <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
+          <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Pembayaran Berhasil!</h1>
+        <p class="text-gray-600 mb-6">Terima kasih atas pembayaran Anda</p>
+
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+          <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+            <div class="text-left">
+              <p class="text-gray-500 mb-1">Referensi</p>
+              <p class="font-mono font-semibold text-gray-900"><%= @payment.reference %></p>
+            </div>
+            <div class="text-left">
+              <p class="text-gray-500 mb-1">Tanggal</p>
+              <p class="font-semibold text-gray-900"><%= @payment.paid_at.in_time_zone('Jakarta').strftime('%d %b %Y, %H:%M WIB') %></p>
+            </div>
+            <div class="text-left">
+              <p class="text-gray-500 mb-1">Blok</p>
+              <p class="font-semibold text-gray-900"><%= @payment.address.block_address&.upcase %></p>
+            </div>
+            <div class="text-left">
+              <p class="text-gray-500 mb-1">Metode</p>
+              <p class="font-semibold text-gray-900">QRIS</p>
+            </div>
+          </div>
+
+          <% contribution_amount = @payment.tripay_response['contribution_amount'] || @payment.amount %>
+          <% fee_amount = @payment.tripay_response['fee_amount'] || 0 %>
+
+          <!-- Breakdown -->
+          <div class="pt-4 border-t border-gray-200 space-y-2 text-sm mb-3">
+            <div class="flex justify-between text-gray-700">
+              <span>Iuran Bulanan</span>
+              <span class="font-semibold">Rp <%= number_with_delimiter(contribution_amount.to_i, delimiter: '.') %></span>
+            </div>
+            <div class="flex justify-between text-gray-700">
+              <span>Biaya Admin</span>
+              <span class="font-semibold">Rp <%= number_with_delimiter(fee_amount.to_i, delimiter: '.') %></span>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t-2 border-gray-300">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-700 font-medium">Total Dibayar</span>
+              <span class="text-2xl font-bold text-green-600">
+                Rp <%= number_with_delimiter(@payment.amount.to_i, delimiter: '.') %>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <%= link_to user_contributions_path, class: "flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors text-center" do %>
+            Lihat Status Iuran
+          <% end %>
+        </div>
+      </div>
+
+    <% elsif @payment.expired? %>
+      <!-- Expired State -->
+      <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-6">
+          <svg class="w-12 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Pembayaran Kadaluarsa</h1>
+        <p class="text-gray-600 mb-6">QR Code telah melewati batas waktu</p>
+
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+          <p class="text-sm text-gray-600 mb-2">Referensi: <span class="font-mono font-semibold"><%= @payment.reference %></span></p>
+          <p class="text-sm text-gray-600">Silakan buat pembayaran baru</p>
+        </div>
+
+        <div class="flex gap-3 justify-center">
+          <%= link_to user_contributions_path, class: "bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors" do %>
+            Kembali ke Iuran
+          <% end %>
+          <%= link_to new_payment_path(address_id: @payment.address_id), class: "bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" do %>
+            Buat Pembayaran Baru
+          <% end %>
+        </div>
+      </div>
+
+    <% else %>
+      <!-- Pending State - Show QR Code -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-indigo-500 to-blue-600 px-6 py-8 text-center text-white">
+          <h1 class="text-2xl font-bold mb-2">Scan QR Code untuk Membayar</h1>
+          <p class="text-indigo-100">Gunakan aplikasi e-wallet Anda</p>
+        </div>
+
+        <!-- QR Code Section -->
+        <div class="p-8">
+          <!-- Timer -->
+          <div class="mb-6 text-center">
+            <div class="inline-flex items-center bg-orange-50 border border-orange-200 rounded-lg px-4 py-2">
+              <svg class="w-5 h-5 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span class="text-sm font-medium text-orange-900">
+                Berlaku hingga <%= @payment.expired_at.in_time_zone('Jakarta').strftime('%d %b %Y, %H:%M WIB') %>
+              </span>
+            </div>
+          </div>
+
+          <!-- QR Code -->
+          <div class="flex justify-center mb-6">
+            <div class="bg-white p-4 rounded-xl border-4 border-indigo-100">
+              <% if @payment.qr_url.present? %>
+                <img src="<%= @payment.qr_url %>"
+                     alt="QR Code"
+                     class="w-64 h-64 object-contain"
+                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-64 h-64 bg-gray-100 flex items-center justify-center flex-col p-4\'><span class=\'text-gray-600 text-center text-sm mb-2\'>QR Code (Sandbox Mode)</span><a href=\'<%= @payment.qr_url %>\' target=\'_blank\' class=\'text-blue-600 hover:text-blue-800 underline text-xs\'>Buka QR Code di tab baru</a></div>';">
+              <% else %>
+                <div class="w-64 h-64 bg-gray-100 flex items-center justify-center">
+                  <span class="text-gray-400">QR Code tidak tersedia</span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Sandbox Mode Notice & Checkout Link -->
+          <% if @payment.checkout_url.present? %>
+            <div class="mb-6 text-center">
+              <p class="text-sm text-gray-600 mb-2">Atau buka halaman checkout Tripay:</p>
+              <a href="<%= @payment.checkout_url %>"
+                 target="_blank"
+                 class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+                Buka Halaman Checkout
+              </a>
+            </div>
+          <% end %>
+
+          <!-- Payment Details -->
+          <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <% contribution_amount = @payment.tripay_response['contribution_amount'] || @payment.amount %>
+            <% fee_amount = @payment.tripay_response['fee_amount'] || 0 %>
+
+            <!-- Breakdown -->
+            <div class="space-y-2 text-sm mb-3">
+              <div class="flex justify-between text-gray-700">
+                <span>Iuran Bulanan</span>
+                <span class="font-semibold">Rp <%= number_with_delimiter(contribution_amount.to_i, delimiter: '.') %></span>
+              </div>
+              <div class="flex justify-between text-gray-700">
+                <span>Biaya Admin</span>
+                <span class="font-semibold">Rp <%= number_with_delimiter(fee_amount.to_i, delimiter: '.') %></span>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t-2 border-gray-300 mb-4">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-900 font-semibold">Total Pembayaran</span>
+                <span class="text-2xl font-bold text-indigo-600">
+                  Rp <%= number_with_delimiter(@payment.amount.to_i, delimiter: '.') %>
+                </span>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-gray-200 space-y-2 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Referensi</span>
+                <span class="font-mono font-semibold text-gray-900"><%= @payment.reference %></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Blok</span>
+                <span class="font-semibold text-gray-900"><%= @payment.address.block_address&.upcase %></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Metode</span>
+                <span class="font-semibold text-gray-900">QRIS</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Instructions -->
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h3 class="font-semibold text-blue-900 mb-2 flex items-center">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+              Cara Membayar
+            </h3>
+            <ol class="list-decimal list-inside text-sm text-blue-900 space-y-1">
+              <li>Buka aplikasi e-wallet Anda (GoPay, OVO, Dana, dll)</li>
+              <li>Pilih menu "Scan QR" atau "Bayar"</li>
+              <li>Scan QR code di atas</li>
+              <li>Konfirmasi pembayaran di aplikasi Anda</li>
+              <li>Tunggu konfirmasi pembayaran berhasil</li>
+            </ol>
+          </div>
+
+          <!-- Auto Refresh Notice -->
+          <div class="text-center text-sm text-gray-500 mb-4">
+            <p>Halaman ini akan otomatis refresh untuk mengecek status pembayaran</p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex gap-3">
+            <%= link_to user_contributions_path, class: "flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors text-center" do %>
+              Kembali ke Iuran
+            <% end %>
+            <button onclick="location.reload()"
+                    class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
+              Refresh Status
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auto-refresh script for pending payments -->
+      <script>
+        // Auto-refresh every 10 seconds to check payment status
+        setTimeout(() => {
+          location.reload();
+        }, 10000);
+      </script>
+    <% end %>
+  </div>
+</div>

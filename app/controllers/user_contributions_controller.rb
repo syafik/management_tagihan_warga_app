@@ -113,7 +113,7 @@ class UserContributionsController < ApplicationController
         Rails.logger.debug "Search - Filtering by block: #{@block_selected}% - Found: #{addresses.count}"
       end
     end
-    
+
     # Order by block letter first, then by number (alphanumeric sort)
     addresses = addresses.order(
       Arel.sql("SUBSTRING(block_address FROM '^[A-Za-z]+'), CAST(SUBSTRING(block_address FROM '[0-9]+') AS INTEGER)")

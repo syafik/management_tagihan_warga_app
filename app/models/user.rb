@@ -61,6 +61,7 @@ class User < ApplicationRecord
 
   has_one_attached :avatar
   has_many :debts
+  has_many :payments, dependent: :destroy
 
   has_many :user_notifications
   has_many :notifications, through: :user_notifications
@@ -355,7 +356,7 @@ class User < ApplicationRecord
       result = { success: true, message: 'Invitation notification queued for sending' }
     else
       # In development/test environments, just log the invitation
-      app_url = 'http://localhost:3100'
+      app_url = 'http://localhost:5100'
       Rails.logger.info "WhatsApp invitation for #{phone_number}: Access granted to #{address.block_address} at #{app_url} (not sent - not in production)"
       result = { success: true, message: 'Invitation generated (not sent in non-production environment)' }
     end

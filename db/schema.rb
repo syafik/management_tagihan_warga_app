@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_27_010616) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_13_063821) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -174,6 +174,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_010616) do
     t.string "ip_address"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "payments", force: :cascade do |t|
+    t.string "reference", null: false
+    t.bigint "user_id", null: false
+    t.bigint "address_id", null: false
+    t.decimal "amount", precision: 15, scale: 2, null: false
+    t.string "status", default: "UNPAID", null: false
+    t.string "payment_method", null: false
+    t.string "payment_channel"
+    t.text "checkout_url"
+    t.text "qr_url"
+    t.datetime "expired_at"
+    t.datetime "paid_at"
+    t.jsonb "tripay_response", default: {}
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id"], name: "index_payments_on_address_id"
+    t.index ["reference"], name: "index_payments_on_reference", unique: true
+    t.index ["status"], name: "index_payments_on_status"
+    t.index ["user_id"], name: "index_payments_on_user_id"
   end
 
   create_table "settings", force: :cascade do |t|
@@ -409,6 +431,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_010616) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "address_contributions", "addresses"
+  add_foreign_key "payments", "addresses"
+  add_foreign_key "payments", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

@@ -167,36 +167,23 @@ export default class extends Controller {
     await this.fetchPaymentStatus(addressId)
   }
 
-  async yearNavigation(event) {
+  yearNavigation(event) {
     event.preventDefault()
-    
+
     const newYear = parseInt(event.currentTarget.dataset.year)
     const currentAddressId = this.addressSelectTarget?.value
-    
+
     console.log("Year navigation clicked:", newYear, "Address:", currentAddressId)
-    
-    // Update year value
-    this.yearValue = newYear
-    
-    // Make turbo stream request with current address
+
+    // Build URL with year and address parameters
     const url = new URL(window.location.origin + '/user_contributions/new')
     url.searchParams.set('year', newYear)
     if (currentAddressId) {
       url.searchParams.set('address_id', currentAddressId)
     }
-    
-    // Use Turbo to navigate with turbo stream
-    await fetch(url.toString(), {
-      method: 'GET',
-      headers: {
-        'Accept': 'text/vnd.turbo-stream.html',
-        'Turbo-Frame': '_top'
-      }
-    }).then(response => response.text())
-      .then(html => {
-        // Process turbo stream response
-        Turbo.renderStreamMessage(html)
-      })
+
+    // Simple page navigation - browser will reload with new parameters
+    window.location.href = url.toString()
   }
 
   // This method is called when monthSelectionContent target is connected/reconnected

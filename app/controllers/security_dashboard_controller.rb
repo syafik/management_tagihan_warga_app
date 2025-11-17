@@ -81,16 +81,19 @@ class SecurityDashboardController < ApplicationController
     @arrears_months = @address.arrears || 0
     @arrears_amount = @arrears_months * @address.current_contribution_rate
 
-    # Get unpaid months (from starting_year to now)
+    # Get unpaid months (from starting_year to all months in current year)
     @unpaid_months = get_unpaid_months_list(@address, @current_year, @current_month)
 
-    # Get future months (next 6 months)
-    @future_months = get_future_months_list(@address, @current_year, @current_month, 6)
+    # Get next year months if current month >= 10
+    @next_year_months = []
+    if @current_month >= 10
+      @next_year_months = get_next_year_months_list(@address, @current_year + 1)
+    end
 
     # Calculate totals
     @total_arrears = @arrears_amount
     @total_unpaid = @unpaid_months.sum { |m| @address.expected_contribution_for(m[:month], m[:year]) }
-    @total_future = @future_months.sum { |m| m[:contribution_rate] }
+    @total_next_year = @next_year_months.sum { |m| m[:contribution_rate] }
     @grand_total = @total_arrears + @total_unpaid
   end
 
@@ -554,13 +557,13 @@ class SecurityDashboardController < ApplicationController
   end
 
   def get_unpaid_months_list(address, current_year, current_month)
-    # Get all months from starting_year to current month
+    # Get all months from starting_year to end of current year (all 12 months)
     starting_year = AppSetting.starting_year
     all_expected_months = []
 
     (starting_year..current_year).each do |year|
       month_start = (year == starting_year) ? 1 : 1
-      month_end = (year == current_year) ? current_month : 12
+      month_end = (year == current_year) ? 12 : 12  # Show all 12 months for current year
 
       (month_start..month_end).each do |month|
         all_expected_months << { year: year, month: month }
@@ -576,6 +579,41 @@ class SecurityDashboardController < ApplicationController
     # Find unpaid months
     unpaid_months = all_expected_months - paid_months
     unpaid_months.sort_by { |m| [m[:year], m[:month]] }
+  end
+
+  def get_next_year_months_list(address, next_year)
+    # Get all 12 months for next year
+    next_year_months = []
+
+    (1..12).each do |month|
+      # Check if already paid
+      already_paid = UserContribution.exists?(
+        address_id: address.id,
+        year: next_year,
+        month: month
+      )
+
+      next if already_paid
+
+      contribution_rate = address.expected_contribution_for(month, next_year)
+
+      next_year_months << {
+        month: month,
+        month_text: UserContribution::MONTHNAMES.invert[month],
+        year: next_year,
+        contribution_rate: contribution_rate,
+        formatted_rate: format_currency(contribution_rate),
+        is_paid: false,
+        is_future: true,
+        is_next_year: true,
+        paid_amount: nil,
+        pay_date: nil,
+        payment_id: nil,
+        receiver_name: nil
+      }
+    end
+
+    next_year_months
   end
 
   def get_future_months_list(address, current_year, current_month, months_ahead = 12)

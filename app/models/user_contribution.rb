@@ -33,7 +33,8 @@ class UserContribution < ApplicationRecord
   validates :contribution, :pay_at, :receiver_id, :payment_type, :blok, presence: true
 
   before_save :set_blok_group
-  after_create :send_payment_notification
+  # Removed after_create :send_payment_notification callback
+  # Notification should be sent manually from controller/service when needed
 
   MONTHNAMES =
     {
@@ -50,6 +51,12 @@ class UserContribution < ApplicationRecord
       'November' => 11,
       'Desember' => 12
     }.freeze
+
+  PAYMENT_TYPES = {
+    'CASH' => 1,
+    'TRANSFER' => 2,
+    'QRIS' => 3
+  }.freeze
 
   def self.import_existing_data(execute_month)
     session = GoogleDrive::Session.from_service_account_key(StringIO.new(GDRIVE_CONFIG.to_json))
@@ -78,27 +85,39 @@ class UserContribution < ApplicationRecord
     end
   end
 
+  def payment_type_name
+    case payment_type
+    when PAYMENT_TYPES['CASH']
+      'CASH'
+    when PAYMENT_TYPES['TRANSFER']
+      'TRANSFER'
+    when PAYMENT_TYPES['QRIS']
+      'QRIS'
+    else
+      'UNKNOWN'
+    end
+  end
+
   def contribution_long_desc
     desc = "LUNAS DAN DI TERIMA OLEH #{try(:receiver).try(:name).try(:upcase)}"
     desc += " TANGGAL #{pay_at.strftime('%d %B %Y')}" unless pay_at.blank?
-    desc += " SECARA #{payment_type == 2 ? 'TRANSFER' : 'CASH'}"
+    desc += " SECARA #{payment_type_name}"
     desc
   end
 
   def contribution_desc
-    "Pembayaran Iuran, #{payment_type == 2 ? 'TRANSFER' : 'CASH'} Diterima Oleh: #{try(:receiver).try(:name).try(:upcase)}"
+    if payment_type == PAYMENT_TYPES['CASH']
+      "Pembayaran Iuran, #{payment_type_name} Diterima Oleh: #{try(:receiver).try(:name).try(:upcase)}"
+    else
+      "Pembayaran Iuran, #{payment_type_name}"
+    end
   end
 
   def tgl_bayar
     pay_at.blank? ? '-' : pay_at.strftime('%d %B %Y')
   end
 
-  private
-
-  def set_blok_group
-    blok = address.block_address.gsub(/[^A-Za-z]/, '').upcase
-  end
-
+  # Send notification for this contribution (call manually when needed)
   def send_payment_notification
     # Queue the notification job to run in background
     SendPaymentNotificationJob.perform_later(id)
@@ -106,5 +125,11 @@ class UserContribution < ApplicationRecord
   rescue StandardError => e
     # Log error but don't fail the payment creation
     Rails.logger.error "Failed to queue payment notification: #{e.message}"
+  end
+
+  private
+
+  def set_blok_group
+    blok = address.block_address.gsub(/[^A-Za-z]/, '').upcase
   end
 end

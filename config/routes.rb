@@ -163,6 +163,16 @@ Rails.application.routes.draw do
   resources :app_settings
   resources :template_transactions
 
+  # Payment routes (QRIS via Tripay)
+  resources :payments, only: [:new, :create, :show], param: :reference do
+    member do
+      get :status # For AJAX status checks
+    end
+  end
+
+  # Tripay webhook callback
+  post '/tripay/callback', to: 'tripay_callbacks#callback'
+
   # Security Dashboard
   resources :security_dashboard, only: [:index] do
     collection do

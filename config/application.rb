@@ -16,9 +16,10 @@ module SwitchupAdministrator
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    # Set timezone to Jakarta (WIB/GMT+7)
+    config.time_zone = "Jakarta"
     # config.eager_load_paths << Rails.root.join("extras")
-    
+
     # ActiveJob configuration
     config.active_job.queue_adapter = :solid_queue
   end

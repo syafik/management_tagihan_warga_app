@@ -109,24 +109,19 @@
       <h2 class="text-base font-bold text-white">Item Pembayaran</h2>
     </div>
 
-    <div class="divide-y divide-gray-100">
-      <% @selected_items.group_by { |item| item[:category] }.each do |category, items| %>
-        <div class="p-4">
-          <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3"><%= category %></div>
-          <div class="space-y-2">
-            <% items.each do |item| %>
-              <div class="flex items-center justify-between py-2">
-                <div class="flex-1">
-                  <div class="text-sm font-medium text-gray-900"><%= item[:description] %></div>
-                </div>
-                <div class="text-sm font-bold text-gray-900 ml-4">
-                  Rp <%= number_with_delimiter(item[:amount], delimiter: '.') %>
-                </div>
-              </div>
-            <% end %>
+    <div class="p-4">
+      <div class="space-y-2">
+        <% @selected_items.each do |item| %>
+          <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+            <div class="flex-1">
+              <div class="text-sm font-medium text-gray-900"><%= item[:description] %></div>
+            </div>
+            <div class="text-sm font-bold text-gray-900 ml-4">
+              Rp <%= number_with_delimiter(item[:amount], delimiter: '.') %>
+            </div>
           </div>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
     </div>
   </div>
 

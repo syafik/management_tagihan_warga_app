@@ -67,8 +67,10 @@ class SendPaymentReminderNotificationJob < ApplicationJob
       #{total_arrears > 1 ? "⚠️ *Total Tunggakan:* #{total_arrears} bulan" : ''}
 
       *Cara Pembayaran:*
-      💵 Transfer ke rekening resmi (lihat aplikasi)
+      💵 QRIS di aplikasi
       💵 Bayar tunai ke petugas keamanan
+
+      _*Abaikan pesan ini jika sudah melakukan pembayaran._
 
       Untuk informasi lebih lanjut atau konfirmasi pembayaran, silakan hubungi pengurus atau akses aplikasi di https://app.puriayana.com
 

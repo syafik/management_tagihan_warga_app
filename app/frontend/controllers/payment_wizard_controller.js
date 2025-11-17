@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["totalAmount", "itemCount", "totalAmountBottom", "itemCountBottom", "arrearsCheckbox", "unpaidCheckbox", "futureCheckbox", "submitButton"]
+  static targets = ["totalAmount", "itemCount", "totalAmountBottom", "itemCountBottom", "arrearsCheckbox", "unpaidCheckbox", "futureCheckbox", "nextYearCheckbox", "submitButton"]
 
   connect() {
     this.updateTotal()
@@ -15,7 +15,8 @@ export default class extends Controller {
     const allCheckboxes = [
       ...this.arrearsCheckboxTargets,
       ...this.unpaidCheckboxTargets,
-      ...(this.hasFutureCheckboxTarget ? this.futureCheckboxTargets : [])
+      ...(this.hasFutureCheckboxTarget ? this.futureCheckboxTargets : []),
+      ...(this.hasNextYearCheckboxTarget ? this.nextYearCheckboxTargets : [])
     ]
 
     allCheckboxes.forEach(checkbox => {
@@ -97,12 +98,24 @@ export default class extends Controller {
     this.updateTotal()
   }
 
+  selectAllNextYear(event) {
+    event.preventDefault()
+    if (this.hasNextYearCheckboxTarget) {
+      this.nextYearCheckboxTargets.forEach(checkbox => {
+        checkbox.checked = true
+        checkbox.dispatchEvent(new Event('change', { bubbles: true }))
+      })
+    }
+    this.updateTotal()
+  }
+
   resetSelection(event) {
     event.preventDefault()
     const allCheckboxes = [
       ...this.arrearsCheckboxTargets,
       ...this.unpaidCheckboxTargets,
-      ...(this.hasFutureCheckboxTarget ? this.futureCheckboxTargets : [])
+      ...(this.hasFutureCheckboxTarget ? this.futureCheckboxTargets : []),
+      ...(this.hasNextYearCheckboxTarget ? this.nextYearCheckboxTargets : [])
     ]
 
     allCheckboxes.forEach(checkbox => {
@@ -120,35 +133,59 @@ export default class extends Controller {
 
     if (checkbox.checked) {
       // Selected state
-      if (card.classList.contains('border-orange-200')) {
+      if (card.classList.contains('border-red-300')) {
+        // Red/arrears months
+        card.classList.remove('border-red-300', 'bg-red-50')
+        card.classList.add('border-red-500', 'bg-red-100')
+        circle.classList.remove('border-red-400')
+        circle.classList.add('bg-red-500', 'border-red-500')
+      } else if (card.classList.contains('border-orange-200')) {
         // Orange/unpaid months
-        card.classList.remove('border-orange-200')
+        card.classList.remove('border-orange-200', 'bg-orange-50')
         card.classList.add('border-orange-500', 'bg-orange-100')
-        circle.classList.remove('border-orange-300')
+        circle.classList.remove('border-orange-400')
         circle.classList.add('bg-orange-500', 'border-orange-500')
-      } else {
-        // Blue/future months
-        card.classList.remove('border-blue-200')
+      } else if (card.classList.contains('border-blue-200')) {
+        // Blue/current year future months
+        card.classList.remove('border-blue-200', 'bg-blue-50')
         card.classList.add('border-blue-500', 'bg-blue-100')
-        circle.classList.remove('border-blue-300')
+        circle.classList.remove('border-blue-400')
         circle.classList.add('bg-blue-500', 'border-blue-500')
+      } else if (card.classList.contains('border-indigo-200')) {
+        // Indigo/next year months
+        card.classList.remove('border-indigo-200', 'bg-indigo-50')
+        card.classList.add('border-indigo-500', 'bg-indigo-100')
+        circle.classList.remove('border-indigo-400')
+        circle.classList.add('bg-indigo-500', 'border-indigo-500')
       }
       icon.classList.remove('opacity-0')
       icon.classList.add('opacity-100')
     } else {
       // Unselected state
-      if (card.classList.contains('border-orange-500')) {
+      if (card.classList.contains('border-red-500')) {
+        // Red/arrears months
+        card.classList.remove('border-red-500', 'bg-red-100')
+        card.classList.add('border-red-300', 'bg-red-50')
+        circle.classList.remove('bg-red-500', 'border-red-500')
+        circle.classList.add('border-red-400')
+      } else if (card.classList.contains('border-orange-500')) {
         // Orange/unpaid months
         card.classList.remove('border-orange-500', 'bg-orange-100')
-        card.classList.add('border-orange-200')
+        card.classList.add('border-orange-200', 'bg-orange-50')
         circle.classList.remove('bg-orange-500', 'border-orange-500')
-        circle.classList.add('border-orange-300')
-      } else {
-        // Blue/future months
+        circle.classList.add('border-orange-400')
+      } else if (card.classList.contains('border-blue-500')) {
+        // Blue/current year future months
         card.classList.remove('border-blue-500', 'bg-blue-100')
-        card.classList.add('border-blue-200')
+        card.classList.add('border-blue-200', 'bg-blue-50')
         circle.classList.remove('bg-blue-500', 'border-blue-500')
-        circle.classList.add('border-blue-300')
+        circle.classList.add('border-blue-400')
+      } else if (card.classList.contains('border-indigo-500')) {
+        // Indigo/next year months
+        card.classList.remove('border-indigo-500', 'bg-indigo-100')
+        card.classList.add('border-indigo-200', 'bg-indigo-50')
+        circle.classList.remove('bg-indigo-500', 'border-indigo-500')
+        circle.classList.add('border-indigo-400')
       }
       icon.classList.remove('opacity-100')
       icon.classList.add('opacity-0')
