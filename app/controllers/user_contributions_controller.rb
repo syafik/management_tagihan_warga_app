@@ -369,6 +369,13 @@ class UserContributionsController < ApplicationController
 
       success = true
     end
+
+    # Send payment notification if successful
+    if success && user_contributions_created.any?
+      contribution_ids = user_contributions_created.map(&:id)
+      SendPaymentNotificationJob.perform_later(contribution_ids)
+    end
+
     respond_to do |format|
       if success
         format.html { redirect_to contribution_by_address_user_contribution_path(@user_contribution.address), notice: 'User contribution was successfully created.' }

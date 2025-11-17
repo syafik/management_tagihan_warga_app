@@ -129,7 +129,10 @@
   <%= form_with url: create_payment_security_dashboard_index_path, method: :post do |f| %>
     <%= f.hidden_field :address_id, value: @address.id %>
     <%= f.hidden_field :payment_type, value: @payment_type %>
-    <%= f.hidden_field :pay_arrears, value: @pay_arrears ? '1' : '0' %>
+
+    <% @pay_arrears.each do |arrears_index| %>
+      <%= hidden_field_tag 'pay_arrears[]', arrears_index %>
+    <% end %>
 
     <% @unpaid_months.each do |month_year| %>
       <%= hidden_field_tag 'unpaid_months[]', month_year %>

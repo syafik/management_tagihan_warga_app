@@ -1,10 +1,20 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["totalAmount", "itemCount", "totalAmountBottom", "itemCountBottom", "arrearsCheckbox", "unpaidCheckbox", "futureCheckbox", "nextYearCheckbox", "submitButton"]
+  static targets = ["totalAmount", "itemCount", "totalAmountBottom", "itemCountBottom", "arrearsCheckbox", "unpaidCheckbox", "futureCheckbox", "nextYearCheckbox", "submitButton", "form"]
 
   connect() {
     this.updateTotal()
+
+    // Debug: Log form submit
+    if (this.hasFormTarget) {
+      this.formTarget.addEventListener('submit', (e) => {
+        console.log('=== FORM SUBMIT DEBUG ===')
+        const formData = new FormData(this.formTarget)
+        console.log('pay_arrears values:', formData.getAll('pay_arrears[]'))
+        console.log('All checked arrears checkboxes:', this.arrearsCheckboxTargets.filter(cb => cb.checked).map(cb => cb.value))
+      })
+    }
   }
 
   updateTotal() {

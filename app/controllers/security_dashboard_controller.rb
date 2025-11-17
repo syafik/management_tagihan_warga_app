@@ -78,8 +78,10 @@ class SecurityDashboardController < ApplicationController
     @current_month = Date.current.month
 
     # Get arrears (tunggakan lama) - stored as number of months, not rupiah
+    # Use rate from January of current year (same as payments_controller)
     @arrears_months = @address.arrears || 0
-    @arrears_amount = @arrears_months * @address.current_contribution_rate
+    @arrears_rate = @address.expected_contribution_for(1, @current_year)
+    @arrears_amount = @arrears_months * @arrears_rate
 
     # Get unpaid months (from starting_year to all months in current year)
     @unpaid_months = get_unpaid_months_list(@address, @current_year, @current_month)
@@ -271,11 +273,12 @@ class SecurityDashboardController < ApplicationController
     end
 
     @payment_type = params[:payment_type]&.to_i || 1
-    @pay_arrears = params[:pay_arrears] == '1'
-    @unpaid_months = params[:unpaid_months] || []
-    @future_months = params[:future_months] || []
+    # Convert to array (handles both single string and array from params)
+    @pay_arrears = Array(params[:pay_arrears]).reject(&:blank?)
+    @unpaid_months = Array(params[:unpaid_months]).reject(&:blank?)
+    @future_months = Array(params[:future_months]).reject(&:blank?)
 
-    if !@pay_arrears && @unpaid_months.empty? && @future_months.empty?
+    if @pay_arrears.empty? && @unpaid_months.empty? && @future_months.empty?
       redirect_to payment_security_dashboard_index_path(address_id: @address.id),
                   alert: 'Pilih minimal 1 item pembayaran'
       return
@@ -285,14 +288,17 @@ class SecurityDashboardController < ApplicationController
     @total_amount = 0
     @selected_items = []
 
-    # Process arrears
-    if @pay_arrears && @address.arrears.to_i > 0
-      arrears_amount = @address.arrears * @address.current_contribution_rate
-      @total_amount += arrears_amount
+    # Process individual arrears (now array of arrears indices)
+    # Use rate from January of current year (same as payments_controller)
+    arrears_rate = @address.expected_contribution_for(1, Date.current.year)
+
+    @pay_arrears.each do |arrears_index|
+      @total_amount += arrears_rate
       @selected_items << {
         category: 'Tunggakan Lama',
-        description: "#{@address.arrears} bulan tunggakan",
-        amount: arrears_amount
+        description: "Tunggakan #{arrears_index}",
+        amount: arrears_rate,
+        arrears_index: arrears_index.to_i
       }
     end
 
@@ -336,11 +342,18 @@ class SecurityDashboardController < ApplicationController
     end
 
     payment_type = params[:payment_type]&.to_i || 1
-    pay_arrears = params[:pay_arrears] == '1'
-    unpaid_months = params[:unpaid_months] || []
-    future_months = params[:future_months] || []
+    # Convert to array (handles both single string and array from params)
+    pay_arrears = Array(params[:pay_arrears]).reject(&:blank?)
+    unpaid_months = Array(params[:unpaid_months]).reject(&:blank?)
+    future_months = Array(params[:future_months]).reject(&:blank?)
 
-    if !pay_arrears && unpaid_months.empty? && future_months.empty?
+    # Debug logging
+    Rails.logger.info "=== CREATE PAYMENT DEBUG ==="
+    Rails.logger.info "params[:pay_arrears] RAW: #{params[:pay_arrears].inspect}"
+    Rails.logger.info "pay_arrears AFTER Array(): #{pay_arrears.inspect}"
+    Rails.logger.info "pay_arrears COUNT: #{pay_arrears.count}"
+
+    if pay_arrears.empty? && unpaid_months.empty? && future_months.empty?
       redirect_to payment_security_dashboard_index_path(address_id: address.id),
                   alert: 'Pilih minimal 1 item pembayaran'
       return
@@ -349,14 +362,26 @@ class SecurityDashboardController < ApplicationController
     success = false
     total_amount = 0
     user_contributions_created = []
+    arrears_paid_count = 0
 
     UserContribution.transaction do
-      # Handle arrears payment - arrears is number of months, not rupiah
-      if pay_arrears && address.arrears.to_i > 0
-        arrears_amount = address.arrears * address.current_contribution_rate
-        total_amount += arrears_amount
-        # Update arrears to 0
-        address.update_column(:arrears, 0)
+      # Handle individual arrears payment
+      # Use rate from January of current year (same as payments_controller)
+      arrears_rate = address.expected_contribution_for(1, Date.current.year)
+
+      pay_arrears.each do |arrears_index|
+        total_amount += arrears_rate
+        arrears_paid_count += 1
+        Rails.logger.info "Processing arrears #{arrears_index}: amount=#{arrears_rate}"
+      end
+
+      # Update arrears counter (reduce by count of arrears paid)
+      if arrears_paid_count > 0
+        old_arrears = address.arrears.to_i
+        new_arrears = [old_arrears - arrears_paid_count, 0].max
+        Rails.logger.info "Updating arrears: #{old_arrears} -> #{new_arrears}"
+        address.update_column(:arrears, new_arrears)
+        Rails.logger.info "Arrears updated successfully"
       end
 
       # Handle unpaid months
@@ -423,15 +448,23 @@ class SecurityDashboardController < ApplicationController
         end
       end
 
-      # Create cash transaction
+      # Create single grouped cash transaction for all contributions (same as payment_controller)
       if total_amount > 0
         description_parts = []
-        description_parts << "Tunggakan Lama" if pay_arrears
-        description_parts << "#{user_contributions_created.count} bulan" if user_contributions_created.any?
+        description_parts << "Tunggakan Lama (#{arrears_paid_count} bulan)" if arrears_paid_count > 0
 
-        CashTransaction.create(
-          month: Date.current.month,
-          year: Date.current.year,
+        if user_contributions_created.any?
+          months_text = user_contributions_created.map { |uc| UserContribution::MONTHNAMES.invert[uc.month] }.join(', ')
+          description_parts << "#{user_contributions_created.count} bulan (#{months_text})"
+        end
+
+        first_contribution = user_contributions_created.first
+        transaction_month = first_contribution&.month || Date.current.month
+        transaction_year = first_contribution&.year || Date.current.year
+
+        ct = CashTransaction.create(
+          month: transaction_month,
+          year: transaction_year,
           transaction_date: Date.current,
           transaction_type: CashTransaction::TYPE['DEBIT'],
           transaction_group: CashTransaction::GROUP['IURAN WARGA'],
@@ -439,9 +472,18 @@ class SecurityDashboardController < ApplicationController
           total: total_amount,
           pic_id: current_user.id
         )
+        Rails.logger.info "CashTransaction created: ID=#{ct.id}, Total=#{total_amount}"
       end
 
       success = true
+    end
+
+    # Send payment notification if successful
+    if success && (user_contributions_created.any? || arrears_paid_count > 0)
+      contribution_ids = user_contributions_created.map(&:id)
+      Rails.logger.info "Sending payment notification: contributions=#{contribution_ids.count}, arrears=#{arrears_paid_count}, total=#{total_amount}"
+      # Pass address_id for arrears-only payments
+      SendPaymentNotificationJob.perform_later(contribution_ids, nil, arrears_paid_count, total_amount, address.id)
     end
 
     if success

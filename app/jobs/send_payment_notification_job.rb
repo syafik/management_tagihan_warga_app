@@ -8,53 +8,62 @@ class SendPaymentNotificationJob < ApplicationJob
   # Can accept:
   # - Single ID: perform(123) → send for 1 contribution
   # - Array of IDs: perform([123, 124, 125]) → send bulk message for multiple contributions
-  # - With payment details: perform([123, 124], payment_id, arrears_count, total_amount)
-  def perform(user_contribution_ids, payment_id = nil, arrears_count = 0, total_amount = nil)
+  # - With payment details: perform([123, 124], payment_id, arrears_count, total_amount, address_id)
+  def perform(user_contribution_ids, payment_id = nil, arrears_count = 0, total_amount = nil, address_id = nil)
     user_contribution_ids = Array(user_contribution_ids)
+
+    # Debug logging
+    puts "=== SendPaymentNotificationJob START ==="
+    puts "user_contribution_ids: #{user_contribution_ids.inspect}"
+    puts "payment_id: #{payment_id.inspect}"
+    puts "arrears_count: #{arrears_count.inspect}"
+    puts "total_amount: #{total_amount.inspect}"
+    puts "address_id: #{address_id.inspect}"
 
     # Get contributions
     contributions = UserContribution.where(id: user_contribution_ids).includes(:address, :receiver)
+    puts "contributions found: #{contributions.count}"
 
-    # If we have payment_id, get address from payment (handles arrears-only payments)
-    if payment_id.present?
-      payment = Payment.find_by(id: payment_id)
-      address = payment&.address
+    # Get payment if payment_id provided
+    payment = Payment.find_by(id: payment_id) if payment_id.present?
+
+    # Get address and head of family
+    if payment.present?
+      address = payment.address
       head_of_family = address&.head_of_family
     elsif contributions.any?
-      # Get address and head of family from first contribution
       address = contributions.first.address
       head_of_family = address.head_of_family
+    elsif address_id.present?
+      # Arrears-only payment
+      address = Address.find_by(id: address_id)
+      head_of_family = address&.head_of_family
     else
-      return # No contributions and no payment
+      return # No contributions, payment, or address
     end
+
+    puts "address found: #{address&.block_address}"
+    puts "head_of_family: #{head_of_family&.name}"
 
     # Skip if no head of family found
     return unless head_of_family && address
 
+    # Skip if nothing to notify
+    return if contributions.empty? && arrears_count.to_i == 0
+
     whatsapp_service = WhatsappService.new
 
-    # Build message based on what we have
-    if payment_id.present? && (contributions.any? || arrears_count > 0)
-      # Payment via QRIS with possible arrears
-      Rails.logger.info "Sending payment notification with arrears (#{arrears_count}) to #{head_of_family.phone_number}"
-      message = build_payment_with_arrears_message(contributions, address, head_of_family, arrears_count, total_amount, payment)
-    elsif contributions.size > 1
-      Rails.logger.info "Sending bulk payment notification (#{contributions.size} months) to #{head_of_family.phone_number}"
-      message = build_bulk_payment_message(contributions, address, head_of_family)
-    elsif contributions.size == 1
-      Rails.logger.info "Sending payment notification to #{head_of_family.phone_number} for address #{address.block_address}"
-      message = build_single_payment_message(contributions.first, address, head_of_family)
-    else
-      return # Nothing to send
-    end
+    # Build universal message
+    Rails.logger.info "Sending payment notification to #{head_of_family.phone_number}: #{contributions.size} contributions + #{arrears_count} arrears"
+    message = build_payment_message(contributions, address, head_of_family, payment, arrears_count, total_amount)
 
     # Log message before sending (to both stdout and log file)
     log_message = <<~LOG
-      #{"="*80}
+      #{'=' * 80}
       Sending WhatsApp notification to #{head_of_family.phone_number}
       Message content:
       #{message}
-      #{"="*80}
+      #{'=' * 80}
     LOG
 
     puts log_message
@@ -94,18 +103,40 @@ class SendPaymentNotificationJob < ApplicationJob
 
   private
 
-  def build_payment_with_arrears_message(contributions, address, head_of_family, arrears_count, total_amount, payment)
-    total_display = number_to_currency(total_amount || contributions.sum(&:contribution))
-    date = payment.paid_at.strftime('%d %B %Y')
-    payment_method = payment.payment_method
+  def build_payment_message(contributions, address, head_of_family, payment, arrears_count, total_amount)
+    # Determine payment method
+    if payment.present?
+      # QRIS payment
+      payment_method = payment.payment_method
+      date = payment.paid_at.strftime('%d %B %Y')
+      total_display = number_to_currency(total_amount || payment.amount)
+      receiver_line = ''
+    elsif contributions.any?
+      # Manual payment (CASH/TRANSFER)
+      payment_method = contributions.first.payment_type_name
+      date = contributions.first.pay_at.strftime('%d %B %Y')
+      total_display = number_to_currency(total_amount || contributions.sum(&:contribution))
+
+      # Only show receiver for CASH payment
+      receiver_line = if contributions.first.payment_type == UserContribution::PAYMENT_TYPES['CASH']
+                        receiver_name = contributions.first.receiver&.name&.upcase || 'PETUGAS'
+                        "👤 *Diterima oleh:* #{receiver_name}\n"
+                      else
+                        ''
+                      end
+    else
+      # Arrears only (no regular contributions)
+      payment_method = 'CASH'
+      date = Date.current.strftime('%d %B %Y')
+      total_display = number_to_currency(total_amount || 0)
+      receiver_line = ''
+    end
 
     # Build items list
     items_list = []
 
     # Add arrears if any
-    if arrears_count > 0
-      items_list << "   🔴 *Tunggakan Lama:* #{arrears_count} bulan"
-    end
+    items_list << "   🔴 *Tunggakan Lama:* #{arrears_count} bulan" if arrears_count.to_i > 0
 
     # Add regular months if any
     if contributions.any?
@@ -125,114 +156,30 @@ class SendPaymentNotificationJob < ApplicationJob
     end
 
     items_display = items_list.join("\n")
-    total_items = arrears_count + contributions.size
+    total_items = arrears_count.to_i + contributions.size
 
     <<~MESSAGE
-      ✅ *Konfirmasi Pembayaran Iuran*
+            ✅ *Konfirmasi Pembayaran Iuran*
 
-      Yth. Bapak/Ibu *#{head_of_family.name}*
+            Yth. Bapak/Ibu *#{head_of_family.name}*
 
-      Pembayaran iuran berhasil:
-      🏠 *Alamat:* #{address.block_address.upcase}
-      💰 *Total:* #{total_display}
-      📅 *Tanggal:* #{date}
-      💳 *Metode:* #{payment_method}
-      📦 *Jumlah:* #{total_items} item
+            Pembayaran iuran berhasil:
+            🏠 *Alamat:* #{address.block_address.upcase}
+            💰 *Total:* #{total_display}
+            📅 *Tanggal:* #{date}
+            💳 *Metode:* #{payment_method}
+            #{receiver_line}
+            📦 *Jumlah:* #{total_items} item
 
-      *Detail Pembayaran:*
-#{items_display}
+            *Detail Pembayaran:*
+      #{items_display}
 
-      Terima kasih atas partisipasi Anda dalam menjaga lingkungan Puri Ayana.
+            Terima kasih atas partisipasi Anda dalam menjaga lingkungan Puri Ayana.
 
-      Untuk informasi lebih lanjut, silakan akses aplikasi di https://app.puriayana.com
+            Untuk informasi lebih lanjut, silakan akses aplikasi di https://app.puriayana.com
 
-      Salam,
-      Pengurus Puri Ayana 🏡
-    MESSAGE
-  end
-
-  def build_single_payment_message(user_contribution, address, head_of_family)
-    payment_method = user_contribution.payment_type_name
-    amount = number_to_currency(user_contribution.contribution)
-    date = user_contribution.pay_at.strftime('%d %B %Y')
-
-    # Only show receiver for CASH payment
-    receiver_line = if user_contribution.payment_type == UserContribution::PAYMENT_TYPES['CASH']
-      receiver_name = user_contribution.receiver&.name&.upcase || 'PETUGAS'
-      "👤 *Diterima oleh:* #{receiver_name}\n"
-    else
-      ""
-    end
-
-    <<~MESSAGE
-      ✅ *Konfirmasi Pembayaran Iuran*
-
-      Yth. Bapak/Ibu *#{head_of_family.name}*
-
-      Pembayaran iuran untuk:
-      🏠 *Alamat:* #{address.block_address.upcase}
-      💰 *Nominal:* #{amount}
-      📅 *Tanggal:* #{date}
-      💳 *Metode:* #{payment_method}
-      #{receiver_line.chomp}
-      Terima kasih atas partisipasi Anda dalam menjaga lingkungan Puri Ayana.
-
-      Untuk informasi lebih lanjut, silakan akses aplikasi di https://app.puriayana.com
-
-      Salam,
-      Pengurus Puri Ayana 🏡
-    MESSAGE
-  end
-
-  def build_bulk_payment_message(contributions, address, head_of_family)
-    total_amount = number_to_currency(contributions.sum(&:contribution))
-    date = contributions.first.pay_at.strftime('%d %B %Y')
-    payment_method = contributions.first.payment_type_name
-    month_count = contributions.size
-
-    # Only show receiver for CASH payment
-    receiver_line = if contributions.first.payment_type == UserContribution::PAYMENT_TYPES['CASH']
-      receiver_name = contributions.first.receiver&.name&.upcase || 'PETUGAS'
-      "👤 *Diterima oleh:* #{receiver_name}\n"
-    else
-      ""
-    end
-
-    # Build month list (max 10 items, then "dan X lainnya")
-    months_list = contributions.sort_by { |c| [c.year, c.month] }.map do |c|
-      month_name = UserContribution::MONTHNAMES.invert[c.month]
-      "   • #{month_name} #{c.year}"
-    end
-
-    if months_list.size > 10
-      first_10 = months_list.first(10).join("\n")
-      remaining = months_list.size - 10
-      months_list = "#{first_10}\n   • dan #{remaining} bulan lainnya"
-    else
-      months_list = months_list.join("\n")
-    end
-
-    <<~MESSAGE
-      ✅ *Konfirmasi Pembayaran Iuran*
-
-      Yth. Bapak/Ibu *#{head_of_family.name}*
-
-      Pembayaran iuran berhasil:
-      🏠 *Alamat:* #{address.block_address.upcase}
-      💰 *Total:* #{total_amount}
-      📅 *Tanggal:* #{date}
-      💳 *Metode:* #{payment_method}
-      #{receiver_line}📦 *Jumlah:* #{month_count} bulan
-
-      *Detail Pembayaran:*
-#{months_list}
-
-      Terima kasih atas partisipasi Anda dalam menjaga lingkungan Puri Ayana.
-
-      Untuk informasi lebih lanjut, silakan akses aplikasi di https://app.puriayana.com
-
-      Salam,
-      Pengurus Puri Ayana 🏡
+            Salam,
+            Pengurus Puri Ayana 🏡
     MESSAGE
   end
 
