@@ -61,6 +61,26 @@
     </div>
 
     <% if user_contribution.new_record? %>
+      <!-- Arrears Section (Tunggakan) -->
+      <div class="sm:col-span-2" data-user-contribution-form-target="arrearsSection" style="display: none;">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="text-sm font-bold text-red-900">Tunggakan Lama</h3>
+              <p class="text-xs text-red-700">Dari tahun sebelumnya</p>
+            </div>
+            <div class="text-right">
+              <div class="text-xs text-red-600">Jumlah Tunggakan</div>
+              <div class="text-lg font-bold text-red-900" data-user-contribution-form-target="arrearsCount">0</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" data-user-contribution-form-target="arrearsGrid">
+            <!-- Arrears checkboxes will be populated by Stimulus -->
+          </div>
+        </div>
+      </div>
+
       <!-- Month Selection for New Records -->
       <div class="sm:col-span-2">
         <%= render 'month_selection', year_selected: @year_selected, month_info: @month_info, selected_address_id: params[:address_id] %>

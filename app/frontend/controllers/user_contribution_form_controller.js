@@ -11,7 +11,10 @@ export default class extends Controller {
     "contributionDisplay",
     "monthsGrid",
     "monthCheckbox",
-    "monthSelectionContent"
+    "monthSelectionContent",
+    "arrearsSection",
+    "arrearsGrid",
+    "arrearsCount"
   ]
 
   static values = {
@@ -199,24 +202,82 @@ export default class extends Controller {
     try {
       const url = `/user_contributions/payment_status?address_id=${addressId}&year=${this.yearValue}`
       console.log('Fetching payment status from:', url)
-      
+
       const response = await fetch(url)
       const data = await response.json()
-      
+
       console.log('Payment Status Response:', data)
-      
+
       if (data.success && data.months) {
         this.updateContributionInfo(data.months[0])
         this.updateMonthsWithPaymentStatus(data.months)
+
+        // Load arrears if available
+        if (data.arrears && data.arrears > 0) {
+          this.loadArrears(data.arrears, data.arrears_rate || 175000)
+        } else {
+          this.hideArrears()
+        }
       } else {
         console.warn('API returned no payment status or failed:', data)
         this.resetForm()
       }
-      
+
     } catch (error) {
       console.error('Error fetching payment status:', error)
       this.resetForm()
     }
+  }
+
+  loadArrears(count, rate) {
+    if (!this.hasArrearsSectionTarget) return
+
+    console.log(`Loading ${count} arrears at rate ${rate}`)
+
+    // Store arrears rate for calculation
+    this.arrearsRate = rate
+
+    // Show arrears section
+    this.arrearsSectionTarget.style.display = 'block'
+    this.arrearsCountTarget.textContent = count
+
+    // Build arrears checkboxes
+    let arrearsHTML = ''
+    for (let i = 1; i <= count; i++) {
+      const formattedRate = new Intl.NumberFormat('id-ID').format(rate)
+      arrearsHTML += `
+        <label class="relative flex items-center p-3 bg-white border-2 border-red-200 rounded-lg cursor-pointer hover:border-red-400 hover:shadow-md transition-all">
+          <input type="checkbox"
+                 name="pay_arrears[]"
+                 value="${i}"
+                 data-arrears-rate="${rate}"
+                 data-action="change->user-contribution-form#updateTotalContribution"
+                 class="sr-only peer">
+          <div class="flex-1 text-center">
+            <div class="text-sm font-bold text-gray-900">Tunggakan ${i}</div>
+            <div class="text-xs text-red-700 mt-1">Rp ${formattedRate}</div>
+          </div>
+          <div class="absolute top-1 right-1 w-5 h-5 border-2 border-red-400 rounded-full peer-checked:bg-red-500 peer-checked:border-red-500 flex items-center justify-center">
+            <svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+        </label>
+      `
+    }
+
+    this.arrearsGridTarget.innerHTML = arrearsHTML
+  }
+
+  hideArrears() {
+    if (!this.hasArrearsSectionTarget) return
+    this.arrearsSectionTarget.style.display = 'none'
+  }
+
+  getCheckedArrearsCount() {
+    if (!this.hasArrearsGridTarget) return 0
+    const arrearsCheckboxes = this.arrearsGridTarget.querySelectorAll('input[type="checkbox"]:checked')
+    return arrearsCheckboxes.length
   }
 
   updateContributionInfo(firstMonth) {
@@ -323,7 +384,7 @@ export default class extends Controller {
     let totalAmount = 0
     let monthsDetails = []
 
-    // Calculate total based on each month's specific contribution rate
+    // Calculate total from regular months
     checkedBoxes.forEach(checkbox => {
       const month = parseInt(checkbox.dataset.month)
       const year = parseInt(checkbox.dataset.year)
@@ -340,9 +401,18 @@ export default class extends Controller {
       })
     })
 
+    // Add arrears amount
+    if (this.hasArrearsGridTarget) {
+      const arrearsCheckboxes = this.arrearsGridTarget.querySelectorAll('input[type="checkbox"]:checked')
+      arrearsCheckboxes.forEach(checkbox => {
+        const arrearsRate = parseFloat(checkbox.dataset.arrearsRate) || this.arrearsRate || 0
+        totalAmount += arrearsRate
+      })
+    }
+
     // Update both the hidden field (for form submission) and display field (for user)
     if (this.hasContributionFieldTarget) {
-      if (checkedBoxes.length > 0 && totalAmount > 0) {
+      if ((checkedBoxes.length > 0 || this.getCheckedArrearsCount() > 0) && totalAmount > 0) {
         this.contributionFieldTarget.value = totalAmount
         if (this.hasContributionDisplayTarget) {
           this.contributionDisplayTarget.value = this.formatCurrency(totalAmount)

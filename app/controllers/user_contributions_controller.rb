@@ -306,6 +306,13 @@ class UserContributionsController < ApplicationController
     @year_selected = (params[:year] || [Date.current.year, AppSetting.starting_year].max).to_i
     @month_info = generate_month_info(@year_selected)
     @selected_address_id = params[:address_id]
+
+    # Load arrears info if address is pre-selected
+    if @selected_address_id.present?
+      @selected_address = Address.find_by(id: @selected_address_id)
+      @arrears_months = @selected_address&.arrears || 0
+      @arrears_rate = @selected_address&.expected_contribution_for(1, Date.current.year) || 0
+    end
   end
 
   # GET /user_contributions/1/edit
@@ -324,44 +331,75 @@ class UserContributionsController < ApplicationController
     end
 
     user_contributions_created = []
+    arrears_paid_count = 0
+
+    # Get arrears payment data
+    pay_arrears = Array(params[:pay_arrears]).reject(&:blank?)
+    arrears_rate = address.expected_contribution_for(1, Date.current.year)
 
     UserContribution.transaction do
-      params[:user_contribution_month].each do |value|
-        month, month_text, year = value.strip.split(",")
+      # Handle arrears payment first
+      pay_arrears.each do |arrears_index|
+        total_contribution_amount += arrears_rate
+        arrears_paid_count += 1
+        Rails.logger.info "Processing arrears #{arrears_index}: amount=#{arrears_rate}"
+      end
 
-        # Get the expected contribution for this specific address, month, and year
-        expected_contribution = address.expected_contribution_for(month.to_i, year.to_i)
+      # Update arrears counter
+      if arrears_paid_count > 0
+        old_arrears = address.arrears.to_i
+        new_arrears = [old_arrears - arrears_paid_count, 0].max
+        Rails.logger.info "Updating arrears: #{old_arrears} -> #{new_arrears}"
+        address.update_column(:arrears, new_arrears)
+      end
 
-        params[:user_contribution][:month] = month.to_i
-        params[:user_contribution][:year] = year.to_i
-        params[:user_contribution][:description] = "#{address.block_address} Pembayaran bulan #{month_text} #{year}"
-        params[:user_contribution][:contribution] = expected_contribution
-        params[:user_contribution][:expected_contribution] = expected_contribution
+      # Handle regular month payments
+      if params[:user_contribution_month].present?
+        params[:user_contribution_month].each do |value|
+          month, month_text, year = value.strip.split(",")
 
-        @user_contribution = UserContribution.new(user_contribution_params)
-        @user_contribution.blok = @user_contribution.address.block_address.gsub(/[^A-Za-z]/,'') rescue ''
+          # Get the expected contribution for this specific address, month, and year
+          expected_contribution = address.expected_contribution_for(month.to_i, year.to_i)
 
-        if @user_contribution.save
-          user_contributions_created << @user_contribution
-          total_contribution_amount += expected_contribution
-        else
-          raise ActiveRecord::Rollback
+          params[:user_contribution][:month] = month.to_i
+          params[:user_contribution][:year] = year.to_i
+          params[:user_contribution][:description] = "#{address.block_address} Pembayaran bulan #{month_text} #{year}"
+          params[:user_contribution][:contribution] = expected_contribution
+          params[:user_contribution][:expected_contribution] = expected_contribution
+
+          @user_contribution = UserContribution.new(user_contribution_params)
+          @user_contribution.blok = @user_contribution.address.block_address.gsub(/[^A-Za-z]/,'') rescue ''
+
+          if @user_contribution.save
+            user_contributions_created << @user_contribution
+            total_contribution_amount += expected_contribution
+          else
+            raise ActiveRecord::Rollback
+          end
         end
       end
 
       # Create single grouped cash transaction for all contributions
-      if user_contributions_created.any?
+      if total_contribution_amount > 0
+        description_parts = []
+        description_parts << "Tunggakan Lama (#{arrears_paid_count} bulan)" if arrears_paid_count > 0
+
+        if user_contributions_created.any?
+          months_text = user_contributions_created.map { |uc| UserContribution::MONTHNAMES.invert[uc.month] }.join(', ')
+          description_parts << "#{user_contributions_created.count} bulan (#{months_text})"
+        end
+
         first_contribution = user_contributions_created.first
-        months_count = user_contributions_created.count
-        months_text = user_contributions_created.map { |uc| UserContribution::MONTHNAMES.invert[uc.month] }.join(', ')
+        transaction_month = first_contribution&.month || Date.current.month
+        transaction_year = first_contribution&.year || Date.current.year
 
         CashTransaction.create(
-          month: first_contribution.month,
-          year: first_contribution.year,
-          transaction_date: first_contribution.pay_at,
+          month: transaction_month,
+          year: transaction_year,
+          transaction_date: first_contribution&.pay_at || Date.current,
           transaction_type: CashTransaction::TYPE['DEBIT'],
           transaction_group: CashTransaction::GROUP['IURAN WARGA'],
-          description: "#{address.block_address} pembayaran iuran #{months_count} bulan (#{months_text})",
+          description: "#{address.block_address} pembayaran iuran (#{description_parts.join(' + ')})",
           total: total_contribution_amount,
           pic_id: current_user.id
         )
@@ -371,9 +409,9 @@ class UserContributionsController < ApplicationController
     end
 
     # Send payment notification if successful
-    if success && user_contributions_created.any?
+    if success && (user_contributions_created.any? || arrears_paid_count > 0)
       contribution_ids = user_contributions_created.map(&:id)
-      SendPaymentNotificationJob.perform_later(contribution_ids)
+      SendPaymentNotificationJob.perform_later(contribution_ids, nil, arrears_paid_count, total_contribution_amount, address.id)
     end
 
     respond_to do |format|
@@ -566,10 +604,16 @@ class UserContributionsController < ApplicationController
 
       months_data = build_months_payment_data(address, year)
 
+      # Get arrears info
+      arrears_months = address.arrears || 0
+      arrears_rate = address.expected_contribution_for(1, Date.current.year)
+
       render json: {
         success: true,
         months: months_data,
-        address_name: address.block_address&.upcase
+        address_name: address.block_address&.upcase,
+        arrears: arrears_months,
+        arrears_rate: arrears_rate
       }
     else
       render json: { success: false, error: 'Address ID required' }
