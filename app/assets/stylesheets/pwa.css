@@ -1,0 +1,242 @@
+/* PWA Install Banner Styles */
+.pwa-install-banner {
+  position: fixed;
+  bottom: -200px;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  transition: bottom 0.3s ease-out;
+}
+
+.pwa-install-banner.show {
+  bottom: 0;
+}
+
+.pwa-install-content {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pwa-install-icon {
+  font-size: 40px;
+  flex-shrink: 0;
+}
+
+.pwa-install-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.pwa-install-title {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.pwa-install-subtitle {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.pwa-install-actions {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.pwa-install-btn {
+  background: white;
+  color: #667eea;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pwa-install-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+}
+
+.pwa-install-btn:active {
+  transform: translateY(0);
+}
+
+.pwa-install-btn-close {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.pwa-install-btn-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* iOS Install Guide */
+.ios-install-guide {
+  position: fixed;
+  bottom: -400px;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  transition: bottom 0.3s ease-out;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.ios-install-guide.show {
+  bottom: 0;
+}
+
+.ios-install-content {
+  padding: 24px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.ios-install-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.ios-install-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+}
+
+.ios-install-close {
+  background: #f7fafc;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4a5568;
+  transition: background 0.2s;
+}
+
+.ios-install-close:hover {
+  background: #edf2f7;
+}
+
+.ios-install-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ios-install-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: #f7fafc;
+  border-radius: 12px;
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.step-text {
+  flex: 1;
+  color: #2d3748;
+  font-size: 15px;
+  line-height: 1.6;
+  padding-top: 4px;
+}
+
+.step-text strong {
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.step-text svg {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 2px;
+  color: #667eea;
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .pwa-install-content {
+    flex-wrap: wrap;
+  }
+
+  .pwa-install-icon {
+    font-size: 32px;
+  }
+
+  .pwa-install-title {
+    font-size: 15px;
+  }
+
+  .pwa-install-subtitle {
+    font-size: 12px;
+  }
+
+  .pwa-install-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .pwa-install-btn {
+    flex: 1;
+  }
+}
+
+/* Standalone mode (when app is installed) */
+@media all and (display-mode: standalone) {
+  /* Hide install prompts when already installed */
+  .pwa-install-banner,
+  .ios-install-guide {
+    display: none !important;
+  }
+}
+
+/* Add visual feedback for standalone mode */
+body.pwa-standalone {
+  /* Optional: Add specific styles for installed app */
+}
