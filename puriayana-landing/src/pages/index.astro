@@ -1,0 +1,498 @@
+---
+const title = "Puri Ayana - Kompleks Perumahan Modern";
+const description = "Sistem Manajemen Tagihan Digital untuk Warga Puri Ayana";
+---
+
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --secondary: #10b981;
+        --dark: #1e293b;
+        --light: #f8fafc;
+        --gray: #64748b;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        line-height: 1.6;
+        color: var(--dark);
+        background: var(--light);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      /* Header */
+      header {
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 0;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary);
+        text-decoration: none;
+      }
+
+      .logo img {
+        height: 64px;
+        width: auto;
+        object-fit: contain;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+      }
+
+      .nav-links a {
+        color: var(--dark);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s;
+      }
+
+      .nav-links a:hover {
+        color: var(--primary);
+      }
+
+      /* Hero Section */
+      .hero {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 6rem 0;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        animation: fadeInUp 0.8s ease;
+      }
+
+      .hero p {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+        opacity: 0.95;
+        animation: fadeInUp 0.8s ease 0.2s backwards;
+      }
+
+      .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fadeInUp 0.8s ease 0.4s backwards;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: none;
+        font-size: 1rem;
+      }
+
+      .btn-primary {
+        background: white;
+        color: var(--primary);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+      }
+
+      .btn-secondary:hover {
+        background: white;
+        color: var(--primary);
+      }
+
+      /* Download Section */
+      .download-section {
+        padding: 4rem 0;
+        background: white;
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--dark);
+      }
+
+      .section-subtitle {
+        text-align: center;
+        color: var(--gray);
+        margin-bottom: 3rem;
+        font-size: 1.125rem;
+      }
+
+      .download-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .download-card {
+        background: var(--light);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+      }
+
+      .download-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        border-color: var(--primary);
+      }
+
+      .download-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+
+      .download-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--dark);
+      }
+
+      .download-card p {
+        color: var(--gray);
+        margin-bottom: 1.5rem;
+      }
+
+      .btn-download {
+        background: var(--primary);
+        color: white;
+        width: 100%;
+      }
+
+      .btn-download:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+      }
+
+      .btn-download.web {
+        background: var(--secondary);
+      }
+
+      .btn-download.web:hover {
+        background: #059669;
+      }
+
+      /* Features Section */
+      .features {
+        padding: 4rem 0;
+        background: var(--light);
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .feature-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      }
+
+      .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .feature-card h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+        color: var(--dark);
+      }
+
+      .feature-card p {
+        color: var(--gray);
+      }
+
+      /* Info Section */
+      .info-section {
+        padding: 4rem 0;
+        background: white;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+        text-align: center;
+      }
+
+      .info-item h4 {
+        font-size: 2rem;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+      }
+
+      .info-item p {
+        color: var(--gray);
+      }
+
+      /* Footer */
+      footer {
+        background: var(--dark);
+        color: white;
+        padding: 2rem 0;
+        text-align: center;
+      }
+
+      footer p {
+        opacity: 0.8;
+      }
+
+      /* Animations */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .hero h1 {
+          font-size: 2rem;
+        }
+
+        .hero p {
+          font-size: 1rem;
+        }
+
+        .section-title {
+          font-size: 2rem;
+        }
+
+        .nav-links {
+          display: none;
+        }
+
+        .download-cards,
+        .features-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <nav class="container">
+        <a href="/" class="logo">
+          <img src="/logo-puri-ayana.png" alt="Puri Ayana Logo" />
+          <span>Puri Ayana</span>
+        </a>
+        <ul class="nav-links">
+          <li><a href="#beranda">Beranda</a></li>
+          <li><a href="#download">Download</a></li>
+          <li><a href="#fitur">Fitur</a></li>
+          <li><a href="#info">Info</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="beranda">
+      <div class="container">
+        <h1>Selamat Datang di Puri Ayana</h1>
+        <p>Kompleks Perumahan Modern dengan Sistem Manajemen Tagihan Digital</p>
+        <div class="cta-buttons">
+          <a href="#download" class="btn btn-primary">Download Aplikasi</a>
+          <a href="https://app.puriayana.com" class="btn btn-secondary">Login Web</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Download Section -->
+    <section class="download-section" id="download">
+      <div class="container">
+        <h2 class="section-title">Download Aplikasi</h2>
+        <p class="section-subtitle">Akses sistem tagihan melalui aplikasi mobile atau web browser</p>
+
+        <div class="download-cards">
+          <!-- Android -->
+          <div class="download-card">
+            <div class="download-icon">📱</div>
+            <h3>Android</h3>
+            <p>Download aplikasi untuk perangkat Android Anda</p>
+            <a href="/downloads/puriayana.apk" class="btn btn-download" download>
+              Download APK
+            </a>
+          </div>
+
+          <!-- iOS -->
+          <div class="download-card">
+            <div class="download-icon">🍎</div>
+            <h3>iPhone / iOS</h3>
+            <p>Akses melalui browser Safari atau Chrome</p>
+            <a href="https://app.puriayana.com" class="btn btn-download web">
+              Buka di Browser
+            </a>
+          </div>
+
+          <!-- Web Browser -->
+          <div class="download-card">
+            <div class="download-icon">💻</div>
+            <h3>Web Browser</h3>
+            <p>Akses dari komputer atau laptop Anda</p>
+            <a href="https://app.puriayana.com" class="btn btn-download web">
+              Login Sekarang
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="fitur">
+      <div class="container">
+        <h2 class="section-title">Fitur Unggulan</h2>
+        <p class="section-subtitle">Kemudahan dalam mengelola tagihan dan iuran warga</p>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">💳</div>
+            <h3>Pembayaran Digital</h3>
+            <p>Bayar iuran bulanan dengan mudah dan cepat</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Riwayat Transaksi</h3>
+            <p>Lihat histori pembayaran dan tagihan Anda</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🔔</div>
+            <h3>Notifikasi</h3>
+            <p>Pengingat otomatis untuk tagihan yang jatuh tempo</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3>Multi Platform</h3>
+            <p>Akses dari Android, iOS, atau web browser</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Aman & Terpercaya</h3>
+            <p>Data Anda dilindungi dengan enkripsi</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Real-time Update</h3>
+            <p>Status pembayaran diperbarui secara otomatis</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Info Section -->
+    <section class="info-section" id="info">
+      <div class="container">
+        <h2 class="section-title">Tentang Puri Ayana</h2>
+        <p class="section-subtitle">Kompleks perumahan modern dengan fasilitas lengkap</p>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <h4>5</h4>
+            <p>Blok Perumahan<br/>(A, B, C, D, F)</p>
+          </div>
+
+          <div class="info-item">
+            <h4>100+</h4>
+            <p>Unit Rumah</p>
+          </div>
+
+          <div class="info-item">
+            <h4>24/7</h4>
+            <p>Akses Aplikasi</p>
+          </div>
+
+          <div class="info-item">
+            <h4>Digital</h4>
+            <p>Sistem Manajemen</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <p>&copy; 2024 Puri Ayana. All rights reserved.</p>
+        <p style="margin-top: 0.5rem;">Sistem Manajemen Tagihan Warga</p>
+      </div>
+    </footer>
+  </body>
+</html>
