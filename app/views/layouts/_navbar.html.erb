@@ -2,29 +2,40 @@
   <div class="max-w-full px-4 lg:pl-64">
     <div class="flex items-center justify-between h-16">
       <!-- Brand -->
-      <div class="flex items-center">
+      <div class="flex items-center gap-3 flex-1 min-w-0">
         <a href="/" class="flex items-center space-x-2 lg:hidden">
-          <%= image_tag "logo-puri-ayana.png", 
-              alt: "Puri Ayana Logo", 
+          <%= image_tag "logo-puri-ayana.png",
+              alt: "Puri Ayana Logo",
               class: "h-8 w-auto object-contain" %>
-          <span class="text-indigo-600 font-bold text-xl">Puri Ayana</span>
+          <span class="text-indigo-600 font-bold text-base sm:text-xl">Puri Ayana</span>
         </a>
         <div class="hidden lg:flex lg:items-center lg:space-x-3">
-          <%= image_tag "logo-puri-ayana.png", 
-              alt: "Puri Ayana Logo", 
+          <%= image_tag "logo-puri-ayana.png",
+              alt: "Puri Ayana Logo",
               class: "h-10 w-auto object-contain" %>
           <h1 class="text-gray-900 text-lg font-medium">Welcome PuriAyana App!</h1>
         </div>
       </div>
-      
+
+      <!-- PWA Install Button - Mobile Only -->
+      <div data-pwa-install-target="button" class="hidden lg:hidden">
+        <button data-action="click->pwa-install#install"
+                class="flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-2.5 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 active:scale-95">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+          </svg>
+          <span class="font-semibold text-xs whitespace-nowrap">Install</span>
+        </button>
+      </div>
+
       <!-- Navigation items -->
-      <div class="flex items-center space-x-4">
-        <%= form_with url: destroy_user_session_path, method: :delete, local: true, 
-              data: { 'turbo-confirm': 'Are you sure you want to sign out?' }, 
+      <div class="hidden lg:flex items-center space-x-4 flex-shrink-0">
+        <%= form_with url: destroy_user_session_path, method: :delete, local: true,
+              data: { 'turbo-confirm': 'Are you sure you want to sign out?' },
               style: 'display: inline;' do %>
           <%= submit_tag 'Sign Out', class: 'text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium bg-transparent border-0 cursor-pointer' %>
         <% end %>
-        
+
       </div>
     </div>
   </div>

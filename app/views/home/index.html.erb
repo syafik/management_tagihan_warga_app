@@ -1,192 +1,142 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <!-- Welcome Header -->
-  <div class="bg-white overflow-hidden shadow rounded-lg mb-6">
-    <div class="px-4 py-5 sm:p-6">
-      <h1 class="text-3xl font-bold text-gray-900">
-        Welcome to PuriAyana Management System
-        <span class="text-lg font-normal text-gray-600">- <%= current_user.role_name %></span>
-      </h1>
-      <p class="mt-1 text-sm text-gray-500">
-        Residential billing and contribution management system - Dashboard <%= AppSetting.starting_year %>
-      </p>
-    </div>
-  </div>
-
-  <!-- Main Statistics Cards -->
-  <div class="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-6">
-    <!-- Total Users -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
-      <div class="p-5">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <svg class="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
-            </svg>
-          </div>
-          <div class="ml-5 w-0 flex-1">
-            <dl>
-              <dt class="text-sm font-medium text-gray-500 truncate">Total Users Aplikasi</dt>
-              <dd class="text-lg font-medium text-gray-900"><%= @total_residents %></dd>
-            </dl>
-          </div>
-        </div>
+<div class="min-h-screen w-full overflow-x-hidden">
+  <div class="w-full px-2 sm:px-4 lg:px-8 py-2 sm:py-4">
+    <!-- Welcome Header -->
+    <div class="bg-white overflow-hidden shadow rounded-lg mb-3 sm:mb-6">
+      <div class="px-2 py-2 sm:px-6 sm:py-5">
+        <h1 class="text-sm sm:text-xl lg:text-2xl font-bold text-gray-900">
+          Welcome to PuriAyana Management System
+        </h1>
+        <p class="text-xs sm:text-sm text-gray-600 mt-1">- <%= current_user.role_name %></p>
+        <p class="mt-1 text-xs sm:text-sm text-gray-500">
+          Dashboard <%= AppSetting.starting_year %>
+        </p>
       </div>
     </div>
 
-    <!-- Total Addresses -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
-      <div class="p-5">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <svg class="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
-            </svg>
-          </div>
-          <div class="ml-5 w-0 flex-1">
-            <dl>
-              <dt class="text-sm font-medium text-gray-500 truncate">Total Alamat</dt>
-              <dd class="text-lg font-medium text-gray-900"><%= @total_addresses %></dd>
-            </dl>
+    <!-- Main Statistics Cards -->
+    <div class="grid grid-cols-1 gap-2 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-3 sm:mb-6">
+      <!-- Total Users -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-2 sm:p-4">
+          <div class="flex items-center gap-2">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+              </svg>
+            </div>
+            <div class="min-w-0 flex-1">
+              <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Users</dt>
+              <dd class="text-sm sm:text-lg font-bold text-gray-900"><%= @total_residents %></dd>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- Total Addresses -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-2 sm:p-4">
+          <div class="flex items-center gap-2">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 sm:h-6 sm:w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+              </svg>
+            </div>
+            <div class="min-w-0 flex-1">
+              <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Alamat</dt>
+              <dd class="text-sm sm:text-lg font-bold text-gray-900"><%= @total_addresses %></dd>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contribution Percentage or Activity (Role-based) -->
+      <% unless current_user&.is_security? %>
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-2 sm:p-4">
+            <div class="flex items-center gap-2">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 sm:h-6 sm:w-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+              </div>
+              <div class="min-w-0 flex-1">
+                <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Kontribusi <%= AppSetting.starting_year %></dt>
+                <dd class="text-sm sm:text-lg font-bold text-gray-900"><%= @contribution_percentage %>%</dd>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-2 sm:p-4">
+            <div class="flex items-center gap-2">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 sm:h-6 sm:w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"/>
+                </svg>
+              </div>
+              <div class="min-w-0 flex-1">
+                <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Aktivitas Bulan Ini</dt>
+                <dd class="text-sm sm:text-lg font-bold text-gray-900"><%= UserContribution.where(month: Date.current.month, year: Date.current.year).count %></dd>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
     </div>
 
-    <!-- Contribution Percentage or Activity (Role-based) -->
     <% unless current_user&.is_security? %>
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Tingkat Kontribusi <%= AppSetting.starting_year %></dt>
-                <dd class="text-lg font-medium text-gray-900"><%= @contribution_percentage %>%</dd>
-              </dl>
-            </div>
+      <!-- Financial Summary Cards -->
+      <div class="grid grid-cols-1 gap-2 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-3 sm:mb-6">
+        <!-- Current Cash Balance -->
+        <div class="bg-gradient-to-r <%= @current_cash_balance >= 0 ? 'from-green-400 to-green-600' : 'from-red-400 to-red-600' %> overflow-hidden shadow rounded-lg">
+          <div class="p-2 sm:p-4">
+            <dt class="text-xs font-medium text-white mb-1">Saldo Kas Saat Ini</dt>
+            <dd class="text-base sm:text-xl font-bold text-white break-all">
+              Rp <%= number_with_delimiter(@current_cash_balance.abs, delimiter: '.') %>
+            </dd>
+            <p class="text-xs text-white text-opacity-80 mt-1">
+              Awal: Rp <%= number_with_delimiter(@starting_balance, delimiter: '.') %>
+            </p>
+          </div>
+        </div>
+
+        <!-- Total Income <%= AppSetting.starting_year %> -->
+        <div class="bg-gradient-to-r from-blue-400 to-blue-600 overflow-hidden shadow rounded-lg">
+          <div class="p-2 sm:p-4">
+            <dt class="text-xs font-medium text-white mb-1">Pemasukan <%= AppSetting.starting_year %></dt>
+            <dd class="text-base sm:text-xl font-bold text-white break-all">
+              Rp <%= number_with_delimiter(@total_income_2025, delimiter: '.') %>
+            </dd>
+          </div>
+        </div>
+
+        <!-- Total Outcome <%= AppSetting.starting_year %> -->
+        <div class="bg-gradient-to-r from-red-400 to-red-600 overflow-hidden shadow rounded-lg">
+          <div class="p-2 sm:p-4">
+            <dt class="text-xs font-medium text-white mb-1">Pengeluaran <%= AppSetting.starting_year %></dt>
+            <dd class="text-base sm:text-xl font-bold text-white break-all">
+              Rp <%= number_with_delimiter(@total_outcome_2025, delimiter: '.') %>
+            </dd>
           </div>
         </div>
       </div>
-    <% else %>
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"/>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Aktivitas Bulan Ini</dt>
-                <dd class="text-lg font-medium text-gray-900"><%= UserContribution.where(month: Date.current.month, year: Date.current.year).count %></dd>
-              </dl>
-            </div>
+
+      <!-- Monthly Financial Chart -->
+      <div class="bg-white overflow-hidden shadow rounded-lg mb-3 sm:mb-6">
+        <div class="px-2 py-2 sm:px-6 sm:py-5">
+          <h3 class="text-xs sm:text-base font-semibold text-gray-900 mb-2 sm:mb-4">Grafik <%= AppSetting.starting_year %></h3>
+          <div class="relative h-48 sm:h-64">
+            <canvas
+              data-controller="financial-chart"
+              data-financial-chart-labels-value="<%= (@monthly_financial_data&.map { |d| d[:month_name] } || []).to_json.html_safe %>"
+              data-financial-chart-income-data-value="<%= (@monthly_financial_data&.map { |d| d[:income] || 0 } || []).to_json.html_safe %>"
+              data-financial-chart-outcome-data-value="<%= (@monthly_financial_data&.map { |d| d[:outcome] || 0 } || []).to_json.html_safe %>">
+            </canvas>
           </div>
         </div>
       </div>
     <% end %>
-  </div>
-
-  <% unless current_user&.is_security? %>
-    <!-- Financial Summary Cards -->
-    <div class="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-6">
-      <!-- Current Cash Balance -->
-      <div class="bg-gradient-to-r <%= @current_cash_balance >= 0 ? 'from-green-400 to-green-600' : 'from-red-400 to-red-600' %> overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <% if @current_cash_balance >= 0 %>
-                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-              <% else %>
-                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"/>
-                </svg>
-              <% end %>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-white truncate">Saldo Kas Saat Ini</dt>
-                <dd class="text-2xl font-bold text-white">
-                  <%= @current_cash_balance < 0 ? '-' : '' %>Rp <%= number_with_delimiter(@current_cash_balance.abs, delimiter: '.') %>
-                </dd>
-                <p class="text-sm <%= @current_cash_balance >= 0 ? 'text-green-100' : 'text-red-100' %>">
-                  <span class="font-semibold">Saldo awal:</span> <span class="font-bold">Rp <%= number_with_delimiter(@starting_balance, delimiter: '.') %></span>
-                  <% if @current_cash_balance < 0 %>
-                    <span class="block mt-1 font-semibold">⚠️ Saldo Negatif</span>
-                  <% end %>
-                </p>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Total Income <%= AppSetting.starting_year %> -->
-      <div class="bg-gradient-to-r from-blue-400 to-blue-600 overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-white truncate">Total Pemasukan <%= AppSetting.starting_year %></dt>
-                <dd class="text-2xl font-bold text-white">
-                  Rp <%= number_with_delimiter(@total_income_2025, delimiter: '.') %>
-                </dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Total Outcome <%= AppSetting.starting_year %> -->
-      <div class="bg-gradient-to-r from-red-400 to-red-600 overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-white truncate">Total Pengeluaran <%= AppSetting.starting_year %></dt>
-                <dd class="text-2xl font-bold text-white">
-                  Rp <%= number_with_delimiter(@total_outcome_2025, delimiter: '.') %>
-                </dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Monthly Financial Chart -->
-    <div class="bg-white overflow-hidden shadow rounded-lg mb-6">
-      <div class="px-4 py-5 sm:p-6">
-        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Pemasukan vs Pengeluaran Bulanan <%= AppSetting.starting_year %></h3>
-        <div class="relative h-64 sm:h-80">
-          <canvas 
-            data-controller="financial-chart"
-            data-financial-chart-labels-value="<%= (@monthly_financial_data&.map { |d| d[:month_name] } || []).to_json.html_safe %>"
-            data-financial-chart-income-data-value="<%= (@monthly_financial_data&.map { |d| d[:income] || 0 } || []).to_json.html_safe %>"
-            data-financial-chart-outcome-data-value="<%= (@monthly_financial_data&.map { |d| d[:outcome] || 0 } || []).to_json.html_safe %>">
-          </canvas>
-        </div>
-      </div>
-    </div>
-
-  <% end %>
 
   <% if current_user&.is_security? || current_user&.is_admin? %>
     <!-- Security Dashboard -->
@@ -241,6 +191,6 @@
       </div>
     <% end %>
 
-  <% end %>
+    <% end %>
+  </div>
 </div>
-

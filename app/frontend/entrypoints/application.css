@@ -1,9 +1,9 @@
+/* PWA Styles */
+@import '../../assets/stylesheets/pwa.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* PWA Styles */
-@import '../../assets/stylesheets/pwa.css';
 
 /* Select2 Tailwind Customization */
 @layer components {

@@ -1,35 +1,35 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6" data-controller="security-dashboard" data-security-dashboard-year-value="<%= @year_selected %>">
+<div class="w-full max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-6 overflow-x-hidden" data-controller="security-dashboard" data-security-dashboard-year-value="<%= @year_selected %>">
   <!-- Header - Mobile Optimized -->
-  <div class="mb-4 sm:mb-6">
-    <div class="flex items-center space-x-3 mb-2">
-      <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-sm">
-        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <div class="mb-3 sm:mb-6">
+    <div class="flex items-center space-x-2 sm:space-x-3 mb-2">
+      <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
+        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
         </svg>
       </div>
-      <div>
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Dashboard Sekurity</h1>
-        <p class="text-xs sm:text-sm text-gray-500">Kelola pembayaran iuran warga</p>
+      <div class="min-w-0">
+        <h1 class="text-lg sm:text-2xl font-bold text-gray-900">Dashboard Sekurity</h1>
+        <p class="text-xs sm:text-sm text-gray-500 truncate">Kelola pembayaran iuran warga</p>
       </div>
     </div>
   </div>
 
   <!-- Block Tabs - Mobile Optimized -->
   <% if @accessible_blocks.any? %>
-    <div class="mb-4">
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-2">
-        <nav class="flex gap-2 overflow-x-auto scrollbar-hide" aria-label="Block tabs">
+    <div class="mb-3 sm:mb-4">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-1.5 sm:p-2">
+        <nav class="flex gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide" aria-label="Block tabs">
           <% @accessible_blocks.each do |block| %>
             <%
               block_addresses = @addresses_with_unpaid.select { |data| data[:address].block_letter == block }
               total_unpaid_in_block = block_addresses.sum { |data| data[:unpaid_months] }
             %>
             <%= link_to security_dashboard_index_path(block: block, search: @search_term),
-                        class: "flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg transition-all whitespace-nowrap #{@selected_block == block ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md' : 'bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200'}" do %>
-              <div class="flex items-center gap-2">
-                <span class="text-base font-bold">Blok <%= block %></span>
+                        class: "flex-shrink-0 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium rounded-lg transition-all whitespace-nowrap #{@selected_block == block ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md' : 'bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200'}" do %>
+              <div class="flex items-center gap-1.5 sm:gap-2">
+                <span class="text-sm sm:text-base font-bold">Blok <%= block %></span>
                 <% if total_unpaid_in_block > 0 %>
-                  <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-xs font-bold <%= @selected_block == block ? 'bg-white text-red-600' : 'bg-red-100 text-red-800' %>">
+                  <span class="inline-flex items-center justify-center min-w-[18px] sm:min-w-[20px] h-4 sm:h-5 px-1 sm:px-1.5 rounded-full text-xs font-bold <%= @selected_block == block ? 'bg-white text-red-600' : 'bg-red-100 text-red-800' %>">
                     <%= total_unpaid_in_block %>
                   </span>
                 <% end %>
@@ -42,13 +42,13 @@
   <% end %>
 
   <!-- Search Bar - Mobile Optimized -->
-  <div class="mb-4 bg-white rounded-xl shadow-sm border border-gray-100 p-3">
+  <div class="mb-3 sm:mb-4 bg-white rounded-xl shadow-sm border border-gray-100 p-2 sm:p-3">
     <%= form_with url: security_dashboard_index_path, method: :get, class: "flex flex-col sm:flex-row gap-2" do |f| %>
       <div class="flex-1">
         <%= f.text_field :search,
                         value: @search_term,
                         placeholder: "Cari alamat atau nama...",
-                        class: "w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm",
+                        class: "w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm",
                         data: {
                           security_dashboard_target: "searchInput",
                           action: "input->security-dashboard#search"
@@ -56,7 +56,7 @@
       </div>
       <%= f.hidden_field :year, value: @year_selected %>
       <%= f.hidden_field :block, value: @selected_block %>
-      <button type="submit" class="px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 active:bg-indigo-800 transition-colors flex items-center justify-center gap-2">
+      <button type="submit" class="px-3 sm:px-4 py-2 sm:py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 active:bg-indigo-800 transition-colors flex items-center justify-center gap-2 flex-shrink-0">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
@@ -79,7 +79,7 @@
 
   <!-- Addresses Grid - Mobile Optimized -->
   <% if @addresses_with_unpaid.any? %>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
       <% @addresses_with_unpaid.each do |data| %>
         <% address = data[:address] %>
         <% unpaid_months = data[:unpaid_months] %>
@@ -91,7 +91,7 @@
         %>
         <%= link_to payment_security_dashboard_index_path(address_id: address.id),
                     class: "block bg-white rounded-xl shadow-sm border #{is_paid ? 'border-green-300 bg-green-50' : 'border-gray-100'} hover:shadow-md active:scale-[0.98] transition-all" do %>
-          <div class="p-4">
+          <div class="p-3 sm:p-4">
             <!-- Address Header - Compact -->
             <div class="flex items-start justify-between mb-3">
               <div class="flex-1 min-w-0">
