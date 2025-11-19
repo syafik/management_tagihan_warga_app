@@ -48,6 +48,7 @@ gem 'dartsass-rails' # Use Dart SASS for better CSS custom properties support
 gem 'coffee-rails'
 gem "solid_queue_dashboard", "~> 0.2.0"
 gem 'chartkick'
+gem 'rollbar'
 
 group :development, :test do
   # Call 'byebug' to stop execution and get a debugger console
