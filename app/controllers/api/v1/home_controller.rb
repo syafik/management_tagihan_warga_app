@@ -159,6 +159,14 @@ module Api
         render json: { success: true, notification: notification }, status: :ok
       end
 
+      def mark_notification_as_read
+        notification = Notification.find(params[:id])
+        notification.read_by(current_user)
+        render json: { success: true, message: 'Notifikasi berhasil ditandai sudah dibaca' }, status: :ok
+      rescue ActiveRecord::RecordNotFound
+        render json: { success: false, message: 'Notifikasi tidak ditemukan' }, status: :not_found
+      end
+
       def add_notification
         notification = Notification.new(title: params[:title], notif: params[:notif])
         if notification.save

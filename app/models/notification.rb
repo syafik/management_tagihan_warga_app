@@ -22,6 +22,8 @@ class Notification < ApplicationRecord
   has_many :users, through: :user_notifications
   has_many :app_notif_receivers, -> { where('device_token IS NOT NULL') }, through: :user_notifications,  source: :user
 
+  after_create :send_push_notifications
+
   before_destroy do
     UserNotification.where(notification_id: self.id).delete_all
   end
@@ -43,5 +45,29 @@ class Notification < ApplicationRecord
 
   def self.ransackable_attributes(auth_object = nil)
     ["created_at", "id", "notif", "title", "updated_at", "user_id"]
+  end
+
+  private
+
+  def send_push_notifications
+    # Send push notification to target users
+    target_users = if users.any?
+                     # Send to specific users if assigned
+                     users.where.not(expo_push_token: nil)
+                   else
+                     # Send to all users with push tokens if no specific users
+                     User.where.not(expo_push_token: nil)
+                   end
+
+    return if target_users.empty?
+
+    ExpoPushNotificationService.send_to_users(
+      target_users,
+      title: title,
+      body: notif,
+      data: { notification_id: id, type: 'notification' }
+    )
+  rescue StandardError => e
+    Rails.logger.error "Failed to send push notification: #{e.message}"
   end
 end

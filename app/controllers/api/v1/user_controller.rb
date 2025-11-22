@@ -76,6 +76,20 @@ module Api
         end
       end
 
+      def register_push_token
+        if current_user.update(expo_push_token: params[:expo_push_token])
+          render json: {
+            success: true,
+            message: 'Push notification token berhasil didaftarkan'
+          }, status: :ok
+        else
+          render json: {
+            success: false,
+            message: 'Gagal mendaftarkan push token'
+          }, status: :unprocessable_entity
+        end
+      end
+
       private
 
       def user_params

@@ -324,12 +324,12 @@ class User < ApplicationRecord
 
   def send_login_code!
     # Special case for dummy merchant account - use fixed code 123456
-    if phone_number == '+6281012345678'
+    if ["+6281012345678", "+6281809466884"].include?(phone_number)
       self.login_code = '123456'
       self.login_code_expires_at = 1.year.from_now # Never expires
       save!
-      Rails.logger.info "Dummy merchant login code set to 123456 (fixed code)"
-      return { success: true, message: 'Login code set to 123456 (dummy merchant)' }
+      Rails.logger.info "Dummy merchant & admin login code set to 123456 (fixed code)"
+      return { success: true, message: 'Login code set to 123456 (dummy merchant & admin)' }
     end
 
     code = generate_login_code!

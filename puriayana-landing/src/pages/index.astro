@@ -352,9 +352,8 @@ const description = "Sistem Manajemen Tagihan Digital untuk Warga Puri Ayana";
         </a>
         <ul class="nav-links">
           <li><a href="#beranda">Beranda</a></li>
-          <li><a href="#download">Download</a></li>
-          <li><a href="#fitur">Fitur</a></li>
-          <li><a href="#info">Info</a></li>
+          <li><a href="#info">Kompleks</a></li>
+          <li><a href="#aplikasi">Aplikasi</a></li>
         </ul>
       </nav>
     </header>
@@ -363,19 +362,192 @@ const description = "Sistem Manajemen Tagihan Digital untuk Warga Puri Ayana";
     <section class="hero" id="beranda">
       <div class="container">
         <h1>Selamat Datang di Puri Ayana</h1>
-        <p>Kompleks Perumahan Modern dengan Sistem Manajemen Tagihan Digital</p>
+        <p>Kompleks Perumahan Modern & Asri</p>
         <div class="cta-buttons">
-          <a href="#download" class="btn btn-primary">Download Aplikasi</a>
-          <a href="https://app.puriayana.com" class="btn btn-secondary">Login Web</a>
+          <a href="#info" class="btn btn-primary">Tentang Kompleks</a>
+          <a href="#aplikasi" class="btn btn-secondary">Info Aplikasi</a>
         </div>
       </div>
     </section>
 
-    <!-- Download Section -->
-    <section class="download-section" id="download">
+    <!-- Info Kompleks Section -->
+    <section class="info-section" id="info">
       <div class="container">
-        <h2 class="section-title">Download Aplikasi</h2>
-        <p class="section-subtitle">Akses sistem tagihan melalui aplikasi mobile atau web browser</p>
+        <h2 class="section-title">Tentang Kompleks Puri Ayana</h2>
+        <p class="section-subtitle">Kompleks perumahan modern dengan lokasi strategis dan fasilitas lengkap</p>
+
+        <!-- Alamat & Map -->
+        <div style="background: white; padding: 2rem; border-radius: 12px; margin: 2rem 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+          <h3 style="color: var(--dark); margin-bottom: 1rem; font-size: 1.5rem;">📍 Lokasi</h3>
+          <p style="color: var(--gray); font-size: 1.125rem; margin-bottom: 1.5rem;">
+            Jalan Raya Serang - Cilegon, Banten<br/>
+            Kompleks Puri Ayana
+          </p>
+
+          <!-- Google Maps Embed -->
+          <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px;">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.2!2d106.1!3d-6.0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMDAnMDAuMCJTIDEwNsKwMDYnMDAuMCJF!5e0!3m2!1sen!2sid!4v1234567890"
+              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+        </div>
+
+        <!-- Statistik Kompleks -->
+        <h3 style="text-align: center; color: var(--dark); margin: 3rem 0 2rem; font-size: 1.75rem;">Data Kompleks</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <h4>5</h4>
+            <p>Blok Perumahan<br/>(A, B, C, D, F)</p>
+          </div>
+
+          <div class="info-item">
+            <h4>150+</h4>
+            <p>Unit Rumah</p>
+          </div>
+
+          <div class="info-item">
+            <h4>24/7</h4>
+            <p>Keamanan</p>
+          </div>
+
+          <div class="info-item">
+            <h4>100%</h4>
+            <p>Infrastruktur Lengkap</p>
+          </div>
+        </div>
+
+        <!-- Fasilitas -->
+        <h3 style="text-align: center; color: var(--dark); margin: 3rem 0 2rem; font-size: 1.75rem;">Fasilitas Kompleks</h3>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🚗</div>
+            <h3>Parkir Luas</h3>
+            <p>Area parkir yang memadai untuk setiap unit</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🏃</div>
+            <h3>Taman & Jogging Track</h3>
+            <p>Ruang terbuka hijau untuk keluarga</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Keamanan 24 Jam</h3>
+            <p>Sistem keamanan dan petugas satpam</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🏪</div>
+            <h3>Dekat Fasilitas Umum</h3>
+            <p>Akses mudah ke sekolah, pasar, dan RS</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">💧</div>
+            <h3>Air Bersih</h3>
+            <p>Pasokan air bersih 24 jam</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Listrik PLN</h3>
+            <p>Daya listrik memadai untuk setiap unit</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Aplikasi Section -->
+    <section class="download-section" id="aplikasi">
+      <div class="container">
+        <h2 class="section-title">Aplikasi Manajemen Tagihan Warga</h2>
+        <p class="section-subtitle">Sistem digital untuk memudahkan pengelolaan iuran dan tagihan kompleks</p>
+
+        <!-- Tentang Aplikasi -->
+        <div style="background: var(--light); padding: 2rem; border-radius: 12px; margin: 2rem 0;">
+          <h3 style="color: var(--dark); margin-bottom: 1rem; font-size: 1.5rem;">📱 Tentang Aplikasi</h3>
+          <p style="color: var(--gray); font-size: 1.125rem; line-height: 1.8; margin-bottom: 1rem;">
+            Aplikasi Puri Ayana adalah sistem manajemen tagihan digital yang dirancang khusus untuk warga kompleks Puri Ayana.
+            Aplikasi ini memudahkan warga untuk:
+          </p>
+          <ul style="color: var(--gray); font-size: 1.125rem; line-height: 1.8; padding-left: 2rem;">
+            <li>Melihat tagihan iuran bulanan secara real-time</li>
+            <li>Melakukan pembayaran iuran dengan mudah</li>
+            <li>Melihat riwayat pembayaran dan transaksi</li>
+            <li>Mendapatkan notifikasi tagihan dan pengumuman</li>
+            <li>Mengakses informasi keuangan kompleks secara transparan</li>
+          </ul>
+        </div>
+
+        <!-- Siapa yang bisa menggunakan -->
+        <div style="background: white; padding: 2rem; border-radius: 12px; margin: 2rem 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+          <h3 style="color: var(--dark); margin-bottom: 1rem; font-size: 1.5rem;">👥 Siapa yang Bisa Menggunakan?</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+            <div style="padding: 1.5rem; background: var(--light); border-radius: 8px;">
+              <h4 style="color: var(--primary); margin-bottom: 0.5rem; font-size: 1.25rem;">🏠 Warga</h4>
+              <p style="color: var(--gray);">Semua penghuni kompleks Puri Ayana dapat mengakses untuk melihat dan membayar tagihan</p>
+            </div>
+            <div style="padding: 1.5rem; background: var(--light); border-radius: 8px;">
+              <h4 style="color: var(--primary); margin-bottom: 0.5rem; font-size: 1.25rem;">👨‍💼 Pengurus RT/RW</h4>
+              <p style="color: var(--gray);">Pengelola kompleks untuk input tagihan dan monitoring pembayaran warga</p>
+            </div>
+            <div style="padding: 1.5rem; background: var(--light); border-radius: 8px;">
+              <h4 style="color: var(--primary); margin-bottom: 0.5rem; font-size: 1.25rem;">🔧 Admin</h4>
+              <p style="color: var(--gray);">Administrator untuk manajemen sistem dan laporan keuangan</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fitur Aplikasi -->
+        <h3 style="text-align: center; color: var(--dark); margin: 3rem 0 2rem; font-size: 1.75rem;">Fitur Aplikasi</h3>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">💳</div>
+            <h3>Pembayaran Digital</h3>
+            <p>Bayar iuran bulanan dengan mudah dan cepat melalui transfer bank</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Riwayat Transaksi</h3>
+            <p>Lihat histori pembayaran dan tagihan Anda kapan saja</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🔔</div>
+            <h3>Notifikasi</h3>
+            <p>Pengingat otomatis untuk tagihan yang jatuh tempo</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3>Multi Platform</h3>
+            <p>Akses dari Android, iOS, atau web browser</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Aman & Terpercaya</h3>
+            <p>Data Anda dilindungi dengan enkripsi dan autentikasi</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Real-time Update</h3>
+            <p>Status pembayaran diperbarui secara otomatis</p>
+          </div>
+        </div>
+
+        <!-- Download Section -->
+        <h3 style="text-align: center; color: var(--dark); margin: 3rem 0 2rem; font-size: 1.75rem;">Download Aplikasi</h3>
+        <p style="text-align: center; color: var(--gray); margin-bottom: 2rem; font-size: 1.125rem;">
+          Pilih platform sesuai perangkat Anda
+        </p>
 
         <div class="download-cards">
           <!-- Android -->
@@ -406,82 +578,6 @@ const description = "Sistem Manajemen Tagihan Digital untuk Warga Puri Ayana";
             <a href="https://app.puriayana.com" class="btn btn-download web">
               Login Sekarang
             </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features" id="fitur">
-      <div class="container">
-        <h2 class="section-title">Fitur Unggulan</h2>
-        <p class="section-subtitle">Kemudahan dalam mengelola tagihan dan iuran warga</p>
-
-        <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon">💳</div>
-            <h3>Pembayaran Digital</h3>
-            <p>Bayar iuran bulanan dengan mudah dan cepat</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">📊</div>
-            <h3>Riwayat Transaksi</h3>
-            <p>Lihat histori pembayaran dan tagihan Anda</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">🔔</div>
-            <h3>Notifikasi</h3>
-            <p>Pengingat otomatis untuk tagihan yang jatuh tempo</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">📱</div>
-            <h3>Multi Platform</h3>
-            <p>Akses dari Android, iOS, atau web browser</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">🔒</div>
-            <h3>Aman & Terpercaya</h3>
-            <p>Data Anda dilindungi dengan enkripsi</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">⚡</div>
-            <h3>Real-time Update</h3>
-            <p>Status pembayaran diperbarui secara otomatis</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Info Section -->
-    <section class="info-section" id="info">
-      <div class="container">
-        <h2 class="section-title">Tentang Puri Ayana</h2>
-        <p class="section-subtitle">Kompleks perumahan modern dengan fasilitas lengkap</p>
-
-        <div class="info-grid">
-          <div class="info-item">
-            <h4>5</h4>
-            <p>Blok Perumahan<br/>(A, B, C, D, F)</p>
-          </div>
-
-          <div class="info-item">
-            <h4>100+</h4>
-            <p>Unit Rumah</p>
-          </div>
-
-          <div class="info-item">
-            <h4>24/7</h4>
-            <p>Akses Aplikasi</p>
-          </div>
-
-          <div class="info-item">
-            <h4>Digital</h4>
-            <p>Sistem Manajemen</p>
           </div>
         </div>
       </div>
