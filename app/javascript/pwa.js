@@ -21,7 +21,6 @@ if ('serviceWorker' in navigator) {
 
 // Install Prompt Handler
 let deferredPrompt;
-let installButton;
 
 window.addEventListener('beforeinstallprompt', (e) => {
   console.log('[PWA] Install prompt available');
@@ -146,65 +145,161 @@ function shouldShowInstallPrompt() {
   return true;
 }
 
-// iOS Install Instructions
+// ✅ Detect Safari iOS specifically (not Chrome iOS, Firefox iOS, etc)
+function isSafariIOS() {
+  const ua = window.navigator.userAgent;
+  const iOS = /iPad|iPhone|iPod/.test(ua);
+  const webkit = /WebKit/.test(ua);
+
+  // Safari iOS has webkit but NOT Chrome, Firefox, Opera, etc
+  const isSafari = iOS && webkit && !/CriOS|FxiOS|OPiOS|mercury/i.test(ua);
+
+  return isSafari;
+}
+
+// ✅ Detect if already installed as PWA
+function isInstalled() {
+  return window.navigator.standalone === true ||
+         window.matchMedia('(display-mode: standalone)').matches;
+}
+
+// iOS Install Instructions - ONLY for Safari iOS
 function showIOSInstallInstructions() {
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  const isStandalone = window.navigator.standalone === true;
+  // ✅ ONLY show on Safari iOS and NOT already installed
+  if (!isSafariIOS() || isInstalled()) {
+    console.log('[PWA] Not Safari iOS or already installed, skipping install button');
+    return;
+  }
 
-  // Show instructions if on iOS and not already installed
-  if (isIOS && !isStandalone && shouldShowInstallPrompt()) {
-    // Create iOS install guide if not exists
-    if (!document.getElementById('ios-install-guide')) {
-      const guide = createIOSInstallGuide();
-      document.body.appendChild(guide);
+  // Don't show if dismissed recently
+  if (!shouldShowInstallPrompt()) {
+    console.log('[PWA] Install prompt dismissed recently');
+    return;
+  }
 
-      // Show guide with animation
-      setTimeout(() => {
-        guide.classList.add('show');
-      }, 1500);
-    }
+  // Create iOS install button if not exists
+  if (!document.getElementById('ios-install-button')) {
+    const button = createIOSInstallButton();
+    document.body.appendChild(button);
+
+    console.log('[PWA] Safari iOS install button shown');
   }
 }
 
-// Create iOS Install Guide
-function createIOSInstallGuide() {
-  const guide = document.createElement('div');
-  guide.id = 'ios-install-guide';
-  guide.className = 'ios-install-guide';
+// ✅ Create iOS Install Button (Fixed position, bottom-right)
+function createIOSInstallButton() {
+  const button = document.createElement('button');
+  button.id = 'ios-install-button';
+  button.className = 'ios-install-button';
+  button.innerHTML = `
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="margin-right: 8px;">
+      <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" fill="currentColor"/>
+    </svg>
+    <span>Install App</span>
+  `;
 
-  guide.innerHTML = `
-    <div class="ios-install-content">
-      <div class="ios-install-header">
-        <h3>📱 Install Puri Ayana App</h3>
-        <button class="ios-install-close" id="ios-install-close">✕</button>
+  // Click handler - show instructions modal
+  button.addEventListener('click', () => {
+    showIOSInstallModal();
+  });
+
+  return button;
+}
+
+// ✅ Show iOS Install Instructions Modal
+function showIOSInstallModal() {
+  // Remove existing modal if any
+  const existingModal = document.getElementById('ios-install-modal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  // Create modal overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'ios-install-modal';
+  overlay.className = 'ios-install-modal-overlay';
+
+  overlay.innerHTML = `
+    <div class="ios-install-modal">
+      <button class="ios-install-modal-close" id="ios-modal-close">×</button>
+
+      <h2 class="ios-install-modal-title">
+        📱 Install Puri Ayana App
+      </h2>
+
+      <p class="ios-install-modal-subtitle">
+        Untuk menginstall aplikasi ke home screen:
+      </p>
+
+      <div class="ios-install-modal-steps">
+        <div class="ios-install-modal-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <p class="step-title">Tap tombol Share</p>
+            <p class="step-description">
+              Tap ikon Share
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="display: inline; vertical-align: middle; margin: 0 4px;">
+                <path d="M16 5l-1.42 1.42-1.59-1.59V16h-1.98V4.83L9.42 6.42 8 5l4-4 4 4zm4 5v11c0 1.1-.9 2-2 2H6c-1.11 0-2-.9-2-2V10c0-1.11.89-2 2-2h3v2H6v11h12V10h-3V8h3c1.1 0 2 .89 2 2z" fill="#007AFF"/>
+              </svg>
+              di bagian bawah layar
+            </p>
+          </div>
+        </div>
+
+        <div class="ios-install-modal-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <p class="step-title">Pilih "Add to Home Screen"</p>
+            <p class="step-description">
+              Scroll ke bawah dan tap "Add to Home Screen"
+            </p>
+          </div>
+        </div>
+
+        <div class="ios-install-modal-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <p class="step-title">Tap "Add"</p>
+            <p class="step-description">
+              Konfirmasi untuk menambahkan ke home screen
+            </p>
+          </div>
+        </div>
       </div>
-      <div class="ios-install-steps">
-        <div class="ios-install-step">
-          <span class="step-number">1</span>
-          <span class="step-text">Tap tombol <strong>Share</strong> <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"/></svg> di bawah</span>
-        </div>
-        <div class="ios-install-step">
-          <span class="step-number">2</span>
-          <span class="step-text">Scroll ke bawah dan tap <strong>"Add to Home Screen"</strong></span>
-        </div>
-        <div class="ios-install-step">
-          <span class="step-number">3</span>
-          <span class="step-text">Tap <strong>"Add"</strong> untuk install</span>
-        </div>
+
+      <div class="ios-install-modal-footer">
+        <p>Setelah di-install, buka app dari home screen untuk pengalaman terbaik!</p>
       </div>
+
+      <button class="ios-install-modal-btn" id="ios-modal-ok">
+        Mengerti
+      </button>
     </div>
   `;
 
-  // Add close button handler
-  guide.querySelector('#ios-install-close').addEventListener('click', () => {
-    guide.classList.remove('show');
-    setTimeout(() => guide.remove(), 300);
+  document.body.appendChild(overlay);
 
-    // Don't show again for 7 days
-    localStorage.setItem('pwa-install-dismissed', Date.now());
+  // Add event listeners
+  const closeBtn = overlay.querySelector('#ios-modal-close');
+  const okBtn = overlay.querySelector('#ios-modal-ok');
+
+  const closeModal = () => {
+    overlay.classList.add('hide');
+    setTimeout(() => overlay.remove(), 300);
+  };
+
+  closeBtn.addEventListener('click', closeModal);
+  okBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      closeModal();
+    }
   });
 
-  return guide;
+  // Show with animation
+  setTimeout(() => {
+    overlay.classList.add('show');
+  }, 10);
 }
 
 // Initialize on load
