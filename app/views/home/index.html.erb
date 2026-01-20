@@ -92,13 +92,13 @@
     <% unless current_user&.is_security? %>
       <!-- Financial Summary Cards -->
       <div class="space-y-3 sm:space-y-4">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center justify-between gap-2">
           <div>
             <h2 class="text-sm sm:text-base font-semibold text-gray-900">Ringkasan Keuangan</h2>
             <p class="text-[11px] sm:text-xs text-gray-500">Filter ringkasan per tahun.</p>
           </div>
           <%= form_with url: root_path, method: :get, local: true, class: "flex items-center gap-2" do %>
-            <label for="year" class="text-xs font-medium text-gray-600">Tahun</label>
+            <label for="year" class="hidden sm:inline text-xs font-medium text-gray-600">Tahun</label>
             <%= select_tag :year,
                 options_for_select((@starting_year..@current_year).to_a, @year_selected),
                 class: "rounded-md border-gray-300 text-xs sm:text-sm py-1.5",

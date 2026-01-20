@@ -61,6 +61,16 @@ class HomeController < ApplicationController
   def calculate_monthly_financial_data
     begin
       (1..12).map do |month|
+        if @year_selected == Date.current.year && month == Date.current.month
+          next {
+            month: month,
+            month_name: Date.new(@year_selected, month, 1).strftime('%B'),
+            income: 0,
+            outcome: 0,
+            net: 0
+          }
+        end
+
         income = CashTransaction.where(
           transaction_type: CashTransaction::TYPE['DEBIT'],
           month: month,
@@ -106,13 +116,13 @@ class HomeController < ApplicationController
                                    .select('addresses.id')
                                    .distinct
                                    .count
-    
+
     (paid_addresses.to_f / total_addresses * 100).round(2)
   end
 
   def calculate_overall_cash_balance
     start_date = Date.new(@starting_year, 1, 1)
-    end_date = Date.current.end_of_day
+    end_date = Date.current.beginning_of_month - 1.day
 
     total_income = CashTransaction.where(
       transaction_type: CashTransaction::TYPE['DEBIT'],
@@ -155,17 +165,21 @@ class HomeController < ApplicationController
   end
 
   def calculate_total_income_year
-    CashTransaction.where(
+    scope = CashTransaction.where(
       transaction_type: CashTransaction::TYPE['DEBIT'],
       year: @year_selected
-    ).sum(:total)
+    )
+    scope = scope.where.not(month: Date.current.month) if @year_selected == Date.current.year
+    scope.sum(:total)
   end
 
   def calculate_total_outcome_year
-    CashTransaction.where(
+    scope = CashTransaction.where(
       transaction_type: CashTransaction::TYPE['KREDIT'],
       year: @year_selected
-    ).sum(:total)
+    )
+    scope = scope.where.not(month: Date.current.month) if @year_selected == Date.current.year
+    scope.sum(:total)
   end
 
   def get_recent_security_activities
