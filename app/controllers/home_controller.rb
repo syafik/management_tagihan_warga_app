@@ -4,7 +4,10 @@ class HomeController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @current_year = AppSetting.starting_year
+    @starting_year = AppSetting.starting_year
+    @current_year = Date.current.year
+    @year_selected = (params[:year] || @current_year).to_i
+    @year_selected = [[@year_selected, @starting_year].max, @current_year].min
     @starting_balance = AppSetting.starting_balance
     
     # Monthly income/outcome data for current year (2025)
@@ -20,17 +23,19 @@ class HomeController < ApplicationController
     unless current_user&.is_security?
       begin
         @contribution_percentage = calculate_contribution_percentage
-        @current_cash_balance = calculate_current_cash_balance
+        @overall_cash_balance = calculate_overall_cash_balance
         @monthly_contribution_stats = calculate_monthly_contribution_stats
-        @total_income_2025 = calculate_total_income_2025
-        @total_outcome_2025 = calculate_total_outcome_2025
+        @total_income_year = calculate_total_income_year
+        @total_outcome_year = calculate_total_outcome_year
+        @year_balance = @total_income_year - @total_outcome_year
       rescue => e
         Rails.logger.error "Failed to calculate contribution data: #{e.message}"
         @contribution_percentage = 0
-        @current_cash_balance = 0
+        @overall_cash_balance = 0
         @monthly_contribution_stats = []
-        @total_income_2025 = 0
-        @total_outcome_2025 = 0
+        @total_income_year = 0
+        @total_outcome_year = 0
+        @year_balance = 0
       end
     end
     
@@ -59,18 +64,18 @@ class HomeController < ApplicationController
         income = CashTransaction.where(
           transaction_type: CashTransaction::TYPE['DEBIT'],
           month: month,
-          year: @current_year
+          year: @year_selected
         ).sum(:total) || 0
         
         outcome = CashTransaction.where(
           transaction_type: CashTransaction::TYPE['KREDIT'],
           month: month,
-          year: @current_year
+          year: @year_selected
         ).sum(:total) || 0
         
         {
           month: month,
-          month_name: Date.new(@current_year, month, 1).strftime('%B'),
+          month_name: Date.new(@year_selected, month, 1).strftime('%B'),
           income: income,
           outcome: outcome,
           net: income - outcome
@@ -82,7 +87,7 @@ class HomeController < ApplicationController
       (1..12).map do |month|
         {
           month: month,
-          month_name: Date.new(@current_year, month, 1).strftime('%B'),
+          month_name: Date.new(@year_selected, month, 1).strftime('%B'),
           income: 0,
           outcome: 0,
           net: 0
@@ -96,7 +101,7 @@ class HomeController < ApplicationController
     return 0 if total_addresses == 0
     
     # Count unique addresses that have paid this year
-    paid_addresses = UserContribution.where(year: @current_year)
+    paid_addresses = UserContribution.where(year: @year_selected)
                                    .joins(:address)
                                    .select('addresses.id')
                                    .distinct
@@ -105,29 +110,32 @@ class HomeController < ApplicationController
     (paid_addresses.to_f / total_addresses * 100).round(2)
   end
 
-  def calculate_current_cash_balance
+  def calculate_overall_cash_balance
+    start_date = Date.new(@starting_year, 1, 1)
+    end_date = Date.current.end_of_day
+
     total_income = CashTransaction.where(
       transaction_type: CashTransaction::TYPE['DEBIT'],
-      year: @current_year
+      transaction_date: start_date..end_date
     ).sum(:total)
-    
+
     total_outcome = CashTransaction.where(
       transaction_type: CashTransaction::TYPE['KREDIT'],
-      year: @current_year
+      transaction_date: start_date..end_date
     ).sum(:total)
-    
+
     @starting_balance + total_income - total_outcome
   end
 
   def calculate_monthly_contribution_stats
     begin
       (1..12).map do |month|
-        contributions_count = UserContribution.where(month: month, year: @current_year).count || 0
-        contributions_amount = UserContribution.where(month: month, year: @current_year).sum(:contribution) || 0
+        contributions_count = UserContribution.where(month: month, year: @year_selected).count || 0
+        contributions_amount = UserContribution.where(month: month, year: @year_selected).sum(:contribution) || 0
         
         {
           month: month,
-          month_name: Date.new(@current_year, month, 1).strftime('%B'),
+          month_name: Date.new(@year_selected, month, 1).strftime('%B'),
           count: contributions_count,
           amount: contributions_amount
         }
@@ -146,17 +154,17 @@ class HomeController < ApplicationController
     end
   end
 
-  def calculate_total_income_2025
+  def calculate_total_income_year
     CashTransaction.where(
       transaction_type: CashTransaction::TYPE['DEBIT'],
-      year: @current_year
+      year: @year_selected
     ).sum(:total)
   end
 
-  def calculate_total_outcome_2025
+  def calculate_total_outcome_year
     CashTransaction.where(
       transaction_type: CashTransaction::TYPE['KREDIT'],
-      year: @current_year
+      year: @year_selected
     ).sum(:total)
   end
 
@@ -175,7 +183,7 @@ class HomeController < ApplicationController
   def calculate_monthly_resident_stats
     begin
       (1..12).map do |month|
-        active_residents = UserContribution.where(month: month, year: @current_year)
+        active_residents = UserContribution.where(month: month, year: @year_selected)
                                          .joins(:address)
                                          .select('addresses.id')
                                          .distinct
@@ -183,7 +191,7 @@ class HomeController < ApplicationController
         
         {
           month: month,
-          month_name: Date.new(@current_year, month, 1).strftime('%B'),
+          month_name: Date.new(@year_selected, month, 1).strftime('%B'),
           active_residents: active_residents
         }
       end

@@ -8,9 +8,6 @@
             <h1 class="text-base sm:text-xl lg:text-2xl font-semibold text-gray-900">
               Welcome to PuriAyana Management System
             </h1>
-            <p class="mt-1 text-xs sm:text-sm text-gray-500">
-              Dashboard <%= AppSetting.starting_year %>
-            </p>
           </div>
           <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-indigo-50 text-indigo-700 whitespace-nowrap">
             <%= current_user.role_name %>
@@ -67,7 +64,7 @@
                 </svg>
               </div>
               <div class="min-w-0 flex-1">
-                <dt class="text-[11px] sm:text-sm font-medium text-gray-500 truncate">Kontribusi <%= AppSetting.starting_year %></dt>
+                <dt class="text-[11px] sm:text-sm font-medium text-gray-500 truncate">Kontribusi <%= @year_selected %></dt>
                 <dd class="text-base sm:text-lg font-bold text-gray-900"><%= @contribution_percentage %>%</dd>
               </div>
             </div>
@@ -95,17 +92,26 @@
     <% unless current_user&.is_security? %>
       <!-- Financial Summary Cards -->
       <div class="space-y-3 sm:space-y-4">
-        <div class="flex items-center justify-between">
-          <h2 class="text-sm sm:text-base font-semibold text-gray-900">Ringkasan Keuangan</h2>
-          <span class="text-[11px] sm:text-xs text-gray-500">Tahun <%= AppSetting.starting_year %></span>
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-sm sm:text-base font-semibold text-gray-900">Ringkasan Keuangan</h2>
+            <p class="text-[11px] sm:text-xs text-gray-500">Filter ringkasan per tahun.</p>
+          </div>
+          <%= form_with url: root_path, method: :get, local: true, class: "flex items-center gap-2" do %>
+            <label for="year" class="text-xs font-medium text-gray-600">Tahun</label>
+            <%= select_tag :year,
+                options_for_select((@starting_year..@current_year).to_a, @year_selected),
+                class: "rounded-md border-gray-300 text-xs sm:text-sm py-1.5",
+                onchange: "this.form.submit()" %>
+          <% end %>
         </div>
-        <div class="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <!-- Current Cash Balance -->
-        <div class="bg-gradient-to-r <%= @current_cash_balance >= 0 ? 'from-green-400 to-green-600' : 'from-red-400 to-red-600' %> overflow-hidden shadow-sm rounded-xl">
+        <div class="bg-gradient-to-r <%= @overall_cash_balance >= 0 ? 'from-green-400 to-green-600' : 'from-red-400 to-red-600' %> overflow-hidden shadow-sm rounded-xl">
           <div class="p-3 sm:p-4">
-            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">Saldo Kas Saat Ini</dt>
+            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">Saldo Kas Saat Ini (Sejak <%= @starting_year %>)</dt>
             <dd class="text-lg sm:text-xl font-bold text-white break-all">
-              Rp <%= number_with_delimiter(@current_cash_balance.abs, delimiter: '.') %>
+              Rp <%= number_with_delimiter(@overall_cash_balance.abs, delimiter: '.') %>
             </dd>
             <p class="text-[11px] sm:text-xs text-white/80 mt-1">
               Awal: Rp <%= number_with_delimiter(@starting_balance, delimiter: '.') %>
@@ -113,22 +119,32 @@
           </div>
         </div>
 
-        <!-- Total Income <%= AppSetting.starting_year %> -->
+        <!-- Total Income <%= @year_selected %> -->
         <div class="bg-gradient-to-r from-blue-400 to-blue-600 overflow-hidden shadow-sm rounded-xl">
           <div class="p-3 sm:p-4">
-            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">Pemasukan <%= AppSetting.starting_year %></dt>
+            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">Pemasukan <%= @year_selected %></dt>
             <dd class="text-lg sm:text-xl font-bold text-white break-all">
-              Rp <%= number_with_delimiter(@total_income_2025, delimiter: '.') %>
+              Rp <%= number_with_delimiter(@total_income_year, delimiter: '.') %>
             </dd>
           </div>
         </div>
 
-        <!-- Total Outcome <%= AppSetting.starting_year %> -->
+        <!-- Total Outcome <%= @year_selected %> -->
         <div class="bg-gradient-to-r from-red-400 to-red-600 overflow-hidden shadow-sm rounded-xl">
           <div class="p-3 sm:p-4">
-            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">Pengeluaran <%= AppSetting.starting_year %></dt>
+            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">Pengeluaran <%= @year_selected %></dt>
             <dd class="text-lg sm:text-xl font-bold text-white break-all">
-              Rp <%= number_with_delimiter(@total_outcome_2025, delimiter: '.') %>
+              Rp <%= number_with_delimiter(@total_outcome_year, delimiter: '.') %>
+            </dd>
+          </div>
+        </div>
+
+        <!-- Year Balance -->
+        <div class="bg-gradient-to-r from-indigo-400 to-indigo-600 overflow-hidden shadow-sm rounded-xl">
+          <div class="p-3 sm:p-4">
+            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">Saldo Tahun <%= @year_selected %></dt>
+            <dd class="text-lg sm:text-xl font-bold text-white break-all">
+              Rp <%= number_with_delimiter(@year_balance, delimiter: '.') %>
             </dd>
           </div>
         </div>
@@ -139,7 +155,7 @@
       <div class="bg-white border border-gray-100 shadow-sm rounded-xl">
         <div class="px-3 py-3 sm:px-6 sm:py-5">
           <div class="flex items-center justify-between mb-2 sm:mb-4">
-            <h3 class="text-sm sm:text-base font-semibold text-gray-900">Grafik <%= AppSetting.starting_year %></h3>
+            <h3 class="text-sm sm:text-base font-semibold text-gray-900">Grafik <%= @year_selected %></h3>
             <span class="text-[11px] sm:text-xs text-gray-500">Pemasukan vs Pengeluaran</span>
           </div>
           <div class="relative h-56 sm:h-64">
