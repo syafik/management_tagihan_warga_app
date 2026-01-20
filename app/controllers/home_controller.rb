@@ -71,16 +71,15 @@ class HomeController < ApplicationController
           }
         end
 
+        range = Date.new(@year_selected, month, 1).beginning_of_month..Date.new(@year_selected, month, 1).end_of_month
         income = CashTransaction.where(
           transaction_type: CashTransaction::TYPE['DEBIT'],
-          month: month,
-          year: @year_selected
+          transaction_date: range
         ).sum(:total) || 0
         
         outcome = CashTransaction.where(
           transaction_type: CashTransaction::TYPE['KREDIT'],
-          month: month,
-          year: @year_selected
+          transaction_date: range
         ).sum(:total) || 0
         
         {
@@ -111,7 +110,7 @@ class HomeController < ApplicationController
     return 0 if total_addresses == 0
     
     # Count unique addresses that have paid this year
-    paid_addresses = UserContribution.where(year: @year_selected)
+    paid_addresses = UserContribution.where(pay_at: yearly_date_range)
                                    .joins(:address)
                                    .select('addresses.id')
                                    .distinct
@@ -140,8 +139,9 @@ class HomeController < ApplicationController
   def calculate_monthly_contribution_stats
     begin
       (1..12).map do |month|
-        contributions_count = UserContribution.where(month: month, year: @year_selected).count || 0
-        contributions_amount = UserContribution.where(month: month, year: @year_selected).sum(:contribution) || 0
+        range = Date.new(@year_selected, month, 1).beginning_of_month..Date.new(@year_selected, month, 1).end_of_month
+        contributions_count = UserContribution.where(pay_at: range).count || 0
+        contributions_amount = UserContribution.where(pay_at: range).sum(:contribution) || 0
         
         {
           month: month,
@@ -165,21 +165,26 @@ class HomeController < ApplicationController
   end
 
   def calculate_total_income_year
-    scope = CashTransaction.where(
+    CashTransaction.where(
       transaction_type: CashTransaction::TYPE['DEBIT'],
-      year: @year_selected
-    )
-    scope = scope.where.not(month: Date.current.month) if @year_selected == Date.current.year
-    scope.sum(:total)
+      transaction_date: yearly_date_range
+    ).sum(:total)
   end
 
   def calculate_total_outcome_year
-    scope = CashTransaction.where(
+    CashTransaction.where(
       transaction_type: CashTransaction::TYPE['KREDIT'],
-      year: @year_selected
-    )
-    scope = scope.where.not(month: Date.current.month) if @year_selected == Date.current.year
-    scope.sum(:total)
+      transaction_date: yearly_date_range
+    ).sum(:total)
+  end
+
+  def yearly_date_range
+    start_date = Date.new(@year_selected, 1, 1)
+    end_date = Date.new(@year_selected, 12, 31).end_of_day
+    if @year_selected == Date.current.year
+      end_date = Date.current.beginning_of_month - 1.day
+    end
+    start_date..end_date
   end
 
   def get_recent_security_activities
@@ -197,7 +202,8 @@ class HomeController < ApplicationController
   def calculate_monthly_resident_stats
     begin
       (1..12).map do |month|
-        active_residents = UserContribution.where(month: month, year: @year_selected)
+        range = Date.new(@year_selected, month, 1).beginning_of_month..Date.new(@year_selected, month, 1).end_of_month
+        active_residents = UserContribution.where(pay_at: range)
                                          .joins(:address)
                                          .select('addresses.id')
                                          .distinct
