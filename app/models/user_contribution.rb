@@ -31,6 +31,7 @@ class UserContribution < ApplicationRecord
   belongs_to :receiver, class_name: 'User'
 
   validates :contribution, :pay_at, :receiver_id, :payment_type, :blok, presence: true
+  validates :address_id, uniqueness: { scope: %i[month year], message: 'sudah ada untuk bulan dan tahun ini' }
 
   before_save :set_blok_group
   # Removed after_create :send_payment_notification callback

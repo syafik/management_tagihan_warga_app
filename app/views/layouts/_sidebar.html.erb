@@ -12,12 +12,20 @@
 
     <!-- Profile section -->
     <div class="mb-6 pb-4 border-b border-gray-200">
-      <a href="<%= user_path(current_user) %>" class="flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100 group">
-        <div class="flex-1">
-          <p class="text-sm font-medium text-gray-900"><%= current_user.name || current_user.phone_number %></p>
-          <p class="text-xs text-gray-500"><%= current_user.role_name %></p>
+      <% if current_user&.id.present? %>
+        <a href="<%= user_path(current_user) %>" class="flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100 group">
+          <div class="flex-1">
+            <p class="text-sm font-medium text-gray-900"><%= current_user.name || current_user.phone_number %></p>
+            <p class="text-xs text-gray-500"><%= current_user.role_name %></p>
+          </div>
+        </a>
+      <% else %>
+        <div class="flex items-center p-3 text-gray-700 rounded-lg">
+          <div class="flex-1">
+            <p class="text-sm font-medium text-gray-900"><%= current_user&.name || current_user&.phone_number || 'User' %></p>
+          </div>
         </div>
-      </a>
+      <% end %>
     </div>
 
     <% if current_user&.is_admin? %>
@@ -47,6 +55,13 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
             </svg>
             Tambah Alamat Baru
+          <% end %>
+
+          <%= link_to payment_reports_path, class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
+            <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6M4 6h16M4 10h16M4 14h16M4 18h16"/>
+            </svg>
+            Laporan Pembayaran
           <% end %>
 
           <div class="my-2 border-t border-gray-200"></div>
@@ -109,7 +124,7 @@
         Daftar Tunggakan
       <% end %>
 
-      <% if current_user.role == 1 %>
+      <% if current_user&.role == 1 %>
         <!-- Iuran Ku for Warga -->
         <%= link_to user_contributions_path, class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
           <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,7 +132,7 @@
           </svg>
           Iuran Ku
         <% end %>
-      <% elsif current_user.is_security? %>
+      <% elsif current_user&.is_security? %>
         <!-- Security Dashboard -->
         <%= link_to security_dashboard_index_path, class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
           <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,7 +150,7 @@
         <% end %>
 
         <!-- Catat Pengeluaran for Security (only if allowed) -->
-        <% if current_user.allow_manage_expense %>
+        <% if current_user&.allow_manage_expense %>
           <%= link_to new_expense_security_dashboard_index_path, class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
             <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
@@ -153,14 +168,14 @@
         <% end %>
       <% end %>
       
-      <% if current_user.is_warga? %>
+      <% if current_user&.is_warga? %>
         <%= link_to show_report_cash_transactions_path('warga', Date.current.year, Date.current.month), class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
           <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
           </svg>
           Laporan Keuangan
         <% end %>
-      <% elsif !current_user.is_security? %>
+      <% elsif !current_user&.is_security? %>
         <%= link_to cash_transactions_path, class: 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 group' do %>
           <svg class="flex-shrink-0 w-5 h-5 text-gray-500 group-hover:text-gray-700 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>

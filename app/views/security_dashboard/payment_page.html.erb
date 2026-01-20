@@ -1,7 +1,7 @@
-<div class="max-w-4xl mx-auto px-4 sm:px-6 py-4" data-controller="payment-wizard">
+<div class="max-w-4xl mx-auto px-1 sm:px-3 py-3" data-controller="payment-wizard">
   <!-- Header - Mobile Optimized -->
   <div class="mb-4">
-    <%= link_to security_dashboard_index_path, class: "inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-3" do %>
+    <%= link_to security_dashboard_index_path, class: "inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700 mb-3 underline underline-offset-4" do %>
       <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
       </svg>
@@ -47,6 +47,15 @@
     <%= f.hidden_field :address_id, value: @address.id %>
     <%= f.hidden_field :payment_type, value: 1, data: { payment_wizard_target: "paymentTypeField" } %>
 
+    <!-- Tanggal Pembayaran -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-3">
+      <label class="block text-sm font-semibold text-gray-800 mb-2">Tanggal Pembayaran</label>
+      <%= date_field_tag :pay_at,
+          Date.current,
+          class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm" %>
+      <p class="mt-2 text-xs text-gray-500">Default hari ini, bisa diubah jika diperlukan.</p>
+    </div>
+
     <!-- STEP 1: Selection -->
     <div class="space-y-3" data-payment-wizard-target="step1">
       <!-- Section: Tunggakan Lama (Collapsible) -->
@@ -86,32 +95,27 @@
                 </button>
               </div>
 
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <div class="grid grid-cols-3 sm:grid-cols-3 gap-2">
                 <% @arrears_months.times do |index| %>
                   <%
                     arrears_index = index + 1
                     # Use @arrears_rate from controller (Januari rate = 175k)
                   %>
-                  <label class="month-card block p-3 border-2 border-red-300 rounded-xl bg-red-50 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all"
+                  <label class="month-card flex items-center justify-between gap-2 p-2 border-2 border-red-300 rounded-lg bg-red-50 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all"
                          data-payment-wizard-target="monthCard">
+                    <div class="min-w-0 flex-1">
+                      <div class="font-semibold text-gray-900 text-xs leading-tight">Tunggakan <%= arrears_index %></div>
+                      <div class="text-[11px] text-red-700 font-semibold leading-tight">
+                        <%= format_compact_currency(@arrears_rate) %>
+                      </div>
+                    </div>
                     <%= check_box_tag "pay_arrears[]", arrears_index, false,
-                        class: "hidden month-checkbox",
+                        class: "month-checkbox h-4 w-4 text-red-600 border-red-300 rounded",
                         data: {
                           payment_wizard_target: "arrearsCheckbox",
                           amount: @arrears_rate,
                           action: "change->payment-wizard#updateTotal change->payment-wizard#toggleCard"
                         } %>
-                    <div class="text-center">
-                      <div class="font-bold text-gray-900 text-sm">Tunggakan <%= arrears_index %></div>
-                      <div class="text-xs text-red-700 font-semibold mt-1">
-                        Rp <%= number_with_delimiter(@arrears_rate, delimiter: '.') %>
-                      </div>
-                      <div class="checkmark-circle mt-2 w-6 h-6 mx-auto rounded-full border-2 border-red-400 flex items-center justify-center transition-all">
-                        <svg class="checkmark-icon w-4 h-4 text-white opacity-0 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                    </div>
                   </label>
                 <% end %>
               </div>
@@ -148,32 +152,27 @@
                   <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 px-1">
                     Tahun <%= year %>
                   </div>
-                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  <div class="grid grid-cols-3 sm:grid-cols-3 gap-2">
                     <% months.each do |month_data| %>
                       <%
                         month = month_data[:month]
                         contribution_rate = @address.expected_contribution_for(month, year)
                       %>
-                      <label class="month-card block p-3 border-2 border-orange-200 rounded-xl bg-gradient-to-br from-orange-50 to-amber-50 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all"
+                      <label class="month-card flex items-center justify-between gap-2 p-2 border-2 border-orange-200 rounded-lg bg-gradient-to-br from-orange-50 to-amber-50 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all"
                              data-payment-wizard-target="monthCard">
+                        <div class="min-w-0 flex-1">
+                          <div class="font-semibold text-gray-900 text-xs leading-tight"><%= UserContribution::MONTHNAMES.invert[month] %></div>
+                          <div class="text-[11px] text-orange-700 font-semibold leading-tight">
+                            <%= format_compact_currency(contribution_rate) %>
+                          </div>
+                        </div>
                         <%= check_box_tag "unpaid_months[]", "#{month},#{year}", false,
-                            class: "hidden month-checkbox",
+                            class: "month-checkbox h-4 w-4 text-orange-600 border-orange-300 rounded",
                             data: {
                               payment_wizard_target: "unpaidCheckbox",
                               amount: contribution_rate,
                               action: "change->payment-wizard#updateTotal change->payment-wizard#toggleCard"
                             } %>
-                        <div class="text-center">
-                          <div class="font-bold text-gray-900 text-sm"><%= UserContribution::MONTHNAMES.invert[month] %></div>
-                          <div class="text-xs text-orange-700 font-semibold mt-1">
-                            Rp <%= number_with_delimiter(contribution_rate, delimiter: '.') %>
-                          </div>
-                          <div class="checkmark-circle mt-2 w-6 h-6 mx-auto rounded-full border-2 border-orange-300 flex items-center justify-center transition-all">
-                            <svg class="checkmark-icon w-4 h-4 text-white opacity-0 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
-                              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                          </div>
-                        </div>
                       </label>
                     <% end %>
                   </div>
@@ -227,28 +226,23 @@
                 </button>
               </div>
 
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <div class="grid grid-cols-3 sm:grid-cols-3 gap-2">
                 <% @next_year_months.each do |month_data| %>
-                  <label class="month-card block p-3 border-2 border-blue-200 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all"
+                  <label class="month-card flex items-center justify-between gap-2 p-2 border-2 border-blue-200 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 cursor-pointer hover:shadow-md active:scale-[0.98] transition-all"
                          data-payment-wizard-target="monthCard">
+                    <div class="min-w-0 flex-1">
+                      <div class="font-semibold text-gray-900 text-xs leading-tight"><%= month_data[:month_text] %></div>
+                      <div class="text-[11px] text-blue-700 font-semibold leading-tight">
+                        <%= format_compact_currency(month_data[:contribution_rate]) %>
+                      </div>
+                    </div>
                     <%= check_box_tag "future_months[]", "#{month_data[:month]},#{month_data[:year]}", false,
-                        class: "hidden month-checkbox",
+                        class: "month-checkbox h-4 w-4 text-blue-600 border-blue-300 rounded",
                         data: {
                           payment_wizard_target: "nextYearCheckbox",
                           amount: month_data[:contribution_rate],
                           action: "change->payment-wizard#updateTotal change->payment-wizard#toggleCard"
                         } %>
-                    <div class="text-center">
-                      <div class="font-bold text-gray-900 text-sm"><%= month_data[:month_text] %></div>
-                      <div class="text-xs text-blue-700 font-semibold mt-1">
-                        Rp <%= number_with_delimiter(month_data[:contribution_rate], delimiter: '.') %>
-                      </div>
-                      <div class="checkmark-circle mt-2 w-6 h-6 mx-auto rounded-full border-2 border-blue-300 flex items-center justify-center transition-all">
-                        <svg class="checkmark-icon w-4 h-4 text-white opacity-0 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                      </div>
-                    </div>
                   </label>
                 <% end %>
               </div>

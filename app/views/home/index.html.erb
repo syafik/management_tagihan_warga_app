@@ -1,49 +1,56 @@
 <div class="min-h-screen w-full overflow-x-hidden">
-  <div class="w-full px-2 sm:px-4 lg:px-8 py-2 sm:py-4">
+  <div class="w-full px-3 sm:px-4 lg:px-8 py-3 sm:py-4 space-y-4 sm:space-y-6">
     <!-- Welcome Header -->
-    <div class="bg-white overflow-hidden shadow rounded-lg mb-3 sm:mb-6">
-      <div class="px-2 py-2 sm:px-6 sm:py-5">
-        <h1 class="text-sm sm:text-xl lg:text-2xl font-bold text-gray-900">
-          Welcome to PuriAyana Management System
-        </h1>
-        <p class="text-xs sm:text-sm text-gray-600 mt-1">- <%= current_user.role_name %></p>
-        <p class="mt-1 text-xs sm:text-sm text-gray-500">
-          Dashboard <%= AppSetting.starting_year %>
-        </p>
+    <div class="bg-white/95 backdrop-blur border border-gray-100 shadow-sm rounded-xl">
+      <div class="px-3 py-3 sm:px-6 sm:py-5">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h1 class="text-base sm:text-xl lg:text-2xl font-semibold text-gray-900">
+              Welcome to PuriAyana Management System
+            </h1>
+            <p class="mt-1 text-xs sm:text-sm text-gray-500">
+              Dashboard <%= AppSetting.starting_year %>
+            </p>
+          </div>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-indigo-50 text-indigo-700 whitespace-nowrap">
+            <%= current_user.role_name %>
+          </span>
+        </div>
+        <p class="mt-2 text-xs sm:text-sm text-gray-600">Ringkasan aktivitas dan keuangan terbaru.</p>
       </div>
     </div>
 
     <!-- Main Statistics Cards -->
-    <div class="grid grid-cols-1 gap-2 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-3 sm:mb-6">
+    <div class="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <!-- Total Users -->
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-2 sm:p-4">
-          <div class="flex items-center gap-2">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="bg-white border border-gray-100 shadow-sm rounded-xl">
+        <div class="p-3 sm:p-4">
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0 h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+              <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
               </svg>
             </div>
             <div class="min-w-0 flex-1">
-              <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Users</dt>
-              <dd class="text-sm sm:text-lg font-bold text-gray-900"><%= @total_residents %></dd>
+              <dt class="text-[11px] sm:text-sm font-medium text-gray-500 truncate">Total Users</dt>
+              <dd class="text-base sm:text-lg font-bold text-gray-900"><%= @total_residents %></dd>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Total Addresses -->
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <div class="p-2 sm:p-4">
-          <div class="flex items-center gap-2">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 sm:h-6 sm:w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="bg-white border border-gray-100 shadow-sm rounded-xl">
+        <div class="p-3 sm:p-4">
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0 h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center">
+              <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
               </svg>
             </div>
             <div class="min-w-0 flex-1">
-              <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Alamat</dt>
-              <dd class="text-sm sm:text-lg font-bold text-gray-900"><%= @total_addresses %></dd>
+              <dt class="text-[11px] sm:text-sm font-medium text-gray-500 truncate">Total Alamat</dt>
+              <dd class="text-base sm:text-lg font-bold text-gray-900"><%= @total_addresses %></dd>
             </div>
           </div>
         </div>
@@ -51,33 +58,33 @@
 
       <!-- Contribution Percentage or Activity (Role-based) -->
       <% unless current_user&.is_security? %>
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-          <div class="p-2 sm:p-4">
-            <div class="flex items-center gap-2">
-              <div class="flex-shrink-0">
-                <svg class="h-5 w-5 sm:h-6 sm:w-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white border border-gray-100 shadow-sm rounded-xl col-span-2 sm:col-span-1">
+          <div class="p-3 sm:p-4">
+            <div class="flex items-center gap-3">
+              <div class="flex-shrink-0 h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
+                <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                 </svg>
               </div>
               <div class="min-w-0 flex-1">
-                <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Kontribusi <%= AppSetting.starting_year %></dt>
-                <dd class="text-sm sm:text-lg font-bold text-gray-900"><%= @contribution_percentage %>%</dd>
+                <dt class="text-[11px] sm:text-sm font-medium text-gray-500 truncate">Kontribusi <%= AppSetting.starting_year %></dt>
+                <dd class="text-base sm:text-lg font-bold text-gray-900"><%= @contribution_percentage %>%</dd>
               </div>
             </div>
           </div>
         </div>
       <% else %>
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-          <div class="p-2 sm:p-4">
-            <div class="flex items-center gap-2">
-              <div class="flex-shrink-0">
-                <svg class="h-5 w-5 sm:h-6 sm:w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white border border-gray-100 shadow-sm rounded-xl col-span-2 sm:col-span-1">
+          <div class="p-3 sm:p-4">
+            <div class="flex items-center gap-3">
+              <div class="flex-shrink-0 h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center">
+                <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"/>
                 </svg>
               </div>
               <div class="min-w-0 flex-1">
-                <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Aktivitas Bulan Ini</dt>
-                <dd class="text-sm sm:text-lg font-bold text-gray-900"><%= UserContribution.where(month: Date.current.month, year: Date.current.year).count %></dd>
+                <dt class="text-[11px] sm:text-sm font-medium text-gray-500 truncate">Aktivitas Bulan Ini</dt>
+                <dd class="text-base sm:text-lg font-bold text-gray-900"><%= UserContribution.where(month: Date.current.month, year: Date.current.year).count %></dd>
               </div>
             </div>
           </div>
@@ -87,46 +94,55 @@
 
     <% unless current_user&.is_security? %>
       <!-- Financial Summary Cards -->
-      <div class="grid grid-cols-1 gap-2 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-3 sm:mb-6">
+      <div class="space-y-3 sm:space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm sm:text-base font-semibold text-gray-900">Ringkasan Keuangan</h2>
+          <span class="text-[11px] sm:text-xs text-gray-500">Tahun <%= AppSetting.starting_year %></span>
+        </div>
+        <div class="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <!-- Current Cash Balance -->
-        <div class="bg-gradient-to-r <%= @current_cash_balance >= 0 ? 'from-green-400 to-green-600' : 'from-red-400 to-red-600' %> overflow-hidden shadow rounded-lg">
-          <div class="p-2 sm:p-4">
-            <dt class="text-xs font-medium text-white mb-1">Saldo Kas Saat Ini</dt>
-            <dd class="text-base sm:text-xl font-bold text-white break-all">
+        <div class="bg-gradient-to-r <%= @current_cash_balance >= 0 ? 'from-green-400 to-green-600' : 'from-red-400 to-red-600' %> overflow-hidden shadow-sm rounded-xl">
+          <div class="p-3 sm:p-4">
+            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">Saldo Kas Saat Ini</dt>
+            <dd class="text-lg sm:text-xl font-bold text-white break-all">
               Rp <%= number_with_delimiter(@current_cash_balance.abs, delimiter: '.') %>
             </dd>
-            <p class="text-xs text-white text-opacity-80 mt-1">
+            <p class="text-[11px] sm:text-xs text-white/80 mt-1">
               Awal: Rp <%= number_with_delimiter(@starting_balance, delimiter: '.') %>
             </p>
           </div>
         </div>
 
         <!-- Total Income <%= AppSetting.starting_year %> -->
-        <div class="bg-gradient-to-r from-blue-400 to-blue-600 overflow-hidden shadow rounded-lg">
-          <div class="p-2 sm:p-4">
-            <dt class="text-xs font-medium text-white mb-1">Pemasukan <%= AppSetting.starting_year %></dt>
-            <dd class="text-base sm:text-xl font-bold text-white break-all">
+        <div class="bg-gradient-to-r from-blue-400 to-blue-600 overflow-hidden shadow-sm rounded-xl">
+          <div class="p-3 sm:p-4">
+            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">Pemasukan <%= AppSetting.starting_year %></dt>
+            <dd class="text-lg sm:text-xl font-bold text-white break-all">
               Rp <%= number_with_delimiter(@total_income_2025, delimiter: '.') %>
             </dd>
           </div>
         </div>
 
         <!-- Total Outcome <%= AppSetting.starting_year %> -->
-        <div class="bg-gradient-to-r from-red-400 to-red-600 overflow-hidden shadow rounded-lg">
-          <div class="p-2 sm:p-4">
-            <dt class="text-xs font-medium text-white mb-1">Pengeluaran <%= AppSetting.starting_year %></dt>
-            <dd class="text-base sm:text-xl font-bold text-white break-all">
+        <div class="bg-gradient-to-r from-red-400 to-red-600 overflow-hidden shadow-sm rounded-xl">
+          <div class="p-3 sm:p-4">
+            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">Pengeluaran <%= AppSetting.starting_year %></dt>
+            <dd class="text-lg sm:text-xl font-bold text-white break-all">
               Rp <%= number_with_delimiter(@total_outcome_2025, delimiter: '.') %>
             </dd>
           </div>
         </div>
+        </div>
       </div>
 
       <!-- Monthly Financial Chart -->
-      <div class="bg-white overflow-hidden shadow rounded-lg mb-3 sm:mb-6">
-        <div class="px-2 py-2 sm:px-6 sm:py-5">
-          <h3 class="text-xs sm:text-base font-semibold text-gray-900 mb-2 sm:mb-4">Grafik <%= AppSetting.starting_year %></h3>
-          <div class="relative h-48 sm:h-64">
+      <div class="bg-white border border-gray-100 shadow-sm rounded-xl">
+        <div class="px-3 py-3 sm:px-6 sm:py-5">
+          <div class="flex items-center justify-between mb-2 sm:mb-4">
+            <h3 class="text-sm sm:text-base font-semibold text-gray-900">Grafik <%= AppSetting.starting_year %></h3>
+            <span class="text-[11px] sm:text-xs text-gray-500">Pemasukan vs Pengeluaran</span>
+          </div>
+          <div class="relative h-56 sm:h-64">
             <canvas
               data-controller="financial-chart"
               data-financial-chart-labels-value="<%= (@monthly_financial_data&.map { |d| d[:month_name] } || []).to_json.html_safe %>"
@@ -140,23 +156,23 @@
 
   <% if current_user&.is_security? || current_user&.is_admin? %>
     <!-- Security Dashboard -->
-    <div class="bg-white overflow-hidden shadow rounded-lg mb-6">
-      <div class="px-4 py-5 sm:p-6">
-        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+    <div class="bg-white border border-gray-100 shadow-sm rounded-xl">
+      <div class="px-4 py-4 sm:p-6">
+        <h3 class="text-base sm:text-lg leading-6 font-semibold text-gray-900 mb-4">
           Dashboard Aktivitas
         </h3>
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
-          <div class="text-center">
-            <div class="text-2xl font-bold text-blue-600"><%= @recent_activities[:recent_registrations] %></div>
-            <div class="text-sm text-gray-500">Pendaftaran Baru (30 hari)</div>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div class="rounded-lg border border-blue-100 bg-blue-50/50 p-3 text-center">
+            <div class="text-xl sm:text-2xl font-bold text-blue-600"><%= @recent_activities[:recent_registrations] %></div>
+            <div class="text-xs sm:text-sm text-gray-600">Pendaftaran Baru (30 hari)</div>
           </div>
-          <div class="text-center">
-            <div class="text-2xl font-bold text-green-600"><%= @recent_activities[:recent_address_updates] %></div>
-            <div class="text-sm text-gray-500">Update Alamat (30 hari)</div>
+          <div class="rounded-lg border border-green-100 bg-green-50/50 p-3 text-center">
+            <div class="text-xl sm:text-2xl font-bold text-green-600"><%= @recent_activities[:recent_address_updates] %></div>
+            <div class="text-xs sm:text-sm text-gray-600">Update Alamat (30 hari)</div>
           </div>
-          <div class="text-center">
-            <div class="text-2xl font-bold text-purple-600"><%= @recent_activities[:active_residents_this_month] %></div>
-            <div class="text-sm text-gray-500">Aktif Bulan Ini</div>
+          <div class="rounded-lg border border-purple-100 bg-purple-50/50 p-3 text-center">
+            <div class="text-xl sm:text-2xl font-bold text-purple-600"><%= @recent_activities[:active_residents_this_month] %></div>
+            <div class="text-xs sm:text-sm text-gray-600">Aktif Bulan Ini</div>
           </div>
         </div>
       </div>
@@ -164,14 +180,14 @@
 
     <!-- Admin Tools Section -->
     <% if current_user&.is_admin? %>
-      <div class="bg-white overflow-hidden shadow rounded-lg mb-6">
-        <div class="px-4 py-5 sm:p-6">
-          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+      <div class="bg-white border border-gray-100 shadow-sm rounded-xl">
+        <div class="px-4 py-4 sm:p-6">
+          <h3 class="text-base sm:text-lg leading-6 font-semibold text-gray-900 mb-4">
             Tools Admin
           </h3>
           <div class="flex flex-col sm:flex-row gap-3">
             <%= link_to backup_database_path,
-                class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors",
+                class: "inline-flex items-center justify-center px-4 py-2.5 border border-transparent text-sm font-semibold rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors",
                 onclick: "return confirm('⚠️ KONFIRMASI BACKUP DATABASE\\n\\n✅ Proses ini akan:\\n• Membuat backup lengkap database PuriAyana\\n• Menghasilkan file SQL dengan timestamp\\n• File akan otomatis diunduh\\n\\n⏱️ Proses mungkin memakan waktu beberapa menit\\n\\nLanjutkan backup database?')",
                 data: { turbo: false } do %>
               <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,7 +196,7 @@
               Backup Database
             <% end %>
             
-            <div class="text-sm text-gray-500 flex items-center">
+            <div class="text-xs sm:text-sm text-gray-500 flex items-center">
               <svg class="h-4 w-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>

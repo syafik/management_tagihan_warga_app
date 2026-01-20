@@ -272,6 +272,13 @@ class SecurityDashboardController < ApplicationController
       return
     end
 
+    @pay_at = params[:pay_at].present? ? Date.parse(params[:pay_at]) : Date.current
+    if current_user.is_security? && @pay_at < Date.current.beginning_of_month
+      redirect_to payment_security_dashboard_index_path(address_id: @address.id),
+                  alert: 'Tanggal pembayaran tidak boleh bulan sebelumnya'
+      return
+    end
+
     @payment_type = params[:payment_type]&.to_i || 1
     # Convert to array (handles both single string and array from params)
     @pay_arrears = Array(params[:pay_arrears]).reject(&:blank?)
@@ -342,6 +349,13 @@ class SecurityDashboardController < ApplicationController
     end
 
     payment_type = params[:payment_type]&.to_i || 1
+    pay_at = params[:pay_at].present? ? Date.parse(params[:pay_at]) : Date.current
+
+    if current_user.is_security? && pay_at < Date.current.beginning_of_month
+      redirect_to payment_security_dashboard_index_path(address_id: address.id),
+                  alert: 'Tanggal pembayaran tidak boleh bulan sebelumnya'
+      return
+    end
     # Convert to array (handles both single string and array from params)
     pay_arrears = Array(params[:pay_arrears]).reject(&:blank?)
     unpaid_months = Array(params[:unpaid_months]).reject(&:blank?)
@@ -401,7 +415,7 @@ class SecurityDashboardController < ApplicationController
           year: year,
           contribution: expected_contribution,
           expected_contribution: expected_contribution,
-          pay_at: Date.current,
+          pay_at: pay_at,
           receiver_id: current_user.id,
           payment_type: payment_type,
           blok: address.block_address.gsub(/[^A-Za-z]/, '').upcase,
@@ -433,7 +447,7 @@ class SecurityDashboardController < ApplicationController
           year: year,
           contribution: expected_contribution,
           expected_contribution: expected_contribution,
-          pay_at: Date.current,
+          pay_at: pay_at,
           receiver_id: current_user.id,
           payment_type: payment_type,
           blok: address.block_address.gsub(/[^A-Za-z]/, '').upcase,
@@ -459,13 +473,13 @@ class SecurityDashboardController < ApplicationController
         end
 
         first_contribution = user_contributions_created.first
-        transaction_month = first_contribution&.month || Date.current.month
-        transaction_year = first_contribution&.year || Date.current.year
+        transaction_month = pay_at.month
+        transaction_year = pay_at.year
 
         ct = CashTransaction.create(
           month: transaction_month,
           year: transaction_year,
-          transaction_date: Date.current,
+          transaction_date: pay_at,
           transaction_type: CashTransaction::TYPE['DEBIT'],
           transaction_group: CashTransaction::GROUP['IURAN WARGA'],
           description: "#{address.block_address} pembayaran iuran (#{description_parts.join(' + ')})",
@@ -555,6 +569,21 @@ class SecurityDashboardController < ApplicationController
 
     amount.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1.').reverse
   end
+
+  def format_compact_currency(amount)
+    return '0' if amount.nil? || amount.zero?
+
+    value = amount.to_f
+    if value >= 1_000_000
+      "#{(value / 1_000_000.0).round(1).to_s.sub(/\\.0$/, '')}jt"
+    elsif value >= 1_000
+      "#{(value / 1_000.0).round(0).to_i}rb"
+    else
+      value.to_i.to_s
+    end
+  end
+
+  helper_method :format_compact_currency
 
   def get_accessible_blocks
     if current_user.pic_blok.present?

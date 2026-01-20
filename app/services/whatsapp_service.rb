@@ -20,6 +20,11 @@ class WhatsappService
     send_message(phone_number, message)
   end
 
+  def send_reset_password_link(phone_number, reset_link)
+    message = build_reset_password_message(reset_link)
+    send_message(phone_number, message)
+  end
+
   def send_message(phone_number, message)
     body = {
       "user_code": @user_code,
@@ -48,6 +53,21 @@ class WhatsappService
       Kode ini akan kadaluarsa dalam 10 menit.
 
       Jangan bagikan kode ini kepada siapa pun.
+
+      Terima kasih! 🙏
+    MESSAGE
+  end
+
+  def build_reset_password_message(reset_link)
+    <<~MESSAGE
+      🏠 *PuriAyana Management System*
+
+      Berikut tautan untuk reset password Anda:
+      #{reset_link}
+
+      Tautan ini hanya berlaku selama 5 menit.
+
+      Jangan bagikan tautan ini kepada siapa pun.
 
       Terima kasih! 🙏
     MESSAGE

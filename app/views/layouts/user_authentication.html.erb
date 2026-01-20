@@ -29,7 +29,7 @@
 
   <link rel="shortcut icon" href="<%= asset_path('img_305218.png') %>" />
 </head>
-<body class="h-full" data-controller="pwa-install">
+<body class="h-full">
   <div class="min-h-full flex flex-col">
     <!-- Header with PWA Install Button -->
     <div class="bg-white shadow-sm border-b border-gray-200">
@@ -45,16 +45,7 @@
             </div>
           </div>
 
-          <!-- PWA Install Button - Mobile Only -->
-          <div data-pwa-install-target="button" class="hidden lg:hidden">
-            <button data-action="click->pwa-install#install"
-                    class="flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-2.5 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 active:scale-95">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-              </svg>
-              <span class="font-semibold text-xs whitespace-nowrap">Install</span>
-            </button>
-          </div>
+          
         </div>
       </div>
     </div>

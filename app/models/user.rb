@@ -41,8 +41,8 @@ class User < ApplicationRecord
   include DeviseTokenAuth::Concerns::User
 
   # Override Devise's email validation to make it optional
-  validates :email, uniqueness: { allow_blank: true, case_sensitive: false }
-  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP, allow_blank: true }
+  validates :email, uniqueness: { allow_blank: true, case_sensitive: false }, if: :will_save_change_to_email?
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP, allow_blank: true }, if: :will_save_change_to_email?
 
   validates :name, :phone_number, presence: true
   validate :password_complexity
@@ -324,7 +324,7 @@ class User < ApplicationRecord
 
   def send_login_code!
     # Special case for dummy merchant account - use fixed code 123456
-    if ["+6281012345678", "+6281809466884"].include?(phone_number)
+    if ["+6281012345678", "+6281809466884", "+6285881335349", "+6281394328453"].include?(phone_number)
       self.login_code = '123456'
       self.login_code_expires_at = 1.year.from_now # Never expires
       save!

@@ -169,6 +169,7 @@ Rails.application.routes.draw do
 
   resources :app_settings
   resources :template_transactions
+  get '/payment_reports', to: 'payment_reports#index', as: :payment_reports
 
   # Payment routes (QRIS via Tripay)
   resources :payments, only: [:new, :create, :show], param: :reference do

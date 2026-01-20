@@ -17,7 +17,9 @@ module Users
     # POST /resource/sign_in
     def create
       # Check if this is a phone login request
-      if params[:phone_number].present?
+      if params[:login_method] == 'password'
+        handle_password_login_request
+      elsif params[:phone_number].present?
         handle_phone_login_request
       else
         super
@@ -59,6 +61,31 @@ module Users
         redirect_to verify_phone_login_path
       else
         flash.now[:error] = result[:message] || 'Gagal mengirimkan kode login. Silakan coba lagi.'
+        render :new
+      end
+    end
+
+    def handle_password_login_request
+      phone_number = params[:phone_number]&.strip
+      password = params[:password]
+
+      if phone_number.blank? || password.blank?
+        flash.now[:error] = 'Nomor WhatsApp dan password wajib diisi'
+        render :new and return
+      end
+
+      @user = User.find_by_phone(phone_number)
+
+      if @user.nil?
+        flash.now[:error] = 'Nomor telepon tidak ditemukan. Silakan hubungi administrator.'
+        render :new and return
+      end
+
+      if @user.valid_password?(password)
+        sign_in(resource_name, @user)
+        redirect_to after_sign_in_path_for(@user)
+      else
+        flash.now[:error] = 'Password salah. Silakan coba lagi.'
         render :new
       end
     end

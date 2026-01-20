@@ -30,18 +30,20 @@
   <link rel="shortcut icon" href="<%= asset_path('img_305218.png') %>" />
 </head>
 <body class="h-full">
-  <div class="min-h-full" data-controller="mobile-menu pwa-install <%= 'webview' if user_signed_in? %>">
+  <div class="min-h-full" data-controller="mobile-menu <%= 'webview' if user_signed_in? %>">
     <!-- Navigation -->
     <%= render partial: 'layouts/navbar' %>
     
     <div class="flex min-h-screen">
       <!-- Sidebar -->
-      <%= render partial: 'layouts/sidebar' %>
+      <% if user_signed_in? %>
+        <%= render partial: 'layouts/sidebar' %>
+      <% end %>
       
       <!-- Main content wrapper -->
       <main class="flex-1 lg:ml-64 flex flex-col">
         <!-- Main content area -->
-        <div class="flex-1 px-4 sm:px-6 pt-20 pb-6 lg:pb-6 pb-20">
+        <div class="flex-1 px-1 sm:px-6 pt-20 pb-6 lg:pb-6 pb-20">
           <%= render partial: 'shared/flash_message' if !flash.empty? %>
           <%= yield %>
         </div>

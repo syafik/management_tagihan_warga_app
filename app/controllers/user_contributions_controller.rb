@@ -629,7 +629,7 @@ class UserContributionsController < ApplicationController
     end
 
     # Search by block address or head of family name
-    addresses = Address.joins(:head_of_family)
+    addresses = Address.left_joins(:head_of_family)
                       .where(
                         "UPPER(addresses.block_address) LIKE UPPER(?) OR UPPER(users.name) LIKE UPPER(?)",
                         "%#{query}%", "%#{query}%"
@@ -639,11 +639,13 @@ class UserContributionsController < ApplicationController
                       .limit(10)
 
     results = addresses.map do |address|
+      head_name = address.head_of_family&.name&.upcase
+      display_text = head_name.present? ? "#{address.block_address&.upcase} - #{head_name}" : address.block_address&.upcase
       {
         id: address.id,
         block_address: address.block_address&.upcase,
-        head_of_family_name: address.head_of_family&.name&.upcase,
-        display_text: "#{address.block_address&.upcase} - #{address.head_of_family&.name&.upcase}"
+        head_of_family_name: head_name,
+        display_text: display_text
       }
     end
 

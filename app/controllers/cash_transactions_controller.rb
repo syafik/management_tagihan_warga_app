@@ -7,6 +7,7 @@ class CashTransactionsController < ApplicationController
 
     # Set default year to current year if it's starting_year or later, otherwise starting_year
     @year_selected = params[:year_eq]&.to_i || [current_year, AppSetting.starting_year].max
+    @pic_selected = params[:pic_id_eq].presence
 
     # Set default month to current month if we're in starting_year or later, otherwise January
     @month_selected = if @year_selected == current_year && current_year >= AppSetting.starting_year

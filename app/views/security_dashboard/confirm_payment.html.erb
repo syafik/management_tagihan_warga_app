@@ -129,6 +129,7 @@
   <%= form_with url: create_payment_security_dashboard_index_path, method: :post do |f| %>
     <%= f.hidden_field :address_id, value: @address.id %>
     <%= f.hidden_field :payment_type, value: @payment_type %>
+    <%= hidden_field_tag :pay_at, @pay_at %>
 
     <% @pay_arrears.each do |arrears_index| %>
       <%= hidden_field_tag 'pay_arrears[]', arrears_index %>
@@ -141,6 +142,13 @@
     <% @future_months.each do |month_year| %>
       <%= hidden_field_tag 'future_months[]', month_year %>
     <% end %>
+
+    <div class="bg-white border border-gray-200 rounded-lg p-3 mb-4">
+      <div class="text-xs text-gray-500">Tanggal Pembayaran</div>
+      <div class="text-sm font-semibold text-gray-900">
+        <%= @pay_at.strftime('%d %B %Y') %>
+      </div>
+    </div>
 
     <!-- Action Buttons -->
     <div class="sticky bottom-0 bg-white border-t-4 border-indigo-600 rounded-t-xl shadow-xl p-4">
