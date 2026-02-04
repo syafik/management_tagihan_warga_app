@@ -11,6 +11,7 @@ class PaymentReportsController < ApplicationController
     @selected_year = (params[:year] || Date.current.year).to_i
     @selected_block = params[:block].presence
     @selected_pic_id = params[:pic_id].presence
+    @selected_payment_type = params[:payment_type].presence
 
     @blocks = Address::BLOK_NAME.keys.sort
     @pics = User.where(id: UserContribution.select(:receiver_id).distinct).order(:name)
@@ -46,6 +47,7 @@ class PaymentReportsController < ApplicationController
                              .where(address_id: address_ids)
     scope = scope.where(blok: @selected_block) if @selected_block.present?
     scope = scope.where(receiver_id: @selected_pic_id) if @selected_pic_id.present?
+    scope = scope.where(payment_type: @selected_payment_type) if @selected_payment_type.present?
     scope
   end
 
