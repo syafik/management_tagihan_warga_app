@@ -34,60 +34,189 @@
     <% end %>
   </div>
 
-  <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-    <% if @rows.any? %>
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Alamat</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Pemilik</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Bayar Bulan</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Payment Type</th>
-              <th class="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Total Bayar</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-100">
-            <% @rows.each do |row| %>
-              <tr class="hover:bg-gray-50">
-                <td class="px-4 py-3 text-sm text-gray-900"><%= row[:address_label] %></td>
-                <td class="px-4 py-3 text-sm text-gray-700"><%= row[:owner] %></td>
-                <td class="px-4 py-3 text-sm text-gray-700"><%= row[:months_paid].presence || '-' %></td>
-                <td class="px-4 py-3 text-sm text-gray-700"><%= row[:payment_types].presence || '-' %></td>
-                <td class="px-4 py-3 text-sm text-gray-900 text-right font-semibold">
-                  <% if row[:total].positive? %>
-                    <%= number_to_currency(row[:total], unit: 'Rp ', precision: 0, delimiter: '.') %>
-                  <% else %>
-                    -
-                  <% end %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    <% else %>
-      <div class="p-4 text-sm text-gray-600">Tidak ada data untuk filter yang dipilih.</div>
-    <% end %>
-  </div>
-
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <% @totals_by_block.sort.each do |block, totals| %>
-      <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 space-y-2">
-        <div class="text-sm font-semibold text-gray-900">Blok <%= block %></div>
-        <div class="flex justify-between text-sm text-gray-700"><span>Cash</span><strong><%= number_to_currency(totals[:cash], unit: 'Rp ', precision: 0, delimiter: '.') %></strong></div>
-        <div class="flex justify-between text-sm text-gray-700"><span>Transfer</span><strong><%= number_to_currency(totals[:transfer], unit: 'Rp ', precision: 0, delimiter: '.') %></strong></div>
-        <div class="flex justify-between text-sm text-gray-700"><span>QRIS</span><strong><%= number_to_currency(totals[:qris], unit: 'Rp ', precision: 0, delimiter: '.') %></strong></div>
-        <div class="flex justify-between text-sm text-gray-900 border-t border-gray-100 pt-2"><span>Total Blok</span><strong><%= number_to_currency(totals[:total], unit: 'Rp ', precision: 0, delimiter: '.') %></strong></div>
-      </div>
-    <% end %>
-
-    <div class="bg-indigo-50 border border-indigo-200 rounded-xl shadow-sm p-4 space-y-2 md:col-span-1">
-      <div class="text-sm font-semibold text-indigo-900">Total Semua Blok</div>
-      <div class="flex justify-between text-sm text-indigo-900"><span>Cash</span><strong><%= number_to_currency(@overall_totals[:cash], unit: 'Rp ', precision: 0, delimiter: '.') %></strong></div>
-      <div class="flex justify-between text-sm text-indigo-900"><span>Transfer</span><strong><%= number_to_currency(@overall_totals[:transfer], unit: 'Rp ', precision: 0, delimiter: '.') %></strong></div>
-      <div class="flex justify-between text-sm text-indigo-900"><span>QRIS</span><strong><%= number_to_currency(@overall_totals[:qris], unit: 'Rp ', precision: 0, delimiter: '.') %></strong></div>
-      <div class="flex justify-between text-sm text-indigo-900 border-t border-indigo-200 pt-2"><span>Total Keseluruhan</span><strong><%= number_to_currency(@overall_totals[:total], unit: 'Rp ', precision: 0, delimiter: '.') %></strong></div>
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+      <div class="text-xs font-semibold text-gray-500 uppercase">Iuran Warga</div>
+      <div class="mt-2 text-2xl font-semibold text-gray-900"><%= number_to_currency(@overall_totals[:total], unit: 'Rp ', precision: 0, delimiter: '.') %></div>
+      <div class="mt-2 text-xs text-gray-500">Total pemasukan iuran warga sesuai filter.</div>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+      <div class="text-xs font-semibold text-gray-500 uppercase">Pemasukan Lain</div>
+      <div class="mt-2 text-2xl font-semibold text-emerald-700"><%= number_to_currency(@total_income_cash, unit: 'Rp ', precision: 0, delimiter: '.') %></div>
+      <div class="mt-2 text-xs text-gray-500">Transaksi debit selain Iuran Warga.</div>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+      <div class="text-xs font-semibold text-gray-500 uppercase">Pengeluaran</div>
+      <div class="mt-2 text-2xl font-semibold text-rose-700"><%= number_to_currency(@total_expenses, unit: 'Rp ', precision: 0, delimiter: '.') %></div>
+      <div class="mt-2 text-xs text-gray-500">Semua transaksi kredit pada bulan ini.</div>
     </div>
   </div>
+
+  <div class="bg-indigo-50 border border-indigo-200 rounded-xl shadow-sm p-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+      <div class="text-sm font-semibold text-indigo-900">Sisa Bulan Ini</div>
+      <div class="text-xl font-semibold text-indigo-900"><%= number_to_currency(@net_balance, unit: 'Rp ', precision: 0, delimiter: '.') %></div>
+    </div>
+    <div class="mt-2 text-xs text-indigo-700">Sisa = iuran warga + pemasukan lain - pengeluaran.</div>
+  </div>
+
+  <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-2">
+    <div class="flex flex-wrap gap-2">
+      <button type="button" data-tab-target="iuran" class="tab-button px-4 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white">Iuran Warga</button>
+      <button type="button" data-tab-target="pemasukan" class="tab-button px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">Pemasukan</button>
+      <button type="button" data-tab-target="pengeluaran" class="tab-button px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">Pengeluaran</button>
+      <button type="button" data-tab-target="ringkasan" class="tab-button px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">Ringkasan</button>
+    </div>
+  </div>
+
+  <div data-tab-panel="iuran" class="tab-panel">
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <% if @rows.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Alamat</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Pemilik</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Bayar Bulan</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Payment Type</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Total Bayar</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-100">
+              <% @rows.each do |row| %>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-4 py-3 text-sm text-gray-900"><%= row[:address_label] %></td>
+                  <td class="px-4 py-3 text-sm text-gray-700"><%= row[:owner] %></td>
+                  <td class="px-4 py-3 text-sm text-gray-700"><%= row[:months_paid].presence || '-' %></td>
+                  <td class="px-4 py-3 text-sm text-gray-700"><%= row[:payment_types].presence || '-' %></td>
+                  <td class="px-4 py-3 text-sm text-gray-900 text-right font-semibold">
+                    <% if row[:total].positive? %>
+                      <%= number_to_currency(row[:total], unit: 'Rp ', precision: 0, delimiter: '.') %>
+                    <% else %>
+                      -
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="p-4 text-sm text-gray-600">Tidak ada data untuk filter yang dipilih.</div>
+      <% end %>
+    </div>
+  </div>
+
+  <div data-tab-panel="pemasukan" class="tab-panel hidden">
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div class="px-4 py-3 border-b border-gray-100">
+        <div class="text-sm font-semibold text-gray-900">Detail Pemasukan Lain</div>
+        <div class="text-xs text-gray-500">Transaksi debit selain Iuran Warga.</div>
+      </div>
+      <% if @income_items.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tanggal</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Deskripsi</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Kategori</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Nominal</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-100">
+              <% @income_items.each do |item| %>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-4 py-3 text-sm text-gray-700"><%= item.transaction_date&.strftime('%d %B %Y') || '-' %></td>
+                  <td class="px-4 py-3 text-sm text-gray-900"><%= item.description.presence || '-' %></td>
+                  <td class="px-4 py-3 text-sm text-gray-700"><%= CashTransaction::GROUP.invert[item.transaction_group] || '-' %></td>
+                  <td class="px-4 py-3 text-sm text-gray-900 text-right font-semibold">
+                    <%= number_to_currency(item.total.to_f, unit: 'Rp ', precision: 0, delimiter: '.') %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="p-4 text-sm text-gray-600">Tidak ada data pemasukan untuk filter yang dipilih.</div>
+      <% end %>
+    </div>
+  </div>
+
+  <div data-tab-panel="pengeluaran" class="tab-panel hidden">
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div class="px-4 py-3 border-b border-gray-100">
+        <div class="text-sm font-semibold text-gray-900">Detail Pengeluaran</div>
+        <div class="text-xs text-gray-500">Berdasarkan tanggal transaksi kas.</div>
+      </div>
+      <% if @expense_items.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tanggal</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Deskripsi</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Kategori</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Nominal</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-100">
+              <% @expense_items.each do |item| %>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-4 py-3 text-sm text-gray-700"><%= item.transaction_date&.strftime('%d %B %Y') || '-' %></td>
+                  <td class="px-4 py-3 text-sm text-gray-900"><%= item.description.presence || '-' %></td>
+                  <td class="px-4 py-3 text-sm text-gray-700"><%= CashTransaction::GROUP.invert[item.transaction_group] || '-' %></td>
+                  <td class="px-4 py-3 text-sm text-gray-900 text-right font-semibold">
+                    <%= number_to_currency(item.total.to_f, unit: 'Rp ', precision: 0, delimiter: '.') %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="p-4 text-sm text-gray-600">Tidak ada data pengeluaran untuk filter yang dipilih.</div>
+      <% end %>
+    </div>
+  </div>
+
+  <div data-tab-panel="ringkasan" class="tab-panel hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <% @totals_by_block.sort.each do |block, totals| %>
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 space-y-2">
+          <div class="text-sm font-semibold text-gray-900">Blok <%= block %></div>
+          <div class="flex justify-between text-sm text-gray-700"><span>Cash</span><strong><%= number_to_currency(totals[:cash], unit: 'Rp ', precision: 0, delimiter: '.') %></strong></div>
+          <div class="flex justify-between text-sm text-gray-700"><span>Transfer</span><strong><%= number_to_currency(totals[:transfer], unit: 'Rp ', precision: 0, delimiter: '.') %></strong></div>
+          <div class="flex justify-between text-sm text-gray-700"><span>QRIS</span><strong><%= number_to_currency(totals[:qris], unit: 'Rp ', precision: 0, delimiter: '.') %></strong></div>
+          <div class="flex justify-between text-sm text-gray-900 border-t border-gray-100 pt-2"><span>Total Blok</span><strong><%= number_to_currency(totals[:total], unit: 'Rp ', precision: 0, delimiter: '.') %></strong></div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const buttons = Array.from(document.querySelectorAll('.tab-button'));
+      const panels = Array.from(document.querySelectorAll('.tab-panel'));
+      if (!buttons.length || !panels.length) return;
+
+      const setActive = (target) => {
+        buttons.forEach((button) => {
+          const isActive = button.dataset.tabTarget === target;
+          button.classList.toggle('bg-indigo-600', isActive);
+          button.classList.toggle('text-white', isActive);
+          button.classList.toggle('text-gray-700', !isActive);
+        });
+        panels.forEach((panel) => {
+          panel.classList.toggle('hidden', panel.dataset.tabPanel !== target);
+        });
+      };
+
+      buttons.forEach((button) => {
+        button.addEventListener('click', () => setActive(button.dataset.tabTarget));
+      });
+    })();
+  </script>
 </div>

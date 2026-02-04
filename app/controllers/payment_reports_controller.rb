@@ -20,6 +20,7 @@ class PaymentReportsController < ApplicationController
 
     @contributions_by_address = contributions.group_by(&:address_id)
     build_totals(contributions)
+    build_cash_transaction_summary
     @rows = build_rows
   end
 
@@ -127,6 +128,21 @@ class PaymentReportsController < ApplicationController
       @totals_by_block[block_key][:total] += amount
       @overall_totals[:total] += amount
     end
+  end
+
+  def build_cash_transaction_summary
+    range = Date.new(@selected_year, @selected_month, 1).beginning_of_month..Date.new(@selected_year, @selected_month, 1).end_of_month
+    cash_scope = CashTransaction.where(transaction_date: range)
+    cash_scope = cash_scope.where(pic_id: @selected_pic_id) if @selected_pic_id.present?
+
+    @expense_items = cash_scope.where(transaction_type: CashTransaction::TYPE['KREDIT'])
+                               .order(transaction_date: :asc, id: :asc)
+    @income_items = cash_scope.where(transaction_type: CashTransaction::TYPE['DEBIT'])
+                              .where.not(transaction_group: CashTransaction::GROUP['IURAN WARGA'])
+                              .order(transaction_date: :asc, id: :asc)
+    @total_expenses = @expense_items.sum(:total).to_f
+    @total_income_cash = @income_items.sum(:total).to_f
+    @net_balance = @overall_totals[:total] + @total_income_cash - @total_expenses
   end
 
   def default_totals
