@@ -1,8 +1,8 @@
 <%= form_for([@address, address_contribution]) do |f| %>
   <% if address_contribution.errors.any? %>
-    <div class="alert alert-danger">
-      <h4><%= pluralize(address_contribution.errors.count, "error") %> prohibited this record from being saved:</h4>
-      <ul>
+    <div class="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+      <div class="font-semibold"><%= pluralize(address_contribution.errors.count, "error") %> prohibited this record from being saved:</div>
+      <ul class="mt-2 list-disc pl-5">
         <% address_contribution.errors.full_messages.each do |message| %>
           <li><%= message %></li>
         <% end %>
@@ -10,35 +10,51 @@
     </div>
   <% end %>
 
-  <div class="form-group">
-    <%= f.label :amount, 'Amount (Rp)' %>
-    <%= f.number_field :amount, step: 0.01, class: 'form-control', placeholder: 'Enter amount' %>
-    <small class="form-text text-muted">Enter 0 for free, or any amount for custom rate</small>
-  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="sm:col-span-1" data-controller="currency-input" data-currency-input-prefix-value="Rp">
+      <%= f.label :amount, 'Amount (Rp)', class: 'block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1' %>
+      <%= text_field_tag :address_contribution_amount_display, nil,
+          placeholder: 'Rp 250.000',
+          inputmode: 'numeric',
+          autocomplete: 'off',
+          data: {
+            currency_input_target: 'display',
+            action: 'input->currency-input#format'
+          },
+          class: 'w-full rounded-xl border-gray-200 bg-white text-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500' %>
+      <%= f.hidden_field :amount, data: { currency_input_target: 'hidden' } %>
+      <p class="mt-1 text-[11px] text-gray-500">Format otomatis: Rp 250.000. Isi 0 untuk gratis.</p>
+    </div>
 
-  <div class="form-group">
-    <%= f.label :effective_from, 'Effective From' %>
-    <%= f.date_field :effective_from, class: 'form-control' %>
-  </div>
+    <div class="sm:col-span-1 flex items-end">
+      <label class="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 w-full">
+        <%= f.check_box :active, class: 'h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500' %>
+        <div>
+          <div class="text-sm font-semibold text-gray-900">Active</div>
+          <div class="text-[11px] text-gray-500">Aktifkan tarif khusus ini.</div>
+        </div>
+      </label>
+    </div>
 
-  <div class="form-group">
-    <%= f.label :effective_until, 'Effective Until (Optional)' %>
-    <%= f.date_field :effective_until, class: 'form-control' %>
-    <small class="form-text text-muted">Leave empty for indefinite period</small>
-  </div>
+    <div>
+      <%= f.label :effective_from, 'Effective From', class: 'block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1' %>
+      <%= f.date_field :effective_from, class: 'w-full rounded-xl border-gray-200 bg-white text-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500' %>
+    </div>
 
-  <div class="form-group">
-    <%= f.label :reason, 'Reason' %>
-    <%= f.text_area :reason, class: 'form-control', rows: 3, placeholder: 'Reason for special rate' %>
-  </div>
+    <div>
+      <%= f.label :effective_until, 'Effective Until (Optional)', class: 'block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1' %>
+      <%= f.date_field :effective_until, class: 'w-full rounded-xl border-gray-200 bg-white text-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500' %>
+      <p class="mt-1 text-[11px] text-gray-500">Kosongkan untuk periode tanpa batas.</p>
+    </div>
 
-  <div class="form-group">
-    <div class="form-check">
-      <%= f.check_box :active, class: 'form-check-input' %>
-      <%= f.label :active, 'Active', class: 'form-check-label' %>
+    <div class="sm:col-span-2">
+      <%= f.label :reason, 'Reason', class: 'block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1' %>
+      <%= f.text_area :reason, class: 'w-full rounded-xl border-gray-200 bg-white text-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500', rows: 3, placeholder: 'Contoh: promo warga baru / penyesuaian sementara' %>
     </div>
   </div>
 
-  <%= f.submit 'Save', class: 'btn btn-primary mr-2' %>
-  <%= link_to 'Cancel', address_address_contributions_path(@address), class: 'btn btn-light' %>
+  <div class="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
+    <%= f.submit 'Save', class: 'inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 w-full sm:w-auto' %>
+    <%= link_to 'Cancel', address_address_contributions_path(@address), class: 'inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 w-full sm:w-auto' %>
+  </div>
 <% end %>

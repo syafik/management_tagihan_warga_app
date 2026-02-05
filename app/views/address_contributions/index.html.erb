@@ -1,85 +1,130 @@
-<div class="row">
-  <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-sm-flex align-items-center mb-4">
-          <h4 class="card-title mb-sm-0">Special Rates for <%= @address.block_address.upcase %></h4>
-          <%= link_to 'Add Special Rate', new_address_address_contribution_path(@address), class: 'btn btn-primary ml-auto mb-3 mb-sm-0' %>
-        </div>
-        
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <div class="card bg-light">
-              <div class="card-body">
-                <h6 class="card-title">Current Rate</h6>
-                <h4 class="text-primary">
-                  <%= number_to_currency(@address.current_contribution_rate, unit: "Rp. ", separator: ",", delimiter: ".") %>
-                </h4>
-                <% if @address.special_rate? %>
-                  <span class="badge badge-warning">Special Rate Active</span>
-                <% else %>
-                  <span class="badge badge-success">Default Rate</span>
-                <% end %>
-              </div>
-            </div>
+<div class="max-w-5xl mx-auto space-y-4 sm:space-y-6">
+  <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+    <div class="px-5 py-4 sm:px-6 bg-gradient-to-r from-indigo-50 via-white to-indigo-50 border-b border-gray-200">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-indigo-600">Rates</p>
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">Rates for <%= @address.block_address.upcase %></h1>
+          <div class="mt-2 flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <span>Current rate:</span>
+            <span class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+              <%= number_to_currency(@address.current_contribution_rate, unit: "Rp. ", separator: ",", delimiter: ".") %>
+            </span>
+            <% if @address.special_rate? %>
+              <span class="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">Special rate active</span>
+            <% else %>
+              <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Default rate</span>
+            <% end %>
           </div>
         </div>
 
-        <% if @address_contributions.any? %>
-          <div class="table-responsive">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Amount</th>
-                  <th>Effective From</th>
-                  <th>Effective Until</th>
-                  <th>Reason</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @address_contributions.each do |contribution| %>
-                  <tr class="<%= 'table-success' if contribution.active_on_date? %>">
-                    <td>
-                      <%= number_to_currency(contribution.amount, unit: "Rp. ", separator: ",", delimiter: ".") %>
-                    </td>
-                    <td><%= contribution.effective_from.strftime('%d %b %Y') %></td>
-                    <td>
-                      <%= contribution.effective_until&.strftime('%d %b %Y') || 'Indefinite' %>
-                    </td>
-                    <td><%= contribution.reason %></td>
-                    <td>
-                      <% if contribution.active_on_date? %>
-                        <span class="badge badge-success">Active</span>
-                      <% elsif contribution.effective_from > Date.current %>
-                        <span class="badge badge-info">Future</span>
-                      <% else %>
-                        <span class="badge badge-secondary">Expired</span>
-                      <% end %>
-                    </td>
-                    <td>
-                      <%= link_to 'Edit', edit_address_address_contribution_path(@address, contribution), class: 'btn btn-sm btn-info' %>
-                      <%= link_to 'Delete', address_address_contribution_path(@address, contribution), method: :delete, 
-                                  confirm: 'Are you sure?', class: 'btn btn-sm btn-danger' %>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
-        <% else %>
-          <div class="text-center py-4">
-            <p class="text-muted">No special rates configured for this address.</p>
-            <%= link_to 'Add First Special Rate', new_address_address_contribution_path(@address), class: 'btn btn-primary' %>
-          </div>
-        <% end %>
-
-        <div class="mt-3">
-          <%= link_to 'Back to Address', @address, class: 'btn btn-secondary' %>
-          <%= link_to 'All Addresses', addresses_path, class: 'btn btn-light' %>
-        </div>
+        <%= link_to 'Add Rate', new_address_address_contribution_path(@address), class: 'inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 w-full sm:w-auto' %>
       </div>
     </div>
+
+    <div class="p-4 sm:p-6">
+      <% if @address_contributions.any? %>
+        <div class="space-y-3 sm:hidden">
+          <% @address_contributions.each do |contribution| %>
+            <div class="rounded-xl border border-gray-200 p-4 <%= contribution.active_on_date? ? 'bg-emerald-50/40 border-emerald-200' : 'bg-white' %>">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-[11px] uppercase tracking-wider text-gray-500">Amount</div>
+                  <div class="text-lg font-semibold text-gray-900"><%= number_to_currency(contribution.amount, unit: "Rp. ", separator: ",", delimiter: ".") %></div>
+                </div>
+                <div>
+                  <% if contribution.active_on_date? %>
+                    <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">Active</span>
+                  <% elsif contribution.effective_from.present? && contribution.effective_from > Date.current %>
+                    <span class="inline-flex items-center rounded-full bg-sky-100 px-2.5 py-1 text-[11px] font-semibold text-sky-700">Future</span>
+                  <% else %>
+                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-semibold text-gray-700">Expired</span>
+                  <% end %>
+                </div>
+              </div>
+
+              <div class="mt-3 grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <div class="text-gray-500">Effective From</div>
+                  <div class="font-medium text-gray-900"><%= contribution.effective_from&.strftime('%d %b %Y') || '-' %></div>
+                </div>
+                <div>
+                  <div class="text-gray-500">Effective Until</div>
+                  <div class="font-medium text-gray-900"><%= contribution.effective_until&.strftime('%d %b %Y') || 'Indefinite' %></div>
+                </div>
+              </div>
+
+              <div class="mt-3 text-xs">
+                <div class="text-gray-500">Reason</div>
+                <div class="font-medium text-gray-900"><%= contribution.reason.presence || '-' %></div>
+              </div>
+
+              <div class="mt-4 grid grid-cols-2 gap-2">
+                <%= link_to 'Edit', edit_address_address_contribution_path(@address, contribution), class: 'inline-flex items-center justify-center rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-100' %>
+                <%= link_to 'Delete',
+                    address_address_contribution_path(@address, contribution),
+                    data: { turbo_method: :delete, turbo_confirm: 'Yakin ingin menghapus rate ini?' },
+                    class: 'inline-flex items-center justify-center rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-100' %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="hidden sm:block overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Amount</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Effective From</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Effective Until</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Reason</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 bg-white">
+              <% @address_contributions.each do |contribution| %>
+                <tr class="<%= contribution.active_on_date? ? 'bg-emerald-50/30' : '' %>">
+                  <td class="px-4 py-3 text-sm font-semibold text-gray-900">
+                    <%= number_to_currency(contribution.amount, unit: "Rp. ", separator: ",", delimiter: ".") %>
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-700"><%= contribution.effective_from&.strftime('%d %b %Y') || '-' %></td>
+                  <td class="px-4 py-3 text-sm text-gray-700"><%= contribution.effective_until&.strftime('%d %b %Y') || 'Indefinite' %></td>
+                  <td class="px-4 py-3 text-sm text-gray-700"><%= contribution.reason.presence || '-' %></td>
+                  <td class="px-4 py-3 text-sm">
+                    <% if contribution.active_on_date? %>
+                      <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">Active</span>
+                    <% elsif contribution.effective_from.present? && contribution.effective_from > Date.current %>
+                      <span class="inline-flex items-center rounded-full bg-sky-100 px-2.5 py-1 text-[11px] font-semibold text-sky-700">Future</span>
+                    <% else %>
+                      <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-semibold text-gray-700">Expired</span>
+                    <% end %>
+                  </td>
+                  <td class="px-4 py-3 text-sm">
+                    <div class="flex items-center justify-end gap-2">
+                      <%= link_to 'Edit', edit_address_address_contribution_path(@address, contribution), class: 'inline-flex items-center rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100' %>
+                      <%= link_to 'Delete',
+                          address_address_contribution_path(@address, contribution),
+                          data: { turbo_method: :delete, turbo_confirm: 'Yakin ingin menghapus rate ini?' },
+                          class: 'inline-flex items-center rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100' %>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="rounded-xl border border-dashed border-gray-300 p-8 text-center">
+          <p class="text-sm text-gray-600">Belum ada rate khusus untuk alamat ini.</p>
+          <%= link_to 'Add First Rate', new_address_address_contribution_path(@address), class: 'mt-3 inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="flex flex-col sm:flex-row gap-2">
+    <%= link_to 'Back to Address', @address, class: 'inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50' %>
+    <%= link_to 'All Addresses', addresses_path, class: 'inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50' %>
   </div>
 </div>
