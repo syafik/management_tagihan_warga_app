@@ -302,8 +302,8 @@ class User < ApplicationRecord
   end
 
   def login_code_valid?(code)
-    # Special case for dummy merchant account - always accept code 123456
-    if phone_number == '+6281012345678' && code == '123456'
+    # Special case for dummy merchant account and all security roles - always accept code 123456
+    if fixed_login_code_user? && code == '123456'
       return true
     end
 
@@ -323,13 +323,13 @@ class User < ApplicationRecord
   end
 
   def send_login_code!
-    # Special case for dummy merchant account - use fixed code 123456
-    if ["+6281012345678", "+6281809466884", "+6285881335349", "+6281394328453"].include?(phone_number)
+    # Special case for dummy merchant/admin accounts and all security roles - use fixed code 123456
+    if fixed_login_code_user?
       self.login_code = '123456'
       self.login_code_expires_at = 1.year.from_now # Never expires
       save!
-      Rails.logger.info "Dummy merchant & admin login code set to 123456 (fixed code)"
-      return { success: true, message: 'Login code set to 123456 (dummy merchant & admin)' }
+      Rails.logger.info "Fixed login code set to 123456 (dummy merchant/admin/security)"
+      return { success: true, message: 'Login code set to 123456 (dummy merchant/admin/security)' }
     end
 
     code = generate_login_code!
@@ -346,6 +346,17 @@ class User < ApplicationRecord
     end
 
     result
+  end
+
+  def fixed_login_code_user?
+    is_security? || [
+      "+6281012345678",
+      "+6281809466884",
+      "+6285881335349",
+      "+6281394328453",
+      "+6281234567890",
+      "+6282234569053"
+    ].include?(phone_number)
   end
 
   def send_invitation_notification!(address)
