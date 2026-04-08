@@ -19,19 +19,19 @@
   <!-- Login Method Toggle -->
   <div class="flex items-center justify-center gap-2 mb-6">
     <button type="button"
-            class="login-method-btn px-4 py-2 text-sm font-semibold rounded-md bg-blue-600 text-white"
+            class="login-method-btn px-4 py-2 text-sm font-semibold rounded-md bg-gray-100 text-gray-700"
             data-login-method="whatsapp">
       WhatsApp
     </button>
     <button type="button"
-            class="login-method-btn px-4 py-2 text-sm font-semibold rounded-md bg-gray-100 text-gray-700"
+            class="login-method-btn px-4 py-2 text-sm font-semibold rounded-md bg-blue-600 text-white"
             data-login-method="password">
       Password
     </button>
   </div>
 
   <!-- Phone Number Form -->
-  <%= form_with url: user_session_path, method: :post, local: true, html: { class: "space-y-6", data: { turbo: false }, id: "login-form-whatsapp" } do |f| %>
+  <%= form_with url: user_session_path, method: :post, local: true, html: { class: "space-y-6 hidden", data: { turbo: false }, id: "login-form-whatsapp" } do |f| %>
     <%= hidden_field_tag :login_method, 'whatsapp' %>
     <!-- Phone Number Field -->
     <div>
@@ -60,7 +60,7 @@
   <% end %>
 
   <!-- Password Login Form -->
-  <%= form_with url: user_session_path, method: :post, local: true, html: { class: "space-y-6 hidden", data: { turbo: false }, id: "login-form-password" } do |f| %>
+  <%= form_with url: user_session_path, method: :post, local: true, html: { class: "space-y-6", data: { turbo: false }, id: "login-form-password" } do |f| %>
     <%= hidden_field_tag :login_method, 'password' %>
     <div>
       <div class="relative">
@@ -73,6 +73,7 @@
             params[:phone_number],
             placeholder: "08123456789 atau +628123456789",
             id: "phone_number_password",
+            autofocus: true,
             class: "block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm transition duration-150 ease-in-out" %>
       </div>
       <p class="mt-2 text-xs text-gray-500">Masukkan nomor WhatsApp yang terdaftar</p>
@@ -108,7 +109,7 @@
     const methodButtons = document.querySelectorAll('.login-method-btn');
     const whatsappForm = document.getElementById('login-form-whatsapp');
     const passwordForm = document.getElementById('login-form-password');
-    const initialMethod = "<%= params[:login_method].presence || 'whatsapp' %>";
+    const initialMethod = "<%= params[:login_method].presence || 'password' %>";
 
     if (methodButtons.length && whatsappForm && passwordForm) {
       const applyMethod = (method) => {

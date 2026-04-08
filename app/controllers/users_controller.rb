@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 class UsersController < ApplicationController
-  before_action :set_user, only: %i[show edit update destroy]
+  before_action :set_user, only: %i[show edit update destroy setup_password]
   before_action :check_user_authorization, only: %i[edit update]
+  before_action :check_admin_authorization, only: %i[setup_password]
   before_action :check_invite_authorization, only: %i[create]
   skip_before_action :action_allowed, only: %i[edit update create]
 
@@ -75,6 +76,44 @@ class UsersController < ApplicationController
   end
 
   def pic_retribution; end
+
+  def setup_password
+    return unless request.patch?
+
+    if setup_password_params[:password].blank?
+      @user.assign_attributes(setup_password_params)
+      @user.errors.add(:password, 'harus diisi')
+      render :setup_password, status: :unprocessable_entity
+      return
+    end
+
+    respond_to do |format|
+      if @user.update(setup_password_params)
+        format.html { redirect_to users_path, notice: "Password untuk #{@user.name} berhasil diset." }
+        format.json { render :show, status: :ok, location: @user }
+      else
+        format.html { render :setup_password, status: :unprocessable_entity }
+        format.json { render json: @user.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  def edit_password; end
+
+  def update_password
+    if update_password_params[:password].blank?
+      current_user.assign_attributes(update_password_params)
+      current_user.errors.add(:password, 'harus diisi')
+      render :edit_password, status: :unprocessable_entity
+      return
+    end
+
+    if current_user.update(update_password_params)
+      redirect_to user_path(current_user), notice: 'Password berhasil diperbarui.'
+    else
+      render :edit_password, status: :unprocessable_entity
+    end
+  end
 
   # DELETE /users/1
   # DELETE /users/1.json
@@ -166,17 +205,32 @@ class UsersController < ApplicationController
     end
   end
 
+  def check_admin_authorization
+    return if current_user.is_admin?
+
+    redirect_to root_path, alert: 'Anda tidak berhak mengakses fitur setup password.'
+  end
+
+  def setup_password_params
+    params.require(:user).permit(:password, :password_confirmation)
+  end
+
+  def update_password_params
+    params.require(:user).permit(:password, :password_confirmation)
+  end
+
   # Only allow a list of trusted parameters through.
   def user_params
     # Restrict parameters based on user role
-    if current_user.is_warga? && current_user == @user
-      # Warga users can only edit their own basic profile info
+    if !current_user.is_admin? && current_user == @user
+      # Non-admin users can only edit their own basic profile info.
       params.fetch(:user, {}).permit(:email, :name, :phone_number, :avatar)
-    else
-      # Admin users can edit all fields
-      permitted_params = params.fetch(:user, {}).permit(:email, :name, :phone_number, :password, :contribution, :block_address, :role,
-                                     :pic_blok, :avatar, :address_id, :allow_manage_transfer, :allow_manage_expense,
-                                     address_ids: [])
+    elsif current_user.is_admin?
+      permitted_params = params.fetch(:user, {}).permit(
+        :email, :name, :phone_number, :password, :contribution, :block_address, :role,
+        :pic_blok, :avatar, :address_id, :allow_manage_transfer, :allow_manage_expense,
+        address_ids: []
+      )
 
       # Filter out empty strings from address_ids array
       if permitted_params[:address_ids].present?
@@ -186,6 +240,8 @@ class UsersController < ApplicationController
       end
 
       permitted_params
+    else
+      {}
     end
   end
 end

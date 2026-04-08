@@ -91,7 +91,14 @@ Rails.application.routes.draw do
   post '/phone_login/authenticate', to: 'phone_logins#authenticate', as: :authenticate_phone_login
   post '/phone_login/resend', to: 'phone_logins#resend', as: :resend_phone_login
   resources :users do
+    member do
+      get :setup_password
+      patch :setup_password
+    end
+
     collection do
+      get :edit_password
+      patch :update_password
       match :search, via: %i[get post]
     end
   end
