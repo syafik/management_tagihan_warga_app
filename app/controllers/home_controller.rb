@@ -9,8 +9,9 @@ class HomeController < ApplicationController
     @year_selected = (params[:year] || @current_year).to_i
     @year_selected = [[@year_selected, @starting_year].max, @current_year].min
     @starting_balance = AppSetting.starting_balance
+    @cash_balance_until = Date.current.beginning_of_month - 1.day
     
-    # Monthly income/outcome data for current year (2025)
+    # Monthly income/outcome data for the selected chart year.
     begin
       @monthly_financial_data = calculate_monthly_financial_data
       Rails.logger.debug "Monthly financial data: #{@monthly_financial_data.inspect}"
@@ -25,17 +26,11 @@ class HomeController < ApplicationController
         @contribution_percentage = calculate_contribution_percentage
         @overall_cash_balance = calculate_overall_cash_balance
         @monthly_contribution_stats = calculate_monthly_contribution_stats
-        @total_income_year = calculate_total_income_year
-        @total_outcome_year = calculate_total_outcome_year
-        @year_balance = @total_income_year - @total_outcome_year
       rescue => e
         Rails.logger.error "Failed to calculate contribution data: #{e.message}"
         @contribution_percentage = 0
         @overall_cash_balance = 0
         @monthly_contribution_stats = []
-        @total_income_year = 0
-        @total_outcome_year = 0
-        @year_balance = 0
       end
     end
     
@@ -121,16 +116,15 @@ class HomeController < ApplicationController
 
   def calculate_overall_cash_balance
     start_date = Date.new(@starting_year, 1, 1)
-    end_date = Date.current.beginning_of_month - 1.day
 
     total_income = CashTransaction.where(
       transaction_type: CashTransaction::TYPE['DEBIT'],
-      transaction_date: start_date..end_date
+      transaction_date: start_date..@cash_balance_until
     ).sum(:total)
 
     total_outcome = CashTransaction.where(
       transaction_type: CashTransaction::TYPE['KREDIT'],
-      transaction_date: start_date..end_date
+      transaction_date: start_date..@cash_balance_until
     ).sum(:total)
 
     @starting_balance + total_income - total_outcome
@@ -162,20 +156,6 @@ class HomeController < ApplicationController
         }
       end
     end
-  end
-
-  def calculate_total_income_year
-    CashTransaction.where(
-      transaction_type: CashTransaction::TYPE['DEBIT'],
-      transaction_date: yearly_date_range
-    ).sum(:total)
-  end
-
-  def calculate_total_outcome_year
-    CashTransaction.where(
-      transaction_type: CashTransaction::TYPE['KREDIT'],
-      transaction_date: yearly_date_range
-    ).sum(:total)
   end
 
   def yearly_date_range

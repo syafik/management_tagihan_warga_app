@@ -90,26 +90,21 @@
     </div>
 
     <% unless current_user&.is_security? %>
-      <!-- Financial Summary Cards -->
+      <!-- Cash Balance Summary -->
       <div class="space-y-3 sm:space-y-4">
         <div class="flex items-center justify-between gap-2">
           <div>
             <h2 class="text-sm sm:text-base font-semibold text-gray-900">Ringkasan Keuangan</h2>
-            <p class="text-[11px] sm:text-xs text-gray-500">Filter ringkasan per tahun.</p>
+            <p class="text-[11px] sm:text-xs text-gray-500">Saldo kas dihitung sampai akhir bulan sebelumnya.</p>
           </div>
-          <%= form_with url: root_path, method: :get, local: true, class: "flex items-center gap-2" do %>
-            <label for="year" class="hidden sm:inline text-xs font-medium text-gray-600">Tahun</label>
-            <%= select_tag :year,
-                options_for_select((@starting_year..@current_year).to_a, @year_selected),
-                class: "rounded-md border-gray-300 text-xs sm:text-sm py-1.5",
-                onchange: "this.form.submit()" %>
-          <% end %>
         </div>
-        <div class="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="grid grid-cols-1 gap-3 sm:gap-4">
         <!-- Current Cash Balance -->
         <div class="bg-gradient-to-r <%= @overall_cash_balance >= 0 ? 'from-green-400 to-green-600' : 'from-red-400 to-red-600' %> overflow-hidden shadow-sm rounded-xl">
           <div class="p-3 sm:p-4">
-            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">Saldo Kas Saat Ini (Sejak <%= @starting_year %>)</dt>
+            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">
+              Saldo Kas Sampai <%= l(@cash_balance_until, format: :long, locale: :id) %>
+            </dt>
             <dd class="text-lg sm:text-xl font-bold text-white break-all">
               Rp <%= number_with_delimiter(@overall_cash_balance.abs, delimiter: '.') %>
             </dd>
@@ -118,45 +113,24 @@
             </p>
           </div>
         </div>
-
-        <!-- Total Income <%= @year_selected %> -->
-        <div class="bg-gradient-to-r from-blue-400 to-blue-600 overflow-hidden shadow-sm rounded-xl">
-          <div class="p-3 sm:p-4">
-            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">Pemasukan <%= @year_selected %></dt>
-            <dd class="text-lg sm:text-xl font-bold text-white break-all">
-              Rp <%= number_with_delimiter(@total_income_year, delimiter: '.') %>
-            </dd>
-          </div>
-        </div>
-
-        <!-- Total Outcome <%= @year_selected %> -->
-        <div class="bg-gradient-to-r from-red-400 to-red-600 overflow-hidden shadow-sm rounded-xl">
-          <div class="p-3 sm:p-4">
-            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">Pengeluaran <%= @year_selected %></dt>
-            <dd class="text-lg sm:text-xl font-bold text-white break-all">
-              Rp <%= number_with_delimiter(@total_outcome_year, delimiter: '.') %>
-            </dd>
-          </div>
-        </div>
-
-        <!-- Year Balance -->
-        <div class="bg-gradient-to-r from-indigo-400 to-indigo-600 overflow-hidden shadow-sm rounded-xl">
-          <div class="p-3 sm:p-4">
-            <dt class="text-[11px] sm:text-xs font-medium text-white/90 mb-1">Saldo Tahun <%= @year_selected %></dt>
-            <dd class="text-lg sm:text-xl font-bold text-white break-all">
-              Rp <%= number_with_delimiter(@year_balance, delimiter: '.') %>
-            </dd>
-          </div>
-        </div>
         </div>
       </div>
 
       <!-- Monthly Financial Chart -->
       <div class="bg-white border border-gray-100 shadow-sm rounded-xl">
         <div class="px-3 py-3 sm:px-6 sm:py-5">
-          <div class="flex items-center justify-between mb-2 sm:mb-4">
-            <h3 class="text-sm sm:text-base font-semibold text-gray-900">Grafik <%= @year_selected %></h3>
-            <span class="text-[11px] sm:text-xs text-gray-500">Pemasukan vs Pengeluaran</span>
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-2 sm:mb-4">
+            <div>
+              <h3 class="text-sm sm:text-base font-semibold text-gray-900">Grafik Kas Tahunan</h3>
+              <p class="text-[11px] sm:text-xs text-gray-500">Pemasukan vs Pengeluaran <%= @year_selected %></p>
+            </div>
+            <%= form_with url: root_path, method: :get, local: true, class: "flex items-center gap-2" do %>
+              <label for="year" class="text-xs font-medium text-gray-600">Tahun grafik</label>
+              <%= select_tag :year,
+                  options_for_select((@starting_year..@current_year).to_a, @year_selected),
+                  class: "rounded-md border-gray-300 text-xs sm:text-sm py-1.5",
+                  onchange: "this.form.submit()" %>
+            <% end %>
           </div>
           <div class="relative h-56 sm:h-64">
             <canvas
