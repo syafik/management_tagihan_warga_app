@@ -76,9 +76,7 @@ class PaymentsController < ApplicationController
     # Calculate contribution total
     contribution_total = @months_to_pay.sum { |m| m[:amount] }
 
-    # Calculate fee and total with fee
     tripay_service = TripayService.new
-    payment_breakdown = tripay_service.calculate_total_with_fee(contribution_total)
 
     # Build month list for order description
     month_names = UserContribution::MONTHNAMES.invert
@@ -91,14 +89,18 @@ class PaymentsController < ApplicationController
     end
 
     begin
-      # Create payment via Tripay with total including fee
+      # Send the contribution amount to Tripay and use the API response as the
+      # source of truth for customer-facing fees and totals.
       tripay_data = tripay_service.create_transaction(
         user: current_user,
         address: @address,
-        amount: payment_breakdown[:total], # Total sudah include fee
+        amount: contribution_total,
         months: months_list,
         base_url: request.base_url
       )
+
+      fee_customer = tripay_data['fee_customer'].to_i
+      total_amount = tripay_data['amount'].to_i + fee_customer
 
       # Save payment record
       # IMPORTANT: We save merchant_ref as reference (for callback lookup)
@@ -107,7 +109,7 @@ class PaymentsController < ApplicationController
         reference: tripay_data['merchant_ref'], # OUR reference for callback
         user: current_user,
         address: @address,
-        amount: payment_breakdown[:total], # Total yang dibayar (sudah include fee)
+        amount: total_amount,
         status: 'UNPAID',
         payment_method: 'QRIS',
         payment_channel: tripay_data['payment_method'],
@@ -115,9 +117,9 @@ class PaymentsController < ApplicationController
         qr_url: tripay_data['qr_url'],
         expired_at: Time.at(tripay_data['expired_time']),
         tripay_response: tripay_data.merge({
-          'contribution_amount' => payment_breakdown[:contribution],
-          'fee_amount' => payment_breakdown[:fee],
-          'total_amount' => payment_breakdown[:total],
+          'contribution_amount' => contribution_total,
+          'fee_amount' => fee_customer,
+          'total_amount' => total_amount,
           'tripay_reference' => tripay_data['reference'] # Tripay's reference
         }),
         notes: "#{months_list.join(', ')} - #{@months_to_pay.to_json}"

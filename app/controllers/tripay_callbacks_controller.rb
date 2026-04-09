@@ -69,10 +69,17 @@ class TripayCallbacksController < ApplicationController
       paid_at = callback_params[:paid_at] ? Time.at(callback_params[:paid_at]) : Time.current
       payment.mark_as_paid!(paid_at)
 
+      callback_data = callback_params.to_unsafe_h
+      fee_customer = callback_data['fee_customer'].to_i
+      total_amount = callback_data['total_amount'].to_i
+
       # Update tripay_response with full callback data
       payment.update!(
+        amount: total_amount.positive? ? total_amount : payment.amount,
         tripay_response: payment.tripay_response.merge(
-          'callback_received' => callback_params.to_unsafe_h,
+          'fee_amount' => fee_customer,
+          'total_amount' => total_amount.positive? ? total_amount : payment.amount,
+          'callback_received' => callback_data,
           'callback_received_at' => Time.current.to_s
         )
       )
