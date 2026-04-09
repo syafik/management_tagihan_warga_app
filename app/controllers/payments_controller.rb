@@ -100,7 +100,9 @@ class PaymentsController < ApplicationController
       )
 
       fee_customer = tripay_data['fee_customer'].to_i
-      total_amount = tripay_data['amount'].to_i + fee_customer
+      total_amount = tripay_data['total_amount'].to_i
+      total_amount = tripay_data['amount'].to_i if total_amount.zero?
+      total_amount = contribution_total + fee_customer if total_amount.zero?
 
       # Save payment record
       # IMPORTANT: We save merchant_ref as reference (for callback lookup)
