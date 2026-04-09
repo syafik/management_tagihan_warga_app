@@ -7,18 +7,17 @@ class TripayService
     @private_key = @credentials[:private_key]
     @merchant_code = @credentials[:merchant_code]
     @base_url = @credentials[:base_url]
-    # Payment method can be configured in credentials or use default
-    # Sandbox: QRIS2 or QRISC
-    # Production: QRIS (after enabled in Tripay dashboard)
-    @payment_method = @credentials[:payment_method] || 'QRIS2'
+    # Payment method can be configured in credentials or fall back by environment.
+    # Non-production defaults to sandbox QRIS2, production defaults to QRIS.
+    @payment_method = @credentials[:payment_method] || default_payment_method
   end
 
   # Create closed payment transaction (QRIS)
-  def create_transaction(user:, address:, amount:, months: [], return_url: nil)
+  def create_transaction(user:, address:, amount:, months: [], return_url: nil, base_url: nil)
     reference = generate_reference
 
     # Build return URL - use provided or construct from host
-    payment_return_url = return_url || build_return_url(reference)
+    payment_return_url = return_url || build_return_url(reference, base_url: base_url)
 
     payload = {
       method: @payment_method,
@@ -90,25 +89,23 @@ class TripayService
 
   private
 
-  def build_return_url(reference)
-    # Try to get from ENV first
-    base_url = ENV['APP_URL'] || ENV['RAILS_HOST']
+  def default_payment_method
+    Rails.env.production? ? 'QRIS' : 'QRIS2'
+  end
 
-    if base_url.present?
-      # Remove trailing slash if present
-      base_url = base_url.chomp('/')
-      return "#{base_url}/payments/#{reference}"
+  def build_return_url(reference, base_url: nil)
+    resolved_base_url = ENV['APP_URL'].presence ||
+      ENV['RAILS_HOST'].presence ||
+      base_url.presence
+
+    if resolved_base_url.present?
+      resolved_base_url = resolved_base_url.chomp('/')
+      return "#{resolved_base_url}/payments/#{reference}"
     end
 
-    # Fallback: construct from Rails default host
-    # For development, use localhost:3000
-    # For production, this should be set in ENV
-    if Rails.env.development?
-      "http://localhost:5100/payments/#{reference}"
-    else
-      # In production, you MUST set APP_URL environment variable
-      raise TripayError, "APP_URL environment variable is not set. Required for return_url."
-    end
+    return "http://localhost:5100/payments/#{reference}" if Rails.env.development? || Rails.env.test?
+
+    raise TripayError, "APP_URL environment variable is not set and request host is unavailable. Required for return_url."
   end
 
   def generate_reference

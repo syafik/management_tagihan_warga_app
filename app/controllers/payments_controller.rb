@@ -96,7 +96,8 @@ class PaymentsController < ApplicationController
         user: current_user,
         address: @address,
         amount: payment_breakdown[:total], # Total sudah include fee
-        months: months_list
+        months: months_list,
+        base_url: request.base_url
       )
 
       # Save payment record

@@ -121,7 +121,7 @@
                 <img src="<%= @payment.qr_url %>"
                      alt="QR Code"
                      class="w-64 h-64 object-contain"
-                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-64 h-64 bg-gray-100 flex items-center justify-center flex-col p-4\'><span class=\'text-gray-600 text-center text-sm mb-2\'>QR Code (Sandbox Mode)</span><a href=\'<%= @payment.qr_url %>\' target=\'_blank\' class=\'text-blue-600 hover:text-blue-800 underline text-xs\'>Buka QR Code di tab baru</a></div>';">
+                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-64 h-64 bg-gray-100 flex items-center justify-center flex-col p-4\'><span class=\'text-gray-600 text-center text-sm mb-2\'>QR Code tidak dapat ditampilkan di halaman ini</span><a href=\'<%= @payment.qr_url %>\' target=\'_blank\' class=\'text-blue-600 hover:text-blue-800 underline text-xs\'>Buka QR Code di tab baru</a></div>';">
               <% else %>
                 <div class="w-64 h-64 bg-gray-100 flex items-center justify-center">
                   <span class="text-gray-400">QR Code tidak tersedia</span>
